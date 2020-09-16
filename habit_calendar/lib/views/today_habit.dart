@@ -24,6 +24,9 @@ class TodayHabit extends StatelessWidget {
               ),
               const Text(
                 '꾸준히 하려면\n작게해야 합니다',
+                style: TextStyle(
+                  fontSize: 30.0,
+                ),
               ),
               const SizedBox(
                 height: 100.0,
