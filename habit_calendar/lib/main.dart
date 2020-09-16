@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:habit_calendar/service/database.dart';
+import 'package:habit_calendar/services/database.dart';
+import 'package:habit_calendar/views/home.dart';
 
 Future<void> main() async {
   _initServices();
@@ -19,22 +20,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      home: MyHome(),
-    );
-  }
-}
-
-class MyHome extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Container(
-            child: Text("test"),
-          ),
-        ),
-      ),
+      theme: ThemeData(
+          textTheme: TextTheme(
+        headline1: TextStyle(fontSize: 60.0),
+      )),
+      home: Home(),
     );
   }
 }
