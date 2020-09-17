@@ -4,8 +4,8 @@ class Habit {
   int id;
   String name;
   String description;
-  //DayOfTheWeek dayOfTheWeek;
-  DateTime when;
+  List<DayOfTheWeek> dotw = List<DayOfTheWeek>();
+  DateTime whatTime;
   Duration notificationTime;
   bool statusBarFix;
   int groupId;
@@ -15,8 +15,7 @@ class Habit {
     this.id,
     this.name,
     this.description,
-    //this.dayOfTheWeek,
-    this.when,
+    this.whatTime,
     this.notificationTime,
     this.statusBarFix,
     this.groupId,
@@ -27,8 +26,9 @@ class Habit {
       : id = json['id'],
         name = json['name'],
         description = json['description'],
-        //dayOfTheWeek = DayOfTheWeek.values[json['day_of_the_week']],
-        when = json['when'] != null ? DateTime.parse(json['when']) : null,
+        whatTime = json['what_time'] != null
+            ? DateTime.parse(json['what_time'])
+            : null,
         notificationTime = json['notification_time'] != null
             ? Duration(seconds: json['notification_time'])
             : null,
@@ -40,11 +40,34 @@ class Habit {
         'id': id,
         'name': name,
         'description': description,
-        //'day_of_the_week': dayOfTheWeek.index,
-        'when': when.toIso8601String(),
+        'what_time': whatTime.toIso8601String(),
         'notification_time': notificationTime.inSeconds,
         'status_bar_fix': statusBarFix ? 1 : 0,
         'group_id': groupId,
         'notification_type_id': notificationTypeId,
       };
+
+  void dotwFromJsons(List<Map<String, dynamic>> jsons) {
+    dotw = List<DayOfTheWeek>();
+    jsons.forEach((element) {
+      if (element['habit_id'] == id)
+        dotw.add(DayOfTheWeek.values[element['week'] - 1]);
+    });
+  }
+
+  List<Map<String, dynamic>> dotwToJsons() {
+    var result = List<Map<String, dynamic>>();
+    dotw.forEach((element) {
+      result.add(
+        {
+          'habit_id': id,
+          'week': element.index + 1,
+        },
+      );
+    });
+    return result;
+  }
+
+  String toString() =>
+      'id: $id, name: $name, description: $description, dotw: $dotw, whatTime: $whatTime, notificationTime: $notificationTime, statusBarFix: $statusBarFix, groupId: $groupId, notificationTypeId: $notificationTypeId';
 }

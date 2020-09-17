@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:habit_calendar/services/database.dart';
+import 'package:habit_calendar/services/database/database.dart';
 import 'package:habit_calendar/views/home.dart';
 
 Future<void> main() async {
-  _initServices();
+  await _initServices();
   runApp(MyApp());
 }
 
-void _initServices() async {
+Future<void> _initServices() async {
   print('starting services ...');
   await Get.putAsync(() => DbService().init());
   print('All services started...');
@@ -20,10 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      theme: ThemeData(
-          textTheme: TextTheme(
-        headline1: TextStyle(fontSize: 60.0),
-      )),
+      theme: ThemeData.light().copyWith(primaryColor: Colors.teal[300]),
       home: Home(),
     );
   }

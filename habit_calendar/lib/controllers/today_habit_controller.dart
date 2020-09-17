@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:habit_calendar/enums/completion.dart';
 import 'package:habit_calendar/models/event.dart';
 import 'package:habit_calendar/models/habit.dart';
 import 'package:habit_calendar/test_data.dart';
@@ -9,9 +10,12 @@ class TodayHabitController extends GetxController {
   List<Event> todayEvents = List<Event>();
 
   TodayHabitController() {
-    for (int i = 0; i < 2; i++) {
-      todayHabits.add(Habit.fromJson(fakeHabits[i]));
+    for (int i = 0; i < fakeHabits.length; i++) {
+      todayHabits.add(Habit.fromJson(fakeHabits[i])..dotwFromJsons(fakeDotws));
     }
+    fakeEvents.forEach((element) {
+      todayEvents.add(Event.fromJson(element));
+    });
   }
   String get formedToday => '${today.month}월 ${today.day}일 ($weekdayString)';
   String get weekdayString {
@@ -35,9 +39,13 @@ class TodayHabitController extends GetxController {
     }
   }
 
+  int get completedEvent => todayEvents
+      .where((element) => element.completion != Completion.No)
+      .length;
+
   double get todayPercentage {
     if (todayEvents.length == 0 || todayHabits.length == 0) return 0;
-    return todayEvents.length / todayHabits.length;
+    return completedEvent / todayHabits.length;
   }
 
   String formWhen(DateTime when) {
@@ -47,4 +55,6 @@ class TodayHabitController extends GetxController {
     else
       return 'PM ${when.hour - 12}:${when.minute}';
   }
+
+  Future<void> addEvent() {}
 }

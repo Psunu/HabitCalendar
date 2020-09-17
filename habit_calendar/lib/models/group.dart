@@ -17,4 +17,6 @@ class Group {
         'name': name,
         'color': color.value,
       };
+
+  String toString() => 'id: $id, name: $name, color: $color';
 }

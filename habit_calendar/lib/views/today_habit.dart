@@ -22,11 +22,9 @@ class TodayHabit extends StatelessWidget {
               const SizedBox(
                 height: 20.0,
               ),
-              const Text(
-                '꾸준히 하려면\n작게해야 합니다',
-                style: TextStyle(
-                  fontSize: 30.0,
-                ),
+              Text(
+                '꾸준히 하려면\n작게 해야 합니다',
+                style: Get.textTheme.headline4.copyWith(color: Colors.black),
               ),
               const SizedBox(
                 height: 100.0,
@@ -77,11 +75,21 @@ class TodayHabit extends StatelessWidget {
           height: 90.0,
           child: Row(
             children: [
-              Text(controller.formWhen(element.when)),
-              SizedBox(
-                width: 10.0,
+              Expanded(
+                flex: 1,
+                child: Text(
+                  controller.formWhen(element.whatTime),
+                ),
               ),
-              Text(element.name),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
+                child: VerticalDivider(),
+              ),
+              Expanded(
+                flex: 4,
+                child: Text(element.name),
+              ),
             ],
           ),
         ),
