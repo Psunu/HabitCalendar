@@ -7,16 +7,22 @@ class Group {
 
   Group(this.id, this.name, this.color);
 
+  static final tableName = 'groups';
+  static final columnId = 'id';
+  static final columnName = 'name';
+  static final columnColor = 'color';
+
   Group.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
-        name = json['name'],
-        color = Color(json['color']);
+      : id = json[columnId],
+        name = json[columnName],
+        color = Color(json[columnColor]);
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'color': color.value,
+        columnId: id,
+        columnName: name,
+        columnColor: color.value,
       };
 
-  String toString() => 'id: $id, name: $name, color: $color';
+  String toString() =>
+      '$columnId: $id, $columnName: $name, $columnColor: $color';
 }

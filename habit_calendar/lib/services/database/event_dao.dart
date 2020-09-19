@@ -1,5 +1,6 @@
 import 'package:habit_calendar/classes/dao.dart';
 import 'package:habit_calendar/models/event.dart';
+import 'package:habit_calendar/models/habit.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:get/get.dart';
 
@@ -12,26 +13,26 @@ class EventDao extends Dao {
 
   Future<void> createTable() async {
     super.database.execute('''
-      CREATE TABLE events (
-        id INTEGER PRIMARY KEY,
-        date TEXT NOT NULL,
-        completion INTEGER NOT NULL,
-        habit_id INTEGER NOT NULL,
-        FOREIGN KEY (habit_id) REFERENCES habits (id) ON UPDATE CASCADE ON DELETE CASCADE
+      CREATE TABLE ${Event.tableName} (
+        ${Event.columnId} INTEGER PRIMARY KEY,
+        ${Event.columnDate} TEXT NOT NULL,
+        ${Event.columnCompletion} INTEGER NOT NULL,
+        ${Event.columnHabitId} INTEGER NOT NULL,
+        FOREIGN KEY (${Event.columnHabitId}) REFERENCES habits (${Habit.columnId}) ON UPDATE CASCADE ON DELETE CASCADE
       );
     ''');
   }
 
   Future<List<Event>> getAll() async {
     final List<Map<String, dynamic>> maps =
-        await super.database.query('events');
+        await super.database.query(Event.tableName);
     events = List.generate(maps.length, (i) => Event.fromJson(maps[i]));
     return events;
   }
 
   Future<void> insert(Event event) async {
     await super.database.insert(
-          'events',
+          Event.tableName,
           event.toJson(),
           conflictAlgorithm: conflictAlgorithm,
         );

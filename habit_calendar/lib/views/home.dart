@@ -26,6 +26,9 @@ class Home extends StatelessWidget {
             ),
           ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: controller.addHabit,
+        ),
       ),
     );
   }

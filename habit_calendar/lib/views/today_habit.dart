@@ -6,7 +6,7 @@ import 'package:habit_calendar/controllers/today_habit_controller.dart';
 class TodayHabit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<TodayHabitController>(
+    return GetX<TodayHabitController>(
       init: TodayHabitController(),
       builder: (controller) => SingleChildScrollView(
         child: Container(

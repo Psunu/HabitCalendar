@@ -2,21 +2,31 @@ import 'package:get/get.dart';
 import 'package:habit_calendar/enums/completion.dart';
 import 'package:habit_calendar/models/event.dart';
 import 'package:habit_calendar/models/habit.dart';
+import 'package:habit_calendar/services/database/database.dart';
+import 'package:habit_calendar/services/database/habit_dao.dart';
 import 'package:habit_calendar/test_data.dart';
 
 class TodayHabitController extends GetxController {
   DateTime today = DateTime.now();
-  List<Habit> todayHabits = List<Habit>();
-  List<Event> todayEvents = List<Event>();
+  RxList<Habit> todayHabits = List<Habit>().obs;
+  var todayEvents = List<Event>();
+  final DbService _dbService = Get.find<DbService>();
 
   TodayHabitController() {
-    for (int i = 0; i < fakeHabits.length; i++) {
-      todayHabits.add(Habit.fromJson(fakeHabits[i])..dotwFromJsons(fakeDotws));
-    }
+    // for (int i = 0; i < fakeHabits.length; i++) {
+    //   todayHabits.add(Habit.fromJson(fakeHabits[i])..weekFromJsons(fakeDotws));
+    // }
     fakeEvents.forEach((element) {
       todayEvents.add(Event.fromJson(element));
     });
   }
+
+  @override
+  void onInit() async {
+    todayHabits = await _dbService.getDao<HabitDao>().getAll();
+    super.onInit();
+  }
+
   String get formedToday => '${today.month}월 ${today.day}일 ($weekdayString)';
   String get weekdayString {
     switch (today.weekday) {
@@ -55,6 +65,4 @@ class TodayHabitController extends GetxController {
     else
       return 'PM ${when.hour - 12}:${when.minute}';
   }
-
-  Future<void> addEvent() {}
 }

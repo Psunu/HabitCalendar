@@ -2,25 +2,31 @@ import 'package:habit_calendar/enums/completion.dart';
 
 class Event {
   int id;
-  Completion completion;
   DateTime date;
+  Completion completion;
   int habitId;
 
   Event(this.id, this.date, this.completion, this.habitId);
 
+  static final tableName = 'events';
+  static final columnId = 'id';
+  static final columnDate = 'date';
+  static final columnCompletion = 'completion';
+  static final columnHabitId = 'habit_id';
+
   Event.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
-        date = DateTime.parse(json['date']),
-        completion = Completion.values[json['completion']],
-        habitId = json['habit_id'];
+      : id = json[columnId],
+        date = DateTime.parse(json[columnDate]),
+        completion = Completion.values[json[columnCompletion]],
+        habitId = json[columnHabitId];
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'date': date.toIso8601String(),
-        'completion': completion.index,
-        'habit_id': habitId,
+        columnId: id,
+        columnDate: date.toIso8601String(),
+        columnCompletion: completion.index,
+        columnHabitId: habitId,
       };
 
   String toString() =>
-      'id: $id, date: $date, completion: $completion, habitId: $habitId';
+      '$columnId: $id, $columnDate: $date, $columnCompletion: $completion, $columnHabitId: $habitId';
 }
