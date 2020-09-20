@@ -1,29 +1,19 @@
 import 'package:get/get.dart';
 import 'package:habit_calendar/enums/completion.dart';
-import 'package:habit_calendar/models/event.dart';
-import 'package:habit_calendar/models/habit.dart';
-import 'package:habit_calendar/services/database/database.dart';
-import 'package:habit_calendar/services/database/habit_dao.dart';
-import 'package:habit_calendar/test_data.dart';
+import 'package:habit_calendar/services/database/app_database.dart';
+import 'package:habit_calendar/services/database/db_service.dart';
 
 class TodayHabitController extends GetxController {
   DateTime today = DateTime.now();
   RxList<Habit> todayHabits = List<Habit>().obs;
-  var todayEvents = List<Event>();
-  final DbService _dbService = Get.find<DbService>();
+  RxList<Event> todayEvents = List<Event>().obs;
 
-  TodayHabitController() {
-    // for (int i = 0; i < fakeHabits.length; i++) {
-    //   todayHabits.add(Habit.fromJson(fakeHabits[i])..weekFromJsons(fakeDotws));
-    // }
-    fakeEvents.forEach((element) {
-      todayEvents.add(Event.fromJson(element));
-    });
-  }
+  final DbService _dbService = Get.find<DbService>();
 
   @override
   void onInit() async {
-    todayHabits = await _dbService.getDao<HabitDao>().getAll();
+    todayHabits.bindStream(_dbService.database.habitDao.watchAllHabits());
+    todayEvents.bindStream(_dbService.database.eventDao.watchAllEvents());
     super.onInit();
   }
 
@@ -50,7 +40,7 @@ class TodayHabitController extends GetxController {
   }
 
   int get completedEvent => todayEvents
-      .where((element) => element.completion != Completion.No)
+      .where((element) => element.completion != Completion.No.index)
       .length;
 
   double get todayPercentage {

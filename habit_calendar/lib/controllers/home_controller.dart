@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_calendar/models/habit.dart';
-import 'package:habit_calendar/services/database/database.dart';
-import 'package:habit_calendar/services/database/habit_dao.dart';
+import 'package:habit_calendar/services/database/app_database.dart';
+import 'package:habit_calendar/services/database/db_service.dart';
 import 'package:habit_calendar/test_data.dart';
 import 'package:habit_calendar/views/today_habit.dart';
 
@@ -21,8 +20,10 @@ class HomeController extends GetxController {
   }
 
   Future<void> addHabit() async {
+    print(Habit.fromJson(fakeHabits[0]).toString());
     Get.find<DbService>()
-        .getDao<HabitDao>()
-        .insert(Habit.fromJson(fakeHabits[0]));
+        .database
+        .habitDao
+        .insertHabit(Habit.fromJson(fakeHabits[1]));
   }
 }
