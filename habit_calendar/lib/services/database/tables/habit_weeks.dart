@@ -5,4 +5,7 @@ class HabitWeeks extends Table {
       'REFERENCES habits (id) ON UPDATE CASCADE ON DELETE CASCADE')();
   IntColumn get week => integer().customConstraint(
       'REFERENCES weeks (id) ON UPDATE CASCADE ON DELETE CASCADE')();
+
+  @override
+  Set<Column> get primaryKey => {habitId, week};
 }

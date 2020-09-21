@@ -3,6 +3,8 @@ import 'package:habit_calendar/enums/completion.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
 
+import '../enums/day_of_the_week.dart';
+
 class TodayHabitController extends GetxController {
   DateTime today = DateTime.now();
   RxList<Habit> todayHabits = List<Habit>().obs;
@@ -12,8 +14,14 @@ class TodayHabitController extends GetxController {
 
   @override
   void onInit() async {
-    todayHabits.bindStream(_dbService.database.habitDao.watchAllHabits());
+    // todayHabits.bindStream(_dbService.database.habitDao.watchAllHabits());
+    todayHabits.bindStream(_dbService.database.habitDao
+        .watchHabitsByWeek(DayOfTheWeek.values[today.weekday - 1]));
     todayEvents.bindStream(_dbService.database.eventDao.watchAllEvents());
+
+    todayHabits.listen((list) {
+      list.forEach((element) => print(element.toString()));
+    });
     super.onInit();
   }
 

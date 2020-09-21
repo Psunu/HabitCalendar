@@ -21,12 +21,11 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
 
   Future<List<Habit>> getAllHabits() => select(habits).get();
   Stream<List<Habit>> watchAllHabits() => select(habits).watch();
-  // TODO implement this function
   Stream<List<Habit>> watchHabitsByWeek(DayOfTheWeek dayOfTheWeek) {
     return (select(habits)
           ..orderBy(
             ([
-              // Primary sorting by due date
+              // Primary sorting by date
               (t) =>
                   OrderingTerm(expression: t.whatTime, mode: OrderingMode.asc),
               // Secondary alphabetical sorting
@@ -39,20 +38,22 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
             // Join all the tasks with their tags.
             // It's important that we use equalsExp and not just equals.
             // This way, we can join using all tag names in the tasks table, not just a specific one.
-            leftOuterJoin(habitWeeks, habitWeeks.habitId.equalsExp(habits.id)),
+            innerJoin(
+                habitWeeks,
+                habitWeeks.habitId.equalsExp(habits.id) &
+                    habitWeeks.week.equals(dayOfTheWeek.index)),
           ],
         )
         // watch the whole select statement including the join
         .watch()
         // Watching a join gets us a Stream of List<TypedResult>
-        // Mapping each List<TypedResult> emitted by the Stream to a List<TaskWithTag>
+        // Mapping each List<TypedResult> emitted by the Stream to a List<Habit>
         .map(
-          (rows) => rows.map(
-            (row) {
-              if (row.readTable(habitWeeks).week == dayOfTheWeek.index)
-                return row.readTable(habits);
-            },
-          ).toList(),
+          (rows) => rows
+              .map(
+                (row) => row.readTable(habits),
+              )
+              .toList(),
         );
   }
 

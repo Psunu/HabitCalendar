@@ -45,19 +45,52 @@ class AppDatabase extends _$AppDatabase {
   int get schemaVersion => 1;
 
   @override
-  MigrationStrategy get migration =>
-      MigrationStrategy(beforeOpen: (details) async {
-        customStatement('PRAGMA foreign_keys = ON');
-        GroupsCompanion.insert(
-            id: const Value(0), name: 'default', color: 0xffffff);
-        NotificationTypesCompanion.insert(id: const Value(0), type: 'PUSH');
-        NotificationTypesCompanion.insert(id: const Value(1), type: 'ALARM');
-        WeeksCompanion.insert(id: const Value(0), week: 'mon');
-        WeeksCompanion.insert(id: const Value(1), week: 'tue');
-        WeeksCompanion.insert(id: const Value(2), week: 'wed');
-        WeeksCompanion.insert(id: const Value(3), week: 'thu');
-        WeeksCompanion.insert(id: const Value(4), week: 'fri');
-        WeeksCompanion.insert(id: const Value(5), week: 'sat');
-        WeeksCompanion.insert(id: const Value(6), week: 'sun');
-      });
+  MigrationStrategy get migration => MigrationStrategy(
+        beforeOpen: (details) async {
+          print('beforeOpen() called');
+
+          // Enable foregin key
+          await customStatement('PRAGMA foreign_keys = ON');
+
+          if (details.wasCreated) {
+            // Insert default group value
+            await into(groups)
+                .insert(Group(id: 0, name: 'default', color: 0xffffff));
+            // Insert default notification type value
+            await into(notificationTypes)
+                .insert(NotificationType(id: 0, type: 'none'));
+            await into(notificationTypes)
+                .insert(NotificationType(id: 1, type: 'alarm'));
+            await into(notificationTypes)
+                .insert(NotificationType(id: 2, type: 'push'));
+            await into(notificationTypes)
+                .insert(NotificationType(id: 3, type: 'sns'));
+            // Insert default week value
+            await into(weeks).insert(Week(id: 0, week: 'mon'));
+            await into(weeks).insert(Week(id: 1, week: 'tue'));
+            await into(weeks).insert(Week(id: 2, week: 'wed'));
+            await into(weeks).insert(Week(id: 3, week: 'thu'));
+            await into(weeks).insert(Week(id: 4, week: 'fri'));
+            await into(weeks).insert(Week(id: 5, week: 'sat'));
+            await into(weeks).insert(Week(id: 6, week: 'sun'));
+          }
+
+          // Print inserted values from groups, notification_types, weeks
+          print('<groups>');
+          (await select(groups).get()).forEach((element) => print(element));
+          print('<notification_types>');
+          (await select(notificationTypes).get())
+              .forEach((element) => print(element));
+          print('<weeks>');
+          (await select(weeks).get()).forEach((element) => print(element));
+          print('<habits>');
+          (await select(habits).get()).forEach((element) => print(element));
+          print('<habit_weeks>');
+          (await select(habitWeeks).get()).forEach((element) => print(element));
+          print('<events>');
+          (await select(events).get()).forEach((element) => print(element));
+
+          print('beforeOpen() finished');
+        },
+      );
 }
