@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:animations/animations.dart';
+import 'package:habit_calendar/widgets/open_container_fab.dart';
 
-import 'package:habit_calendar/controllers/home_controller.dart';
+import '../controllers/home_controller.dart';
+import '../views/make_habit.dart';
 
 class Home extends StatelessWidget {
   @override
@@ -9,27 +12,41 @@ class Home extends StatelessWidget {
     return GetBuilder<HomeController>(
       init: HomeController(),
       builder: (controller) => Scaffold(
-        body: SafeArea(
-          child: controller.pages[controller.currentIndex],
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          onTap: controller.onBottomNavTapped,
-          currentIndex: controller.currentIndex,
-          items: [
-            const BottomNavigationBarItem(
-              icon: const Icon(Icons.home),
-              title: const Text('Home'),
+          body: PageTransitionSwitcher(
+            transitionBuilder: (
+              Widget child,
+              Animation<double> primaryAnimation,
+              Animation<double> secondaryAnimation,
+            ) {
+              return FadeThroughTransition(
+                child: SafeArea(child: child),
+                animation: primaryAnimation,
+                secondaryAnimation: secondaryAnimation,
+              );
+            },
+            child: controller.pages[controller.currentIndex],
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            onTap: controller.onBottomNavTapped,
+            currentIndex: controller.currentIndex,
+            items: [
+              const BottomNavigationBarItem(
+                icon: const Icon(Icons.home),
+                title: const Text('Home'),
+              ),
+              const BottomNavigationBarItem(
+                icon: const Icon(Icons.calendar_today),
+                title: const Text('Calendar'),
+              ),
+            ],
+          ),
+          floatingActionButton: OpenContainerFab(
+            openPage: MakeHabit(),
+            icon: Icon(
+              Icons.add,
+              color: Colors.white,
             ),
-            const BottomNavigationBarItem(
-              icon: const Icon(Icons.calendar_today),
-              title: const Text('Calendar'),
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: controller.addHabit,
-        ),
-      ),
+          )),
     );
   }
 }

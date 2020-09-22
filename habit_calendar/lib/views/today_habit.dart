@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:habit_calendar/controllers/today_habit_controller.dart';
+import 'package:habit_calendar/widgets/progress_bar.dart';
 
 class TodayHabit extends StatelessWidget {
   @override
@@ -29,28 +30,11 @@ class TodayHabit extends StatelessWidget {
               const SizedBox(
                 height: 100.0,
               ),
-              Stack(
-                children: [
-                  Container(
-                    width: context.width,
-                    height: 20.0,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  AnimatedContainer(
-                    width: (context.width - 60.0) * controller.todayPercentage,
-                    height: 20.0,
-                    decoration: BoxDecoration(
-                      color: context.theme.primaryColor,
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    duration: Duration(
-                      milliseconds: 200,
-                    ),
-                  ),
-                ],
+              //TODO test progress work properly
+              ProgressBar(
+                percentage: controller.todayPercentage,
+                constraints:
+                    BoxConstraints(maxWidth: context.width, maxHeight: 15.0),
               ),
               const SizedBox(
                 height: 50.0,

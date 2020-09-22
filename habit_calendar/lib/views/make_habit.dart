@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 
 import '../controllers/make_habit_controller.dart';
 
-// TODO implement make habit view
 class MakeHabit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -11,7 +10,14 @@ class MakeHabit extends StatelessWidget {
       init: MakeHabitController(),
       builder: (controller) => Container(
         child: Column(
-          children: [],
+          children: [
+            TextField(
+              controller: controller.nameController,
+              decoration: InputDecoration(
+                hintText: '습관 이름',
+              ),
+            ),
+          ],
         ),
       ),
     );
