@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:habit_calendar/controllers/today_habit_controller.dart';
+import 'package:habit_calendar/widgets/habit_tile.dart';
 import 'package:habit_calendar/widgets/progress_bar.dart';
 
 class TodayHabit extends StatelessWidget {
@@ -21,20 +22,19 @@ class TodayHabit extends StatelessWidget {
                 child: Text(controller.formedToday),
               ),
               const SizedBox(
-                height: 20.0,
+                height: 40.0,
               ),
               Text(
                 '꾸준히 하려면\n작게 해야 합니다',
-                style: Get.textTheme.headline4.copyWith(color: Colors.black),
+                style: Get.textTheme.headline4,
               ),
               const SizedBox(
-                height: 100.0,
+                height: 50.0,
               ),
-              //TODO test progress work properly
               ProgressBar(
                 percentage: controller.todayPercentage,
-                constraints:
-                    BoxConstraints(maxWidth: context.width, maxHeight: 15.0),
+                constraints: BoxConstraints(
+                    maxWidth: context.width - 60.0, maxHeight: 15.0),
               ),
               const SizedBox(
                 height: 50.0,
@@ -52,31 +52,9 @@ class TodayHabit extends StatelessWidget {
   List<Widget> _buildHabits(TodayHabitController controller) {
     List<Widget> result = List<Widget>();
     controller.todayHabits.forEach((element) {
-      result.add(Card(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20.0),
-          width: Get.context.width,
-          height: 90.0,
-          child: Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: Text(
-                  controller.formWhen(element.whatTime),
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
-                child: VerticalDivider(),
-              ),
-              Expanded(
-                flex: 4,
-                child: Text(element.name),
-              ),
-            ],
-          ),
-        ),
+      result.add(HabitTile(
+        date: Text(controller.formWhen(element.whatTime)),
+        name: Text(element.name),
       ));
     });
 

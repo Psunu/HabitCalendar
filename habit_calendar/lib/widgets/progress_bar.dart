@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ProgressBar extends StatelessWidget {
-  static const _barHeight = 20.0;
   final _borderRadius = BorderRadius.circular(10.0);
 
   final double percentage;

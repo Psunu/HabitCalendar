@@ -20,6 +20,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      theme: ThemeData.light().copyWith(
+        textTheme: context.textTheme
+            .apply(
+              bodyColor: Colors.black87,
+              displayColor: Colors.black87,
+            )
+            .copyWith(
+                bodyText1:
+                    context.textTheme.bodyText1.copyWith(fontSize: 16.0)),
+      ),
       home: Home(),
     );
   }
