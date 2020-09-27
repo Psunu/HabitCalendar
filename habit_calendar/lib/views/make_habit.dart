@@ -7,7 +7,7 @@ import '../controllers/make_habit_controller.dart';
 class MakeHabit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<MakeHabitController>(
+    return GetX<MakeHabitController>(
       init: MakeHabitController(),
       builder: (controller) => SafeArea(
         child: Container(
@@ -30,8 +30,8 @@ class MakeHabit extends StatelessWidget {
                   InkWell(
                     customBorder: const CircleBorder(),
                     child: Container(
-                      width: 42,
-                      height: 42,
+                      width: 36,
+                      height: 36,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey, width: 1.5),
                         color: Colors.white,
@@ -41,47 +41,18 @@ class MakeHabit extends StatelessWidget {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Text(controller.selectedWeeksString),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: _buildWeekTiles(),
+                children: controller.buildWeekTiles(7),
               )
             ],
           ),
         ),
       ),
     );
-  }
-
-  List<Widget> _buildWeekTiles() {
-    return List.generate(7, (index) {
-      return WeekCard(
-        margin: EdgeInsets.symmetric(horizontal: 2.0),
-        width: (Get.context.width - 68.0) / 7,
-        height: 60.0,
-        child: Text(
-          _getWeekString(index),
-        ),
-      );
-    });
-  }
-
-  String _getWeekString(int week) {
-    switch (week) {
-      case 0:
-        return '월';
-      case 1:
-        return '화';
-      case 2:
-        return '수';
-      case 3:
-        return '목';
-      case 4:
-        return '금';
-      case 5:
-        return '토';
-      case 6:
-        return '일';
-    }
-    return '월';
   }
 }

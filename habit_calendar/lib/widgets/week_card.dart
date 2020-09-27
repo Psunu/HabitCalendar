@@ -11,6 +11,7 @@ class WeekCard extends StatefulWidget {
   final Color selectedColor;
   final Duration duration;
   final void Function(bool) onTapped;
+  final Key key;
 
   WeekCard({
     this.width,
@@ -22,7 +23,8 @@ class WeekCard extends StatefulWidget {
     this.selectedColor,
     this.duration,
     this.onTapped,
-  });
+    this.key,
+  }) : super(key: key);
 
   @override
   _WeekCardState createState() => _WeekCardState();
