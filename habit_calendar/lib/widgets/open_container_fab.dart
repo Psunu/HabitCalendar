@@ -13,7 +13,7 @@ class OpenContainerFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OpenContainer(
-      openBuilder: (context, closedContainer) => SafeArea(child: openPage),
+      openBuilder: (context, closedContainer) => openPage,
       closedShape: _circleFabBorder,
       closedColor: Get.theme.accentColor,
       closedElevation: 6,

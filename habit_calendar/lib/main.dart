@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
+import 'package:habit_calendar/translations/messages.dart';
 
 import 'package:habit_calendar/views/home.dart';
 
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      translations: Messages(),
       theme: ThemeData.light().copyWith(
         textTheme: context.textTheme
             .apply(

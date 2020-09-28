@@ -10,28 +10,49 @@ class MakeHabitController extends GetxController {
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
 
-  Map<int, bool> selectedWeeks = Map<int, bool>().obs;
+  final weekCardHeight = 60.0;
 
-  //TODO implement function
+  final selectedWeeks = Map<int, bool>().obs;
+  int weeksLength = 7;
+
+  final whatTimeActivated = false.obs;
+  final notificationActivated = false.obs;
+  final descriptionActivated = false.obs;
+
   String get selectedWeeksString {
-    if (selectedWeeks.isEmpty) return '';
-    String result = '매주 ';
+    if (selectedWeeks.isEmpty) return '반복할 요일을 선택해 주세요';
+
+    int falses = 0;
+    int trues = 0;
+
+    String result = '매주';
 
     selectedWeeks.forEach((key, value) {
       if (value) {
-        result += getWeekString(key) + ', ';
+        result += ' ' + getWeekString(key) + ',';
+        trues++;
+      } else {
+        falses++;
       }
     });
 
-    return result;
+    if (falses == selectedWeeks.length) return '반복할 요일을 선택해 주세요';
+    if (trues == weeksLength) return '매일';
+    return result.replaceRange(result.length - 1, result.length, '');
   }
 
   List<Widget> buildWeekTiles(int length) {
+    weeksLength = length;
+    EdgeInsets margin = const EdgeInsets.only(right: 2.0);
     return List.generate(length, (index) {
+      if (index == length - 1)
+        margin = const EdgeInsets.only(left: 2.0);
+      else if (index != 0) margin = const EdgeInsets.symmetric(horizontal: 2.0);
+
       return WeekCard(
-        margin: EdgeInsets.symmetric(horizontal: 2.0),
+        margin: margin,
         width: (Get.context.width - 68.0) / length,
-        height: 60.0,
+        height: weekCardHeight,
         child: Text(
           getWeekString(index),
         ),
@@ -61,4 +82,6 @@ class MakeHabitController extends GetxController {
     }
     return '월';
   }
+
+  Future<void> save() {}
 }
