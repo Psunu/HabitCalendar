@@ -18,18 +18,15 @@ class OpenContainerFab extends StatelessWidget {
       closedColor: Get.theme.accentColor,
       closedElevation: 6,
       closedBuilder: (context, openContainer) {
-        return InkWell(
-          customBorder: _circleFabBorder,
-          onTap: () => openContainer(),
-          child: SizedBox(
-            width: _mobileFabDimension,
-            height: _mobileFabDimension,
-            child: Center(
-              child: icon,
-            ),
+        return SizedBox(
+          width: _mobileFabDimension,
+          height: _mobileFabDimension,
+          child: Center(
+            child: icon,
           ),
         );
       },
+      tappable: true,
     );
   }
 }

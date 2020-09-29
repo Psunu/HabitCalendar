@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_calendar/widgets/time_picker.dart';
 
 import '../controllers/make_habit_controller.dart';
 
@@ -72,79 +73,88 @@ class MakeHabit extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 20.0),
                     child: Divider(),
                   ),
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 3.0),
-                        child: InputChip(
-                          label: Text('언제'),
-                          padding: EdgeInsets.all(10.0),
-                          onPressed: () {},
-                        ),
+                  // Row(
+                  //   children: [
+                  //     Padding(
+                  //       padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                  //       child: InputChip(
+                  //         label: Text('언제'),
+                  //         padding: EdgeInsets.all(10.0),
+                  //         onPressed: () {},
+                  //       ),
+                  //     ),
+                  //     Padding(
+                  //       padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                  //       child: InputChip(
+                  //         label: Text('알림'),
+                  //         padding: EdgeInsets.all(10.0),
+                  //         onPressed: () {},
+                  //       ),
+                  //     ),
+                  //     Padding(
+                  //       padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                  //       child: InputChip(
+                  //         label: Text('설명'),
+                  //         padding: EdgeInsets.all(10.0),
+                  //         onPressed: () {},
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () {
+                        controller.whatTimeActivated.value =
+                            !controller.whatTimeActivated.value;
+                        if (controller.whatTimeActivated.value)
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return TimePicker();
+                            },
+                          );
+                      },
+                      child: Icon(
+                        Icons.access_time,
+                        size: 50.0,
+                        color: controller.whatTimeActivated.value
+                            ? Get.theme.accentColor
+                            : Colors.grey[400],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 3.0),
-                        child: InputChip(
-                          label: Text('알림'),
-                          padding: EdgeInsets.all(10.0),
-                          onPressed: () {},
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 3.0),
-                        child: InputChip(
-                          label: Text('설명'),
-                          padding: EdgeInsets.all(10.0),
-                          onPressed: () {},
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  //   child: InkWell(
-                  //     customBorder: const CircleBorder(),
-                  //     onTap: () => controller.whatTimeActivated.value =
-                  //         !controller.whatTimeActivated.value,
-                  //     child: Icon(
-                  //       Icons.access_time,
-                  //       size: 50.0,
-                  //       color: controller.whatTimeActivated.value
-                  //           ? Get.theme.accentColor
-                  //           : Colors.grey[400],
-                  //     ),
-                  //   ),
-                  // ),
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  //   child: InkWell(
-                  //     customBorder: const CircleBorder(),
-                  //     onTap: () => controller.notificationActivated.value =
-                  //         !controller.notificationActivated.value,
-                  //     child: Icon(
-                  //       Icons.notifications,
-                  //       size: 50.0,
-                  //       color: controller.notificationActivated.value
-                  //           ? Get.theme.accentColor
-                  //           : Colors.grey[400],
-                  //     ),
-                  //   ),
-                  // ),
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  //   child: InkWell(
-                  //     customBorder: const CircleBorder(),
-                  //     onTap: () => controller.descriptionActivated.value =
-                  //         !controller.descriptionActivated.value,
-                  //     child: Icon(
-                  //       Icons.description,
-                  //       size: 50.0,
-                  //       color: controller.descriptionActivated.value
-                  //           ? Get.theme.accentColor
-                  //           : Colors.grey[400],
-                  //     ),
-                  //   ),
-                  // ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () => controller.notificationActivated.value =
+                          !controller.notificationActivated.value,
+                      child: Icon(
+                        Icons.notifications,
+                        size: 50.0,
+                        color: controller.notificationActivated.value
+                            ? Get.theme.accentColor
+                            : Colors.grey[400],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () => controller.descriptionActivated.value =
+                          !controller.descriptionActivated.value,
+                      child: Icon(
+                        Icons.description,
+                        size: 50.0,
+                        color: controller.descriptionActivated.value
+                            ? Get.theme.accentColor
+                            : Colors.grey[400],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
