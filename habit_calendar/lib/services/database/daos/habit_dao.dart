@@ -57,7 +57,7 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
         );
   }
 
-  Future insertHabit(Habit habit) => into(habits).insert(habit);
+  Future<int> insertHabit(Habit habit) => into(habits).insert(habit);
   Future updateHabit(Habit habit) => update(habits).replace(habit);
   Future deleteHabit(Habit habit) => delete(habits).delete(habit);
 }
