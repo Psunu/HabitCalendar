@@ -87,21 +87,33 @@ class _TimePickerState extends State<TimePicker> {
           controller: ampmController,
           length: 2,
           ampm: true,
+          style: widget.ampmStyle,
         ),
         // Hour
         _buildSelector(
           controller: hourController,
           length: 24,
           hour12: !(widget.enable24 ?? false),
-        ),
-        Text(
-          ':',
+          tag: '시',
           style: widget.timeStyle,
+        ),
+        // Padding to align with Selectors
+        // Padding value = font size + adjustment
+        Padding(
+          padding: EdgeInsets.only(
+            top: widget.ampmStyle.fontSize + 10,
+          ),
+          child: Text(
+            ':',
+            style: widget.timeStyle,
+          ),
         ),
         // Minute
         _buildSelector(
           controller: minuteController,
           length: 60,
+          tag: '분',
+          style: widget.timeStyle,
         ),
       ],
     );
@@ -112,44 +124,59 @@ class _TimePickerState extends State<TimePicker> {
     @required length,
     bool hour12 = false,
     bool ampm = false,
+    TextStyle style,
+    String tag,
   }) {
     return Expanded(
-      child: Container(
-        height: widget.height ?? (widget.itemExtent * 3) ?? 120.0,
-        child: ScrollConfiguration(
-          behavior: ScrollBehavior(),
-          child: ListWheelScrollView(
-            perspective: 0.009,
-            controller: controller,
-            physics: ampm
-                ? NeverScrollableScrollPhysics()
-                : FixedExtentScrollPhysics(),
-            itemExtent: widget.itemExtent ?? 40.0,
-            children: List.generate(
-              length,
-              (index) {
-                String value;
-                if (ampm)
-                  value = index == 0 ? '오전' : '오후';
-                else if (hour12)
-                  value =
-                      index > 12 ? (index - 12).toString() : index.toString();
-                else
-                  value = index.toString();
-
-                return Container(
-                  height: widget.itemExtent ?? 40.0,
-                  child: Center(
-                    child: Text(
-                      value,
-                      style: ampm ? widget.ampmStyle : widget.timeStyle,
-                    ),
-                  ),
-                );
-              },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              tag ?? '',
+              style: widget.ampmStyle,
             ),
           ),
-        ),
+          Container(
+            height: widget.height ?? (widget.itemExtent * 3) ?? 120.0,
+            child: ScrollConfiguration(
+              behavior: ScrollBehavior(),
+              child: ListWheelScrollView(
+                perspective: 0.009,
+                controller: controller,
+                physics: ampm
+                    ? NeverScrollableScrollPhysics()
+                    : FixedExtentScrollPhysics(),
+                itemExtent: widget.itemExtent ?? 40.0,
+                children: List.generate(
+                  length,
+                  (index) {
+                    String value;
+                    if (ampm)
+                      value = index == 0 ? '오전' : '오후';
+                    else if (hour12)
+                      value = index > 12
+                          ? (index - 12).toString()
+                          : index.toString();
+                    else
+                      value = index.toString();
+
+                    return Container(
+                      height: widget.itemExtent ?? 40.0,
+                      child: Center(
+                        child: Text(
+                          value,
+                          style: style,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

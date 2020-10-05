@@ -32,11 +32,11 @@ class Home extends StatelessWidget {
             items: [
               const BottomNavigationBarItem(
                 icon: const Icon(Icons.home),
-                title: const Text('Home'),
+                label: 'Home',
               ),
               const BottomNavigationBarItem(
                 icon: const Icon(Icons.calendar_today),
-                title: const Text('Calendar'),
+                label: 'Calendar',
               ),
             ],
           ),

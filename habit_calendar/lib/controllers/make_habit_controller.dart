@@ -27,6 +27,9 @@ class MakeHabitController extends GetxController {
 
   // settings
   final weekCardHeight = 60.0;
+  final iconSize = 30.0;
+  final iconTextPadding = 20.0;
+  final bottomSheetBorderRadius = 15.0;
 
   // Get Set
   String get selectedWeeksString {
@@ -96,21 +99,110 @@ class MakeHabitController extends GetxController {
         margin = const EdgeInsets.only(left: 2.0);
       else if (index != 0) margin = const EdgeInsets.symmetric(horizontal: 2.0);
 
-      return WeekCard(
-        margin: margin,
-        width: (Get.context.width - 68.0) / length,
-        height: weekCardHeight,
-        child: Text(
-          _getWeekString(index),
+      return Expanded(
+        child: WeekCard(
+          margin: margin,
+          height: weekCardHeight,
+          child: Text(
+            _getWeekString(index),
+          ),
+          onTapped: (selected) {
+            selectedWeeks[index] = selected;
+          },
         ),
-        onTapped: (selected) {
-          selectedWeeks[index] = selected;
-        },
       );
     });
   }
 
+  Widget buildIconText({
+    @required IconData iconData,
+    @required String text,
+    @required RxBool isActivated,
+    @required void Function() onTap,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: iconTextPadding),
+      child: Row(
+        children: [
+          InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () {
+              isActivated.value = !isActivated.value;
+              onTap();
+            },
+            child: Icon(
+              iconData,
+              size: iconSize,
+              color:
+                  isActivated.value ? Get.theme.accentColor : Colors.grey[400],
+            ),
+          ),
+          SizedBox(
+            width: 30.0,
+          ),
+          Expanded(
+            child: InkWell(
+              onTap: () {
+                if (!isActivated.value) {
+                  isActivated.value = !isActivated.value;
+                }
+                onTap();
+              },
+              child: Text(
+                text,
+                style: Get.textTheme.headline6.copyWith(
+                  color: isActivated.value ? Colors.black87 : Colors.grey,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<T> customShowModalBottomSheet<T>(
+      {@required void Function(BuildContext) builder}) {
+    return showModalBottomSheet<T>(
+      context: Get.context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(bottomSheetBorderRadius),
+          topRight: Radius.circular(bottomSheetBorderRadius),
+        ),
+      ),
+      builder: builder,
+    );
+  }
+
   Future<void> save() async {
+    if (nameController.text.isEmpty && !_isWeekSelected()) {
+      Get.rawSnackbar(
+        message: '습관 이름과 반복할 요일을 입력해주세요',
+        borderRadius: 10.0,
+        margin: const EdgeInsets.all(20.0),
+      );
+
+      return false;
+    } else if (nameController.text.isEmpty) {
+      Get.rawSnackbar(
+        message: '습관 이름을 입력해주세요',
+        borderRadius: 10.0,
+        margin: const EdgeInsets.all(20.0),
+      );
+
+      return false;
+    } else if (!_isWeekSelected()) {
+      Get.rawSnackbar(
+        message: '반복할 요일을 입력해주세요',
+        borderRadius: 10.0,
+        margin: const EdgeInsets.all(20.0),
+      );
+
+      return false;
+    }
+
     int id = await dbService.database.habitDao.insertHabit(
       Habit(
         id: null,
@@ -129,6 +221,8 @@ class MakeHabitController extends GetxController {
             .insertHabitWeek(HabitWeek(habitId: id, week: key));
       }
     });
+
+    Get.back();
   }
 
   // local method
@@ -152,8 +246,21 @@ class MakeHabitController extends GetxController {
     return '월';
   }
 
-  static String _twoDigits(int n) {
+  String _twoDigits(int n) {
     if (n >= 10) return "${n}";
     return "0${n}";
+  }
+
+  bool _isWeekSelected() {
+    if (selectedWeeks.isEmpty) return false;
+
+    int falseNum = 0;
+    selectedWeeks.forEach((key, value) {
+      if (!value) falseNum++;
+    });
+
+    if (falseNum == selectedWeeks.length) return false;
+
+    return true;
   }
 }

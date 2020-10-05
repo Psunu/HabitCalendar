@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 class DurationPicker extends StatefulWidget {
   final double itemExtent;
   final double height;
-  final TextStyle style;
+  final TextStyle durationStyle;
+  final TextStyle tagStyle;
   final Duration initDuration;
   final void Function(Duration) onDurationChanged;
 
   DurationPicker({
     this.itemExtent,
     this.height,
-    this.style,
+    this.durationStyle,
+    this.tagStyle,
     this.initDuration,
     this.onDurationChanged,
   });
@@ -71,9 +73,14 @@ class _DurationPickerState extends State<DurationPicker> {
           length: 100,
           tag: '시간',
         ),
-        Text(
-          ':',
-          style: widget.style,
+        // Padding to align with Selectors
+        // Padding value = font size + adjustment
+        Padding(
+          padding: EdgeInsets.only(top: widget.tagStyle.fontSize + 10.0),
+          child: Text(
+            ':',
+            style: widget.durationStyle,
+          ),
         ),
         // Minute
         _buildSelector(
@@ -96,7 +103,10 @@ class _DurationPickerState extends State<DurationPicker> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(tag),
+            child: Text(
+              tag,
+              style: widget.tagStyle,
+            ),
           ),
           Container(
             height: widget.height ?? (widget.itemExtent * 3) ?? 120.0,
@@ -115,7 +125,7 @@ class _DurationPickerState extends State<DurationPicker> {
                       child: Center(
                         child: Text(
                           index.toString(),
-                          style: widget.style,
+                          style: widget.durationStyle,
                         ),
                       ),
                     );

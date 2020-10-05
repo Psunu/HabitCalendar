@@ -29,14 +29,10 @@ class MyApp extends StatelessWidget {
               displayColor: Colors.black87,
             )
             .copyWith(
-              // headline3: context.textTheme.headline3.copyWith(
-              //   fontSize: 38.0,
-              //   color: Colors.black87,
-              // ),
-              // headline4: context.textTheme.headline4.copyWith(
-              //   fontSize: 32.0,
-              //   color: Colors.black87,
-              // ),
+              headline5: context.textTheme.headline4.copyWith(
+                fontSize: 30.0,
+                color: Colors.black87,
+              ),
               bodyText1: context.textTheme.bodyText1.copyWith(
                 fontSize: 16.0,
               ),
