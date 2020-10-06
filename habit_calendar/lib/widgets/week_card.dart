@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_calendar/constants/constants.dart';
 
 class WeekCard extends StatefulWidget {
   final double width;
@@ -7,6 +8,7 @@ class WeekCard extends StatefulWidget {
   final Text child;
   final EdgeInsets padding;
   final EdgeInsets margin;
+  final double borderRadius;
   final Color color;
   final Color selectedColor;
   final Duration duration;
@@ -19,6 +21,7 @@ class WeekCard extends StatefulWidget {
     this.child,
     this.padding,
     this.margin,
+    this.borderRadius,
     this.color,
     this.selectedColor,
     this.duration,
@@ -43,7 +46,10 @@ class _WeekCardState extends State<WeekCard> {
         });
       },
       child: AnimatedContainer(
-        duration: widget.duration ?? Duration(milliseconds: 150),
+        duration: widget.duration ??
+            const Duration(
+              milliseconds: Constants.mediumAnimationSpeed,
+            ),
         curve: Curves.ease,
         width: widget.width,
         height: _selected ? widget.height * 1.3 : widget.height,
@@ -53,7 +59,7 @@ class _WeekCardState extends State<WeekCard> {
           color: _selected
               ? widget.selectedColor ?? Get.theme.accentColor
               : widget.color ?? Colors.grey[300],
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(widget.borderRadius ?? 10.0),
         ),
         child: DefaultTextStyle(
             style: Get.textTheme.bodyText1

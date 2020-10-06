@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_calendar/constants/constants.dart';
 
 import 'package:habit_calendar/controllers/today_habit_controller.dart';
-import 'package:habit_calendar/widgets/habit_tile.dart';
 import 'package:habit_calendar/widgets/progress_bar.dart';
 
 class TodayHabit extends StatelessWidget {
@@ -12,7 +12,11 @@ class TodayHabit extends StatelessWidget {
       init: TodayHabitController(),
       builder: (controller) => SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(30.0),
+          padding: const EdgeInsets.only(
+            left: Constants.horizontalPadding,
+            right: Constants.horizontalPadding,
+            top: Constants.verticalPadding,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,24 +44,12 @@ class TodayHabit extends StatelessWidget {
                 height: 50.0,
               ),
               Column(
-                children: _buildHabits(controller),
+                children: controller.buildHabits(),
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  List<Widget> _buildHabits(TodayHabitController controller) {
-    List<Widget> result = List<Widget>();
-    controller.todayHabits.forEach((element) {
-      result.add(HabitTile(
-        date: Text(controller.formWhen(element.whatTime)),
-        name: Text(element.name),
-      ));
-    });
-
-    return result;
   }
 }

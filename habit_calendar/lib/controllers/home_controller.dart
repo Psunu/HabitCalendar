@@ -10,6 +10,7 @@ import '../services/database/db_service.dart';
 
 class HomeController extends GetxController {
   final dbService = Get.find<DbService>();
+
   int currentIndex = 0;
 
   final List<Widget> pages = <Widget>[
@@ -19,6 +20,7 @@ class HomeController extends GetxController {
     ),
   ];
 
+  // Methods
   void onBottomNavTapped(int index) {
     currentIndex = index;
     update();
