@@ -12,10 +12,8 @@ class TodayHabit extends StatelessWidget {
       init: TodayHabitController(),
       builder: (controller) => SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.only(
-            left: Constants.horizontalPadding,
-            right: Constants.horizontalPadding,
-            top: Constants.verticalPadding,
+          padding: const EdgeInsets.all(
+            Constants.padding,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,

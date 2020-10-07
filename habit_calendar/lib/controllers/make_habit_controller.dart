@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
+import 'package:habit_calendar/utils/utils.dart';
 import 'package:habit_calendar/widgets/week_card.dart';
 
 import '../services/database/db_service.dart';
@@ -19,6 +20,10 @@ class MakeHabitController extends GetxController {
   // TextField Controllers
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
+
+  // TextField FocusNode
+  final nameFocusNode = FocusNode();
+  final descriptionFocusNode = FocusNode();
 
   // Weeks input
   final selectedWeeks = Map<int, bool>().obs;
@@ -64,7 +69,7 @@ class MakeHabitController extends GetxController {
 
     selectedWeeks.forEach((key, value) {
       if (value) {
-        result += ' ' + _getWeekString(key) + ',';
+        result += ' ' + Utils.getWeekString(key) + ',';
         trues++;
       } else {
         falses++;
@@ -81,16 +86,16 @@ class MakeHabitController extends GetxController {
 
     if (whatTime.value.hour < 12) {
       result = '오전 ';
-      result += _twoDigits(whatTime.value.hour);
+      result += Utils.twoDigits(whatTime.value.hour);
     } else {
       result = '오후 ';
       if (whatTime.value.hour > 12)
-        result += _twoDigits(whatTime.value.hour - 12).toString();
+        result += Utils.twoDigits(whatTime.value.hour - 12).toString();
       else
-        result += _twoDigits(whatTime.value.hour);
+        result += Utils.twoDigits(whatTime.value.hour);
     }
 
-    result += ' : ${_twoDigits(whatTime.value.minute)}';
+    result += ' : ${Utils.twoDigits(whatTime.value.minute)}';
 
     return result;
   }
@@ -120,6 +125,12 @@ class MakeHabitController extends GetxController {
     selectedGroup.value = await _dbService.database.groupDao.getGroupById(0);
 
     habits.bindStream(_dbService.database.habitDao.watchAllHabits());
+
+    for (int i = 0; i < weeksLength; i++) {
+      selectedWeeks[i] = false;
+    }
+
+    Get.focusScope.requestFocus(nameFocusNode);
   }
 
   @override
@@ -128,15 +139,96 @@ class MakeHabitController extends GetxController {
     descriptionController.dispose();
   }
 
-  // Methods
+  // Primary Methods
+  Future<void> save() async {
+    // if name has error
+    if (checkNameError()) {
+      return;
+    }
+    if (!_isWeekSelected()) {
+      print('weeks empty');
+      isWeeksAlertOn.value = true;
+      return;
+    }
+
+    int id = await _dbService.database.habitDao.insertHabit(
+      Habit(
+        id: null,
+        name: nameController.text,
+        statusBarFix: null,
+        groupId: selectedGroup.value.id,
+        notificationTypeId: null,
+        notificationTime: isNotificationActivated.value
+            ? notificationTime.value.inMinutes
+            : null,
+        whatTime: isWhatTimeActivated.value ? whatTime.value : null,
+        description:
+            isDescriptionActivated.value ? descriptionController.text : null,
+      ),
+    );
+    selectedWeeks.forEach((key, value) async {
+      if (value) {
+        await _dbService.database.habitWeekDao
+            .insertHabitWeek(HabitWeek(habitId: id, week: key));
+      }
+    });
+
+    Get.back();
+  }
+
+  // Utility Methods
+  bool checkNameError() {
+    if (nameController.text.isEmpty) {
+      print('name empty');
+      isNameEmptyAlertOn.value = true;
+      return true;
+    } else if (_isNameDuplicated()) {
+      print('name duplicated');
+      isNameDuplicatedAlertOn.value = true;
+      return true;
+    }
+
+    return false;
+  }
+
   List<PopupMenuEntry<int>> popupMenuEntryBuilder(BuildContext context) {
     final list = List<PopupMenuEntry<int>>();
+    list.add(PopupMenuItem(
+      enabled: false,
+      child: Text(
+        '분류',
+        style: Get.textTheme.bodyText1,
+      ),
+    ));
+    list.add(PopupMenuDivider());
 
     groups.forEach((group) {
       list.add(PopupMenuItem(
         value: group.id,
-        child: Text(
-          group.name,
+        child: Row(
+          children: [
+            Text(
+              group.name,
+              style: Get.textTheme.bodyText1,
+            ),
+            SizedBox(
+              width: 10.0,
+            ),
+            Container(
+              width: 24.0,
+              height: 24.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.grey[400],
+                  width: 1.5,
+                ),
+                color: Color(
+                  group.color,
+                ),
+              ),
+            ),
+          ],
         ),
       ));
     });
@@ -158,7 +250,7 @@ class MakeHabitController extends GetxController {
           height: weekCardHeight,
           borderRadius: Constants.smallBorderRadius,
           child: Text(
-            _getWeekString(index),
+            Utils.getWeekString(index),
           ),
           onTapped: (selected) {
             selectedWeeks[index] = selected;
@@ -184,7 +276,7 @@ class MakeHabitController extends GetxController {
             customBorder: const CircleBorder(),
             onTap: () {
               isActivated.value = !isActivated.value;
-              onTap();
+              Get.focusScope.unfocus();
             },
             child: Icon(
               iconData,
@@ -203,6 +295,7 @@ class MakeHabitController extends GetxController {
                   isActivated.value = !isActivated.value;
                 }
                 onTap();
+                Get.focusScope.unfocus();
               },
               child: Text(
                 text,
@@ -232,70 +325,7 @@ class MakeHabitController extends GetxController {
     );
   }
 
-  Future<void> save() async {
-    if (nameController.text.isEmpty) {
-      print('name empty');
-      isNameEmptyAlertOn.value = true;
-      return;
-    } else if (_isNameDuplicated()) {
-      print('name duplicated');
-      isNameDuplicatedAlertOn.value = true;
-      return;
-    }
-    if (!_isWeekSelected()) {
-      print('weeks empty');
-      isWeeksAlertOn.value = true;
-      return;
-    }
-
-    int id = await _dbService.database.habitDao.insertHabit(
-      Habit(
-        id: null,
-        name: nameController.text,
-        statusBarFix: null,
-        groupId: selectedGroup.value.id,
-        notificationTypeId: null,
-        notificationTime: notificationTime.value.inMinutes,
-        whatTime: whatTime.value,
-        description: descriptionController.text,
-      ),
-    );
-    selectedWeeks.forEach((key, value) async {
-      if (value) {
-        await _dbService.database.habitWeekDao
-            .insertHabitWeek(HabitWeek(habitId: id, week: key));
-      }
-    });
-
-    Get.back();
-  }
-
   // local method
-  String _getWeekString(int week) {
-    switch (week) {
-      case 0:
-        return '월';
-      case 1:
-        return '화';
-      case 2:
-        return '수';
-      case 3:
-        return '목';
-      case 4:
-        return '금';
-      case 5:
-        return '토';
-      case 6:
-        return '일';
-    }
-    return '월';
-  }
-
-  String _twoDigits(int n) {
-    if (n >= 10) return "$n";
-    return "0$n";
-  }
-
   bool _isNameDuplicated() {
     bool result = false;
 
@@ -310,9 +340,8 @@ class MakeHabitController extends GetxController {
   }
 
   bool _isWeekSelected() {
-    if (selectedWeeks.isEmpty) return false;
-
     int falseNum = 0;
+
     selectedWeeks.forEach((key, value) {
       if (!value) falseNum++;
     });

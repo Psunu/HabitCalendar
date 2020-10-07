@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/enums/completion.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
+import 'package:habit_calendar/utils/utils.dart';
 import 'package:habit_calendar/widgets/habit_tile.dart';
 
 import '../enums/day_of_the_week.dart';
@@ -46,7 +49,7 @@ class TodayHabitController extends GetxController {
     return completedEvent / todayHabits.length;
   }
 
-  // Methods
+  // Controller life cycle
   @override
   void onInit() async {
     todayHabits.bindStream(_dbService.database.habitDao
@@ -59,23 +62,41 @@ class TodayHabitController extends GetxController {
     super.onInit();
   }
 
+  // Utility Methods
   List<Widget> buildHabits() {
     List<Widget> result = List<Widget>();
     todayHabits.forEach((element) {
       result.add(HabitTile(
-        date: Text(formWhen(element.whatTime)),
+        key: ValueKey(element.id),
+        date: Text(formWhatTime(element.whatTime)),
         name: Text(element.name),
+        background: Container(
+          decoration: BoxDecoration(
+            color: Colors.red,
+            borderRadius: BorderRadius.circular(
+              Constants.mediumBorderRadius,
+            ),
+          ),
+        ),
+        secondaryBackground: Container(
+          decoration: BoxDecoration(
+            color: Colors.blue,
+            borderRadius: BorderRadius.circular(
+              Constants.mediumBorderRadius,
+            ),
+          ),
+        ),
       ));
     });
 
     return result;
   }
 
-  String formWhen(DateTime when) {
+  String formWhatTime(DateTime when) {
     if (when == null) return '오늘안에';
     if (when.hour - 12 < 1)
-      return 'AM ${when.hour}:${when.minute}';
+      return 'AM ${Utils.twoDigits(when.hour)}:${Utils.twoDigits(when.minute)}';
     else
-      return 'PM ${when.hour - 12}:${when.minute}';
+      return 'PM ${Utils.twoDigits(when.hour - 12)}:${Utils.twoDigits(when.minute)}';
   }
 }

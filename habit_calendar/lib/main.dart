@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
               ),
               bodyText1: context.textTheme.bodyText1.copyWith(
                 fontSize: 16.0,
+                fontWeight: FontWeight.normal,
               ),
             ),
       ),

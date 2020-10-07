@@ -6,7 +6,6 @@ import 'package:habit_calendar/widgets/time_picker.dart';
 
 import '../controllers/make_habit_controller.dart';
 
-// TODO implment group select
 class MakeHabit extends StatefulWidget {
   @override
   _MakeHabitState createState() => _MakeHabitState();
@@ -23,10 +22,8 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
             Scaffold(
               body: SingleChildScrollView(
                 child: Container(
-                  padding: const EdgeInsets.only(
-                    left: Constants.horizontalPadding,
-                    right: Constants.horizontalPadding,
-                    top: Constants.verticalPadding,
+                  padding: const EdgeInsets.all(
+                    Constants.padding,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -75,6 +72,7 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                                     ),
                                     TextField(
                                       controller: controller.nameController,
+                                      focusNode: controller.nameFocusNode,
                                       decoration: InputDecoration(
                                         hintText: '습관 이름',
                                         border: InputBorder.none,
@@ -93,14 +91,16 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                               // Group
                               PopupMenuButton<int>(
                                 itemBuilder: controller.popupMenuEntryBuilder,
+                                onCanceled: () => Get.focusScope.unfocus(),
+                                onSelected: (_) => Get.focusScope.unfocus(),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
                                     Constants.smallBorderRadius,
                                   ),
                                 ),
                                 child: Container(
-                                  width: 36.0,
-                                  height: 36.0,
+                                  width: 30.0,
+                                  height: 30.0,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
@@ -230,13 +230,28 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
-                                  child: Icon(
-                                    Icons.description,
-                                    size: controller.iconSize,
-                                    color:
-                                        controller.isDescriptionActivated.value
-                                            ? Get.theme.accentColor
-                                            : Colors.grey[400],
+                                  child: InkWell(
+                                    customBorder: const CircleBorder(),
+                                    onTap: () {
+                                      controller.isDescriptionActivated.value =
+                                          !controller
+                                              .isDescriptionActivated.value;
+                                      if (controller
+                                          .isDescriptionActivated.value) {
+                                        Get.focusScope.requestFocus(
+                                            controller.descriptionFocusNode);
+                                      } else {
+                                        Get.focusScope.unfocus();
+                                      }
+                                    },
+                                    child: Icon(
+                                      Icons.description,
+                                      size: controller.iconSize,
+                                      color: controller
+                                              .isDescriptionActivated.value
+                                          ? Get.theme.accentColor
+                                          : Colors.grey[400],
+                                    ),
                                   ),
                                 ),
                                 SizedBox(
@@ -246,8 +261,14 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                                   child: TextField(
                                     controller:
                                         controller.descriptionController,
+                                    focusNode: controller.descriptionFocusNode,
                                     keyboardType: TextInputType.text,
-                                    style: Get.textTheme.headline6,
+                                    style:
+                                        controller.isDescriptionActivated.value
+                                            ? Get.textTheme.headline6
+                                            : Get.textTheme.headline6.copyWith(
+                                                color: Colors.grey,
+                                              ),
                                     maxLines: null,
                                     decoration: InputDecoration(
                                       hintText: '메모',
@@ -283,26 +304,40 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
               alignment: Alignment.bottomCenter,
               child: Container(
                 color: Get.theme.scaffoldBackgroundColor,
-                child: ButtonBar(
-                  alignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    FlatButton(
-                      onPressed: () => Get.back(),
-                      child: Text(
-                        '취소',
-                        style: Get.textTheme.headline6,
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Expanded(
+                        child: FlatButton(
+                          padding: const EdgeInsets.all(13.0),
+                          onPressed: () => Get.back(),
+                          child: Text(
+                            '취소',
+                            style: Get.textTheme.headline6
+                                .copyWith(color: Colors.grey[700]),
+                          ),
+                        ),
                       ),
-                    ),
-                    FlatButton(
-                      onPressed: () {
-                        controller.save();
-                      },
-                      child: Text(
-                        '저장',
-                        style: Get.textTheme.headline6,
+                      Expanded(
+                        child: RaisedButton(
+                          padding: const EdgeInsets.all(13.0),
+                          color: Get.theme.accentColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                Constants.mediumBorderRadius),
+                          ),
+                          onPressed: controller.save,
+                          child: Text(
+                            '저장',
+                            style: Get.textTheme.headline6.copyWith(
+                                color: Get.theme.scaffoldBackgroundColor),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
