@@ -71,18 +71,36 @@ class TodayHabitController extends GetxController {
         date: Text(formWhatTime(element.whatTime)),
         name: Text(element.name),
         background: Container(
+          alignment: Alignment.centerRight,
+          decoration: BoxDecoration(
+            color: Get.theme.accentColor,
+            borderRadius: BorderRadius.circular(
+              Constants.mediumBorderRadius,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Icon(
+              Icons.check_circle_outline,
+              color: Get.theme.scaffoldBackgroundColor,
+              size: 30.0,
+            ),
+          ),
+        ),
+        secondaryBackground: Container(
+          alignment: Alignment.centerRight,
           decoration: BoxDecoration(
             color: Colors.red,
             borderRadius: BorderRadius.circular(
               Constants.mediumBorderRadius,
             ),
           ),
-        ),
-        secondaryBackground: Container(
-          decoration: BoxDecoration(
-            color: Colors.blue,
-            borderRadius: BorderRadius.circular(
-              Constants.mediumBorderRadius,
+          child: Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Icon(
+              Icons.replay,
+              color: Get.theme.scaffoldBackgroundColor,
+              size: 30.0,
             ),
           ),
         ),

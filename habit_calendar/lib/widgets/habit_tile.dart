@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
-import 'package:habit_calendar/widgets/rounded_rectangle_dismissible.dart';
+import 'package:habit_calendar/widgets/slidable.dart';
 
 // TODO implement dismissible
-class HabitTile extends StatelessWidget {
+class HabitTile extends StatefulWidget {
+  HabitTile({
+    @required this.key,
+    this.padding,
+    this.width,
+    this.height,
+    @required this.date,
+    @required this.name,
+    this.background,
+    this.secondaryBackground,
+  })  : assert(key != null),
+        assert(secondaryBackground != null ? background != null : true),
+        super(key: key);
+
   final Key key;
   final EdgeInsets padding;
   final double width;
@@ -14,24 +27,29 @@ class HabitTile extends StatelessWidget {
   final Widget background;
   final Widget secondaryBackground;
 
-  HabitTile(
-      {@required this.key,
-      this.padding,
-      this.width,
-      this.height,
-      @required this.date,
-      @required this.name,
-      this.background,
-      this.secondaryBackground})
-      : super(key: key);
+  @override
+  _HabitTileState createState() => _HabitTileState();
+}
+
+class _HabitTileState extends State<HabitTile> {
+  SlidableController _slidableController = SlidableController();
+  bool _isBackground = true;
 
   @override
   Widget build(BuildContext context) {
-    return RoundedRectangleDismissible(
-      key: key,
-      background: background,
-      secondaryBackground: secondaryBackground,
-      borderRadius: BorderRadius.circular(Constants.mediumBorderRadius),
+    return Slidable(
+      key: widget.key,
+      controller: _slidableController,
+      background: InkWell(
+        onTap: () => setState(() {
+          _slidableController.reverse();
+          _isBackground = !_isBackground;
+        }),
+        child: _isBackground
+            ? widget.background
+            : widget.secondaryBackground ?? widget.background,
+      ),
+      slideThresholds: 0.25,
       child: Card(
         margin: const EdgeInsets.all(0.0),
         shape: RoundedRectangleBorder(
@@ -40,14 +58,15 @@ class HabitTile extends StatelessWidget {
           ),
         ),
         child: Container(
-          margin: padding ?? const EdgeInsets.symmetric(horizontal: 20.0),
-          width: width ?? Get.context.width,
-          height: height ?? 90.0,
+          margin:
+              widget.padding ?? const EdgeInsets.symmetric(horizontal: 20.0),
+          width: widget.width ?? Get.context.width,
+          height: widget.height ?? 90.0,
           child: Row(
             children: [
               Expanded(
                 flex: 1,
-                child: date,
+                child: widget.date,
               ),
               Container(
                 padding:
@@ -56,7 +75,7 @@ class HabitTile extends StatelessWidget {
               ),
               Expanded(
                 flex: 3,
-                child: name,
+                child: widget.name,
               ),
             ],
           ),
