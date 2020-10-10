@@ -3,7 +3,20 @@ import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/widgets/slidable.dart';
 
-// TODO implement dismissible
+typedef OnBackgroundChangedAnimation = Future<void> Function(
+  HabitTileBackgroundType from,
+  HabitTileBackgroundType to,
+);
+typedef OnBackgroundChangedCallback = void Function(
+  HabitTileBackgroundType from,
+  HabitTileBackgroundType to,
+);
+
+enum HabitTileBackgroundType {
+  background,
+  secondaryBackground,
+}
+
 class HabitTile extends StatefulWidget {
   HabitTile({
     @required this.key,
@@ -14,6 +27,9 @@ class HabitTile extends StatefulWidget {
     @required this.name,
     this.background,
     this.secondaryBackground,
+    this.onBackgroundChangedAnimation,
+    this.onBeforeBackgroundChanged,
+    this.onBackgroundChanged,
   })  : assert(key != null),
         assert(secondaryBackground != null ? background != null : true),
         super(key: key);
@@ -26,6 +42,9 @@ class HabitTile extends StatefulWidget {
   final Text name;
   final Widget background;
   final Widget secondaryBackground;
+  final OnBackgroundChangedAnimation onBackgroundChangedAnimation;
+  final OnBackgroundChangedCallback onBeforeBackgroundChanged;
+  final OnBackgroundChangedCallback onBackgroundChanged;
 
   @override
   _HabitTileState createState() => _HabitTileState();
@@ -41,10 +60,57 @@ class _HabitTileState extends State<HabitTile> {
       key: widget.key,
       controller: _slidableController,
       background: InkWell(
-        onTap: () => setState(() {
-          _slidableController.reverse();
-          _isBackground = !_isBackground;
-        }),
+        onTap: () async {
+          if (widget.onBackgroundChangedAnimation != null) {
+            if (_isBackground) {
+              await widget.onBackgroundChangedAnimation(
+                HabitTileBackgroundType.background,
+                HabitTileBackgroundType.secondaryBackground,
+              );
+            } else {
+              await widget.onBackgroundChangedAnimation(
+                HabitTileBackgroundType.secondaryBackground,
+                HabitTileBackgroundType.background,
+              );
+            }
+          }
+          // Call onBeforeBackgroundChanged callback
+          if (widget.onBeforeBackgroundChanged != null) {
+            if (_isBackground) {
+              widget.onBeforeBackgroundChanged(
+                HabitTileBackgroundType.background,
+                HabitTileBackgroundType.secondaryBackground,
+              );
+            } else {
+              widget.onBeforeBackgroundChanged(
+                HabitTileBackgroundType.secondaryBackground,
+                HabitTileBackgroundType.background,
+              );
+            }
+          }
+
+          // Animate reverse and after change background
+          await _slidableController.reverse().then((value) {
+            setState(() {
+              _isBackground = !_isBackground;
+            });
+          });
+
+          // Call onBackgroundChanged callback
+          if (widget.onBackgroundChanged != null) {
+            if (_isBackground) {
+              widget.onBackgroundChanged(
+                HabitTileBackgroundType.secondaryBackground,
+                HabitTileBackgroundType.background,
+              );
+            } else {
+              widget.onBackgroundChanged(
+                HabitTileBackgroundType.background,
+                HabitTileBackgroundType.secondaryBackground,
+              );
+            }
+          }
+        },
         child: _isBackground
             ? widget.background
             : widget.secondaryBackground ?? widget.background,

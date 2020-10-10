@@ -6,7 +6,6 @@ import 'package:habit_calendar/enums/completion.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
 import 'package:habit_calendar/utils/utils.dart';
-import 'package:habit_calendar/widgets/habit_tile.dart';
 
 import '../enums/day_of_the_week.dart';
 
@@ -16,6 +15,9 @@ class TodayHabitController extends GetxController {
   final todayEvents = List<Event>().obs;
 
   final DbService _dbService = Get.find<DbService>();
+
+  final backgroundAnimationTrigger = false.obs;
+  final secondaryBackgroundAnimationTrigger = false.obs;
 
   // Get Set
   String get formedToday => '${today.month}월 ${today.day}일 ($weekdayString)';
@@ -56,65 +58,83 @@ class TodayHabitController extends GetxController {
         .watchHabitsByWeek(DayOfTheWeek.values[today.weekday - 1]));
     todayEvents.bindStream(_dbService.database.eventDao.watchAllEvents());
 
-    todayHabits.listen((list) {
-      list.forEach((element) => print(element.toString()));
+    todayEvents.listen((list) {
+      list.forEach((element) {
+        print(element);
+      });
     });
+    today = DateTime(today.year, today.month, today.day);
     super.onInit();
   }
 
-  // Utility Methods
-  List<Widget> buildHabits() {
-    List<Widget> result = List<Widget>();
-    todayHabits.forEach((element) {
-      result.add(HabitTile(
-        key: ValueKey(element.id),
-        date: Text(formWhatTime(element.whatTime)),
-        name: Text(element.name),
-        background: Container(
-          alignment: Alignment.centerRight,
-          decoration: BoxDecoration(
-            color: Get.theme.accentColor,
-            borderRadius: BorderRadius.circular(
-              Constants.mediumBorderRadius,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: Icon(
-              Icons.check_circle_outline,
-              color: Get.theme.scaffoldBackgroundColor,
-              size: 30.0,
-            ),
-          ),
-        ),
-        secondaryBackground: Container(
-          alignment: Alignment.centerRight,
-          decoration: BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(
-              Constants.mediumBorderRadius,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: Icon(
-              Icons.replay,
-              color: Get.theme.scaffoldBackgroundColor,
-              size: 30.0,
-            ),
-          ),
-        ),
-      ));
+  // Primary methods
+  Future<void> complete(int id) async {
+    todayEvents.forEach((event) {
+      if (event.date.isAtSameMomentAs(today) && event.habitId == id) {
+        return;
+      }
     });
 
-    return result;
+    _dbService.database.eventDao.insertEvent(
+      Event(
+        id: null,
+        date: today,
+        completion: 1,
+        habitId: id,
+      ),
+    );
   }
 
+  Future<void> notComplete(int id) async {
+    Event event;
+    for (int i = 0; i < todayEvents.length; i++) {
+      if (todayEvents[i].date.isAtSameMomentAs(today) &&
+          todayEvents[i].habitId == id) {
+        event = todayEvents[i];
+        break;
+      }
+    }
+
+    if (event != null) {
+      _dbService.database.eventDao.deleteEvent(event);
+    }
+  }
+
+  // Utility Methods
   String formWhatTime(DateTime when) {
     if (when == null) return '오늘안에';
     if (when.hour - 12 < 1)
       return 'AM ${Utils.twoDigits(when.hour)}:${Utils.twoDigits(when.minute)}';
     else
       return 'PM ${Utils.twoDigits(when.hour - 12)}:${Utils.twoDigits(when.minute)}';
+  }
+}
+
+class HabitTileBackground extends StatefulWidget {
+  HabitTileBackground({
+    @required this.color,
+    @required this.child,
+  });
+
+  final Color color;
+  final Widget child;
+
+  @override
+  _HabitTileBackgroundState createState() => _HabitTileBackgroundState();
+}
+
+class _HabitTileBackgroundState extends State<HabitTileBackground> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.centerRight,
+      decoration: BoxDecoration(
+        color: widget.color,
+        borderRadius: BorderRadius.circular(
+          Constants.mediumBorderRadius,
+        ),
+      ),
+      child: widget.child,
+    );
   }
 }

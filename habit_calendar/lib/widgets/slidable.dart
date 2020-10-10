@@ -2,10 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+// if you need to controll Slidable internal function
+// Get instance of SlidableController and pass it to Slidable initiator
 class SlidableController {
-  SlidableController();
-
-  void Function() reverse;
+  TickerFuture Function() reverse;
 }
 
 class Slidable extends StatefulWidget {
@@ -23,11 +23,19 @@ class Slidable extends StatefulWidget {
         super(key: key);
 
   final Widget child;
+
   final Widget background;
+
+  // Controller is used to expose internal functions
   final SlidableController controller;
+
   final VoidCallback onSlided;
+  // When child dragged end to start. it will go back to slidThresholds
   final double slideThresholds;
+
+  // Animation duration that used animation when drag finished
   final Duration movementDuration;
+
   final DragStartBehavior dragStartBehavior;
 
   @override
@@ -39,6 +47,8 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
   Animation<Offset> _moveAnimation;
 
   double _dragExtent = 0.0;
+
+  // if child stopped on slideThresholds. it will be true
   bool _gotoStart = false;
 
   @override
@@ -46,8 +56,11 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
     super.initState();
     _moveController =
         AnimationController(duration: widget.movementDuration, vsync: this);
+
+    // init animation
     _updateMoveAnimation();
 
+    // Expose reverse animation
     if (widget.controller != null) {
       widget.controller.reverse = () => _moveController.animateBack(
             0.0,
