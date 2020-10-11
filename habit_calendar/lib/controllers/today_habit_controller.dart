@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/enums/completion.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
 import 'package:habit_calendar/utils/utils.dart';
+import 'package:habit_calendar/widgets/habit_tile.dart';
 
 import '../enums/day_of_the_week.dart';
 
@@ -13,10 +15,14 @@ class TodayHabitController extends GetxController {
   final todayHabits = List<Habit>().obs;
   final todayEvents = List<Event>().obs;
 
+  final listKey = GlobalKey<AnimatedListState>();
+  List<Habit> habitsCache = List<Habit>();
+  int latestChangedHabitId;
+
   final DbService _dbService = Get.find<DbService>();
 
-  // animationControllers is map to keep every each HabitTile animation controllers
-  // key : habit id, value : animation controller
+  /// animationControllers is map to keep every each HabitTile animation controllers
+  /// key : habit id, value : animation controller
   Map<int, AnimationController> animationControllers =
       Map<int, AnimationController>();
 
@@ -62,12 +68,89 @@ class TodayHabitController extends GetxController {
     todayEvents
         .bindStream(_dbService.database.eventDao.watchEventsByDate(today));
 
+    /// When AnimatedList builded initialItemCount is 0. because todayHabits is kind of Stream.
+    /// so at that time todayHabits has nothing.
+    /// after todayHabits is loaded listen callback is called and habitsCache is null.
+    /// therefore all initial todayHabits entries are loaded to AnimatedList
     todayHabits.listen((list) {
-      _sortTodayHabits(list);
+      Map<int, Habit> removed = Map<int, Habit>();
+      Map<int, Habit> added = Map<int, Habit>();
+
+      // Load inital todayHabits entries to AnimatedList
+      if (habitsCache.isNull || habitsCache.isEmpty) {
+        for (int i = 0; i < list.length; i++) {
+          added[i] = list[i];
+        }
+      } else {
+        /// Check removed habits
+        /// if habitsCache has but new todayHabits doesn't. it is removed
+        for (int i = 0; i < habitsCache.length; i++) {
+          if (!list.contains(habitsCache[i])) {
+            removed[i] = habitsCache[i];
+          }
+        }
+
+        /// Check added habits
+        /// if new todayHabits has but habitsCache doesn't. it is added
+        for (int i = 0; i < list.length; i++) {
+          if (!habitsCache.contains(list[i])) {
+            added[i] = list[i];
+          }
+        }
+      }
+
+      // Remove all removed habits from AnimatedList
+      removed.forEach((key, value) {
+        print('removed : $value');
+        listKey.currentState.removeItem(
+          key + 1,
+          (context, animation) => buildItem(value, animation),
+          duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
+        );
+      });
+
+      // Insert all added habits to AnimatedList
+      added.forEach((key, value) {
+        print('added : $value');
+        listKey.currentState.insertItem(
+          key + 1,
+          duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
+        );
+      });
+
+      // Update habitsCache
+      habitsCache = list;
     });
 
+    /// When Events added because of HabitTile action. todayHabits should be resorted.
+    /// Check whether habit should be moved or not by compare before sort index and after sort index.
+    /// If habit should be moved. remove habit from AnimatedList at before sort index
+    /// and insert to AnimatedList at after sort index
     todayEvents.listen((list) {
-      todayHabits.refresh();
+      // Get before sort index
+      int oldIndex = todayHabits
+          .indexWhere((element) => element.id == latestChangedHabitId);
+
+      // Sort todayHabits
+      _sortTodayHabits(todayHabits);
+
+      // Get after sort index
+      int newIndex = todayHabits
+          .indexWhere((element) => element.id == latestChangedHabitId);
+
+      /// if before sort index is not equal after sort index
+      /// it shuld be moved
+      if (oldIndex != newIndex) {
+        listKey.currentState.removeItem(
+          oldIndex + 1,
+          (context, animation) => buildItem(todayHabits[oldIndex], animation),
+          duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
+        );
+        listKey.currentState.insertItem(
+          newIndex + 1,
+          duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
+        );
+      }
     });
 
     super.onInit();
@@ -111,6 +194,81 @@ class TodayHabitController extends GetxController {
   }
 
   // Utility Methods
+  Widget buildItem(Habit habit, Animation<double> animation) {
+    return SizeTransition(
+      sizeFactor: CurvedAnimation(parent: animation, curve: Curves.ease),
+      child: Padding(
+        padding: const EdgeInsets.only(
+          bottom: 8.0,
+        ),
+        child: HabitTile(
+          key: ValueKey(habit.id),
+          date: Text(formWhatTime(habit.whatTime)),
+          name: Text(habit.name),
+          checkMark: Icon(
+            Icons.radio_button_unchecked,
+            color: Get.theme.accentColor,
+            size: 60.0,
+          ),
+          background: HabitTileBackground(
+            color: Get.theme.accentColor,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 30.0),
+              child: RotationTransition(
+                turns: Tween(begin: 0.0, end: -0.3).animate(
+                  CurvedAnimation(
+                      parent: animationControllers[habit.id],
+                      curve: Curves.ease),
+                ),
+                child: Icon(
+                  Icons.check_circle_outline,
+                  color: Get.theme.scaffoldBackgroundColor,
+                  size: 30.0,
+                ),
+              ),
+            ),
+          ),
+          secondaryBackground: HabitTileBackground(
+            color: Colors.red,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 30.0),
+              child: RotationTransition(
+                turns: Tween(begin: 0.0, end: -0.3).animate(
+                  CurvedAnimation(
+                      parent: animationControllers[habit.id],
+                      curve: Curves.ease),
+                ),
+                child: Icon(
+                  Icons.replay,
+                  color: Get.theme.scaffoldBackgroundColor,
+                  size: 30.0,
+                ),
+              ),
+            ),
+          ),
+          initBackground: isCompleted(habit.id)
+              ? HabitTileBackgroundType.secondaryBackground
+              : HabitTileBackgroundType.background,
+          onBackgroundChangedAnimation: (from, to) async {
+            await animationControllers[habit.id].forward();
+            return animationControllers[habit.id].reverse();
+          },
+          onBackgroundChanged: (from, to) {
+            switch (from) {
+              case HabitTileBackgroundType.background:
+                complete(habit.id);
+                break;
+              case HabitTileBackgroundType.secondaryBackground:
+                notComplete(habit.id);
+                break;
+            }
+            latestChangedHabitId = habit.id;
+          },
+        ),
+      ),
+    );
+  }
+
   String formWhatTime(DateTime when) {
     if (when == null) return '오늘안에';
     if (when.hour - 12 < 1)
@@ -161,7 +319,7 @@ class TodayHabitController extends GetxController {
         // 3rd Sort : Sort by whatTime
         // Move habit has more late whatTime to end of list
         else {
-          int value = a.whatTime.compareTo(b.whatTime);
+          int value = a.whatTime?.compareTo(b.whatTime) ?? 0;
           if (value != 0)
             return value;
           // 4th Sort : Sort by name alphabet
