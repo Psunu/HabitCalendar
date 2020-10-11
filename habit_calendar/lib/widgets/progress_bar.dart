@@ -1,38 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_calendar/constants/constants.dart';
 
 class ProgressBar extends StatelessWidget {
-  final _borderRadius = BorderRadius.circular(10.0);
+  ProgressBar({
+    this.width,
+    this.height = 15.0,
+    this.layoutPadding = 0.0,
+    this.borderRadius,
+    this.backgroundColor,
+    this.frontColor,
+    @required this.percentage,
+    this.duration = const Duration(
+      milliseconds: Constants.mediumAnimationSpeed,
+    ),
+  });
 
+  final double width;
+  final double height;
+  final double layoutPadding;
+  final BorderRadius borderRadius;
+  final Color backgroundColor;
+  final Color frontColor;
   final double percentage;
-  final double duration;
-  final BoxConstraints constraints;
+  final Duration duration;
 
-  ProgressBar({this.percentage, this.duration, this.constraints});
+  double get _width => (width ?? Get.context.width) - layoutPadding;
+  BorderRadius get _borderRadius =>
+      borderRadius ?? BorderRadius.circular(Constants.smallBorderRadius);
+  Color get _backgroundColor => backgroundColor ?? Colors.grey[200];
+  Color get _frontColor => frontColor ?? Get.theme.accentColor;
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Container(
-          width: constraints.maxWidth,
-          height: constraints.maxHeight,
+          width: _width,
+          height: height,
           decoration: BoxDecoration(
-            color: Colors.grey[200],
+            color: _backgroundColor,
             borderRadius: _borderRadius,
           ),
         ),
         AnimatedContainer(
-          width: constraints.maxWidth * percentage,
-          height: constraints.maxHeight,
+          width: _width * percentage,
+          height: height,
           decoration: BoxDecoration(
-            color: context.theme.primaryColor,
+            color: _frontColor,
             borderRadius: _borderRadius,
           ),
-          duration: duration ??
-              const Duration(
-                milliseconds: 200,
-              ),
+          duration: duration,
+          curve: Curves.ease,
         ),
       ],
     );

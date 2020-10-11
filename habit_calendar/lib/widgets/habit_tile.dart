@@ -22,9 +22,10 @@ class HabitTile extends StatefulWidget {
     @required this.key,
     this.padding = const EdgeInsets.symmetric(horizontal: 20.0),
     this.width,
-    this.height,
+    this.height = 90.0,
     @required this.date,
     @required this.name,
+    this.checkMark,
     this.background,
     this.secondaryBackground,
     this.initBackground = HabitTileBackgroundType.background,
@@ -41,6 +42,7 @@ class HabitTile extends StatefulWidget {
   final double height;
   final Text date;
   final Text name;
+  final Widget checkMark;
   final Widget background;
   final Widget secondaryBackground;
   final HabitTileBackgroundType initBackground;
@@ -134,12 +136,25 @@ class _HabitTileState extends State<HabitTile> {
         child: Container(
           margin: widget.padding,
           width: widget.width ?? Get.context.width,
-          height: widget.height ?? 90.0,
+          height: widget.height,
           child: Row(
             children: [
               Expanded(
                 flex: 1,
-                child: widget.date,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    AnimatedOpacity(
+                      opacity: _isBackground ? 0.0 : 0.8,
+                      duration: Duration(
+                        milliseconds: Constants.smallAnimationSpeed,
+                      ),
+                      curve: Curves.ease,
+                      child: widget.checkMark,
+                    ),
+                    widget.date,
+                  ],
+                ),
               ),
               Container(
                 padding:
@@ -154,6 +169,35 @@ class _HabitTileState extends State<HabitTile> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class HabitTileBackground extends StatefulWidget {
+  HabitTileBackground({
+    @required this.color,
+    @required this.child,
+  });
+
+  final Color color;
+  final Widget child;
+
+  @override
+  _HabitTileBackgroundState createState() => _HabitTileBackgroundState();
+}
+
+class _HabitTileBackgroundState extends State<HabitTileBackground> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.centerRight,
+      decoration: BoxDecoration(
+        color: widget.color,
+        borderRadius: BorderRadius.circular(
+          Constants.mediumBorderRadius,
+        ),
+      ),
+      child: widget.child,
     );
   }
 }

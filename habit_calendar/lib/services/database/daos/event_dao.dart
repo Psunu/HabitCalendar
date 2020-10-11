@@ -1,4 +1,3 @@
-import 'package:habit_calendar/enums/day_of_the_week.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/tables/events.dart';
 import 'package:moor_flutter/moor_flutter.dart';
@@ -20,7 +19,7 @@ class EventDao extends DatabaseAccessor<AppDatabase> with _$EventDaoMixin {
     return (select(events)..where((tbl) => tbl.date.equals(date))).watch();
   }
 
-  Future insertEvent(Event event) => into(events).insert(event);
-  Future updateEvent(Event event) => update(events).replace(event);
-  Future deleteEvent(Event event) => delete(events).delete(event);
+  Future<int> insertEvent(Event event) => into(events).insert(event);
+  Future<bool> updateEvent(Event event) => update(events).replace(event);
+  Future<int> deleteEvent(Event event) => delete(events).delete(event);
 }

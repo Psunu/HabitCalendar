@@ -41,92 +41,99 @@ class _TodayHabitState extends State<TodayHabit> with TickerProviderStateMixin {
               ),
               ProgressBar(
                 percentage: controller.todayPercentage,
-                constraints: BoxConstraints(
-                    maxWidth: context.width - 60.0, maxHeight: 15.0),
+                layoutPadding: Constants.padding * 2,
               ),
               const SizedBox(
                 height: 50.0,
               ),
-              Column(
-                children: List.generate(
-                  controller.todayHabits.length,
-                  (index) {
-                    final element = controller.todayHabits[index];
-                    controller.animationControllers[element.id] =
-                        AnimationController(
-                            duration: Duration(
-                              milliseconds: Constants.smallAnimationSpeed,
-                            ),
-                            vsync: this);
+              Padding(
+                padding: const EdgeInsets.only(bottom: 40.0),
+                child: Column(
+                  children: List.generate(
+                    controller.todayHabits.length,
+                    (index) {
+                      final element = controller.todayHabits[index];
+                      controller.animationControllers[element.id] =
+                          AnimationController(
+                              duration: Duration(
+                                milliseconds: Constants.smallAnimationSpeed,
+                              ),
+                              vsync: this);
 
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                        bottom: 8.0,
-                      ),
-                      child: HabitTile(
-                        key: ValueKey(element.id),
-                        date: Text(controller.formWhatTime(element.whatTime)),
-                        name: Text(element.name),
-                        background: HabitTileBackground(
-                          color: Get.theme.accentColor,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 30.0),
-                            child: RotationTransition(
-                              turns: Tween(begin: 0.0, end: -0.3).animate(
-                                CurvedAnimation(
-                                    parent: controller
-                                        .animationControllers[element.id],
-                                    curve: Curves.ease),
-                              ),
-                              child: Icon(
-                                Icons.check_circle_outline,
-                                color: Get.theme.scaffoldBackgroundColor,
-                                size: 30.0,
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 8.0,
+                        ),
+                        child: HabitTile(
+                          key: ValueKey(element.id),
+                          date: Text(controller.formWhatTime(element.whatTime)),
+                          name: Text(element.name),
+                          checkMark: Icon(
+                            Icons.radio_button_unchecked,
+                            color: Get.theme.accentColor,
+                            size: 60.0,
+                          ),
+                          background: HabitTileBackground(
+                            color: Get.theme.accentColor,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 30.0),
+                              child: RotationTransition(
+                                turns: Tween(begin: 0.0, end: -0.3).animate(
+                                  CurvedAnimation(
+                                      parent: controller
+                                          .animationControllers[element.id],
+                                      curve: Curves.ease),
+                                ),
+                                child: Icon(
+                                  Icons.check_circle_outline,
+                                  color: Get.theme.scaffoldBackgroundColor,
+                                  size: 30.0,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        secondaryBackground: HabitTileBackground(
-                          color: Colors.red,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 30.0),
-                            child: RotationTransition(
-                              turns: Tween(begin: 0.0, end: -0.3).animate(
-                                CurvedAnimation(
-                                    parent: controller
-                                        .animationControllers[element.id],
-                                    curve: Curves.ease),
-                              ),
-                              child: Icon(
-                                Icons.replay,
-                                color: Get.theme.scaffoldBackgroundColor,
-                                size: 30.0,
+                          secondaryBackground: HabitTileBackground(
+                            color: Colors.red,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 30.0),
+                              child: RotationTransition(
+                                turns: Tween(begin: 0.0, end: -0.3).animate(
+                                  CurvedAnimation(
+                                      parent: controller
+                                          .animationControllers[element.id],
+                                      curve: Curves.ease),
+                                ),
+                                child: Icon(
+                                  Icons.replay,
+                                  color: Get.theme.scaffoldBackgroundColor,
+                                  size: 30.0,
+                                ),
                               ),
                             ),
                           ),
+                          initBackground: controller.isCompleted(element.id)
+                              ? HabitTileBackgroundType.secondaryBackground
+                              : HabitTileBackgroundType.background,
+                          onBackgroundChangedAnimation: (from, to) async {
+                            await controller.animationControllers[element.id]
+                                .forward();
+                            return controller.animationControllers[element.id]
+                                .reverse();
+                          },
+                          onBackgroundChanged: (from, to) {
+                            switch (from) {
+                              case HabitTileBackgroundType.background:
+                                controller.complete(element.id);
+                                break;
+                              case HabitTileBackgroundType.secondaryBackground:
+                                controller.notComplete(element.id);
+                                break;
+                            }
+                          },
                         ),
-                        initBackground: controller.isCompleted(element.id)
-                            ? HabitTileBackgroundType.secondaryBackground
-                            : HabitTileBackgroundType.background,
-                        onBackgroundChangedAnimation: (from, to) async {
-                          await controller.animationControllers[element.id]
-                              .forward();
-                          return controller.animationControllers[element.id]
-                              .reverse();
-                        },
-                        onBackgroundChanged: (from, to) {
-                          switch (from) {
-                            case HabitTileBackgroundType.background:
-                              controller.complete(element.id);
-                              break;
-                            case HabitTileBackgroundType.secondaryBackground:
-                              controller.notComplete(element.id);
-                              break;
-                          }
-                        },
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             ],

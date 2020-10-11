@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/enums/completion.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
@@ -63,10 +62,12 @@ class TodayHabitController extends GetxController {
     todayEvents
         .bindStream(_dbService.database.eventDao.watchEventsByDate(today));
 
+    todayHabits.listen((list) {
+      _sortTodayHabits(list);
+    });
+
     todayEvents.listen((list) {
-      list.forEach((element) {
-        print(element);
-      });
+      todayHabits.refresh();
     });
 
     super.onInit();
@@ -84,8 +85,7 @@ class TodayHabitController extends GetxController {
   Future<void> complete(int habitId) async {
     if (todayEvents
         .where(
-          (event) =>
-              event.date.isAtSameMomentAs(today) && event.habitId == habitId,
+          (event) => _eventsWhere(event, habitId),
         )
         .isEmpty) {
       _dbService.database.eventDao.insertEvent(
@@ -101,7 +101,7 @@ class TodayHabitController extends GetxController {
 
   Future<void> notComplete(int habitId) async {
     Event event = todayEvents.singleWhere(
-      (event) => event.date.isAtSameMomentAs(today) && event.habitId == habitId,
+      (event) => _eventsWhere(event, habitId),
       orElse: () => null,
     );
 
@@ -122,42 +122,53 @@ class TodayHabitController extends GetxController {
   bool isCompleted(int habitId) {
     return todayEvents
                 .singleWhere(
-                  (event) =>
-                      event.date.isAtSameMomentAs(today) &&
-                      event.habitId == habitId,
+                  (event) => _eventsWhere(event, habitId),
                   orElse: () => null,
                 )
                 ?.completion ==
             Completion.Ok.index ??
         false;
   }
-}
 
-class HabitTileBackground extends StatefulWidget {
-  HabitTileBackground({
-    @required this.color,
-    @required this.child,
-  });
+  bool _eventsWhere(Event event, int habitId) {
+    if (event == null) return false;
 
-  final Color color;
-  final Widget child;
+    return event.date.isAtSameMomentAs(today) && event.habitId == habitId;
+  }
 
-  @override
-  _HabitTileBackgroundState createState() => _HabitTileBackgroundState();
-}
+  void _sortTodayHabits(List<Habit> list) {
+    list.sort((a, b) {
+      final aEvent = todayEvents.singleWhere(
+          (event) => _eventsWhere(event, a.id),
+          orElse: () => null);
+      final bEvent = todayEvents.singleWhere(
+          (event) => _eventsWhere(event, b.id),
+          orElse: () => null);
 
-class _HabitTileBackgroundState extends State<HabitTileBackground> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.centerRight,
-      decoration: BoxDecoration(
-        color: widget.color,
-        borderRadius: BorderRadius.circular(
-          Constants.mediumBorderRadius,
-        ),
-      ),
-      child: widget.child,
-    );
+      // 1st Sort : Sort by event is completed
+      // Move habit that is completed to end of list
+      if (aEvent.isNull && !bEvent.isNull)
+        return -1;
+      else if (bEvent.isNull && !aEvent.isNull)
+        return 1;
+      // 2nd Sort : Sort by whatTime is not null
+      // Move habit has whatTime is null to end of list
+      else {
+        if (a.whatTime.isNull && !b.whatTime.isNull)
+          return 1;
+        else if (b.whatTime.isNull && !a.whatTime.isNull)
+          return -1;
+        // 3rd Sort : Sort by whatTime
+        // Move habit has more late whatTime to end of list
+        else {
+          int value = a.whatTime.compareTo(b.whatTime);
+          if (value != 0)
+            return value;
+          // 4th Sort : Sort by name alphabet
+          else
+            return a.name.compareTo(b.name);
+        }
+      }
+    });
   }
 }
