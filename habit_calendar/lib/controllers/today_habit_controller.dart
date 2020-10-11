@@ -16,8 +16,10 @@ class TodayHabitController extends GetxController {
 
   final DbService _dbService = Get.find<DbService>();
 
-  final backgroundAnimationTrigger = false.obs;
-  final secondaryBackgroundAnimationTrigger = false.obs;
+  // animationControllers is map to keep every each HabitTile animation controllers
+  // key : habit id, value : animation controller
+  Map<int, AnimationController> animationControllers =
+      Map<int, AnimationController>();
 
   // Get Set
   String get formedToday => '${today.month}월 ${today.day}일 ($weekdayString)';
@@ -54,46 +56,54 @@ class TodayHabitController extends GetxController {
   // Controller life cycle
   @override
   void onInit() async {
+    today = DateTime(today.year, today.month, today.day);
+
     todayHabits.bindStream(_dbService.database.habitDao
         .watchHabitsByWeek(DayOfTheWeek.values[today.weekday - 1]));
-    todayEvents.bindStream(_dbService.database.eventDao.watchAllEvents());
+    todayEvents
+        .bindStream(_dbService.database.eventDao.watchEventsByDate(today));
 
     todayEvents.listen((list) {
       list.forEach((element) {
         print(element);
       });
     });
-    today = DateTime(today.year, today.month, today.day);
+
     super.onInit();
   }
 
-  // Primary methods
-  Future<void> complete(int id) async {
-    todayEvents.forEach((event) {
-      if (event.date.isAtSameMomentAs(today) && event.habitId == id) {
-        return;
-      }
+  @override
+  void onClose() {
+    animationControllers.forEach((key, value) {
+      value.dispose();
     });
-
-    _dbService.database.eventDao.insertEvent(
-      Event(
-        id: null,
-        date: today,
-        completion: 1,
-        habitId: id,
-      ),
-    );
+    super.onClose();
   }
 
-  Future<void> notComplete(int id) async {
-    Event event;
-    for (int i = 0; i < todayEvents.length; i++) {
-      if (todayEvents[i].date.isAtSameMomentAs(today) &&
-          todayEvents[i].habitId == id) {
-        event = todayEvents[i];
-        break;
-      }
+  // Primary methods
+  Future<void> complete(int habitId) async {
+    if (todayEvents
+        .where(
+          (event) =>
+              event.date.isAtSameMomentAs(today) && event.habitId == habitId,
+        )
+        .isEmpty) {
+      _dbService.database.eventDao.insertEvent(
+        Event(
+          id: null,
+          date: today,
+          completion: Completion.Ok.index,
+          habitId: habitId,
+        ),
+      );
     }
+  }
+
+  Future<void> notComplete(int habitId) async {
+    Event event = todayEvents.singleWhere(
+      (event) => event.date.isAtSameMomentAs(today) && event.habitId == habitId,
+      orElse: () => null,
+    );
 
     if (event != null) {
       _dbService.database.eventDao.deleteEvent(event);
@@ -107,6 +117,19 @@ class TodayHabitController extends GetxController {
       return 'AM ${Utils.twoDigits(when.hour)}:${Utils.twoDigits(when.minute)}';
     else
       return 'PM ${Utils.twoDigits(when.hour - 12)}:${Utils.twoDigits(when.minute)}';
+  }
+
+  bool isCompleted(int habitId) {
+    return todayEvents
+                .singleWhere(
+                  (event) =>
+                      event.date.isAtSameMomentAs(today) &&
+                      event.habitId == habitId,
+                  orElse: () => null,
+                )
+                ?.completion ==
+            Completion.Ok.index ??
+        false;
   }
 }
 

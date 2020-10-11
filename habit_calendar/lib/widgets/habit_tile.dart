@@ -20,13 +20,14 @@ enum HabitTileBackgroundType {
 class HabitTile extends StatefulWidget {
   HabitTile({
     @required this.key,
-    this.padding,
+    this.padding = const EdgeInsets.symmetric(horizontal: 20.0),
     this.width,
     this.height,
     @required this.date,
     @required this.name,
     this.background,
     this.secondaryBackground,
+    this.initBackground = HabitTileBackgroundType.background,
     this.onBackgroundChangedAnimation,
     this.onBeforeBackgroundChanged,
     this.onBackgroundChanged,
@@ -42,6 +43,7 @@ class HabitTile extends StatefulWidget {
   final Text name;
   final Widget background;
   final Widget secondaryBackground;
+  final HabitTileBackgroundType initBackground;
   final OnBackgroundChangedAnimation onBackgroundChangedAnimation;
   final OnBackgroundChangedCallback onBeforeBackgroundChanged;
   final OnBackgroundChangedCallback onBackgroundChanged;
@@ -52,7 +54,13 @@ class HabitTile extends StatefulWidget {
 
 class _HabitTileState extends State<HabitTile> {
   SlidableController _slidableController = SlidableController();
-  bool _isBackground = true;
+  bool _isBackground;
+
+  @override
+  void initState() {
+    _isBackground = widget.initBackground == HabitTileBackgroundType.background;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,8 +132,7 @@ class _HabitTileState extends State<HabitTile> {
           ),
         ),
         child: Container(
-          margin:
-              widget.padding ?? const EdgeInsets.symmetric(horizontal: 20.0),
+          margin: widget.padding,
           width: widget.width ?? Get.context.width,
           height: widget.height ?? 90.0,
           child: Row(

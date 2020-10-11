@@ -1,5 +1,4 @@
 enum Completion {
-  Ok,
-  Little,
   No,
+  Ok,
 }
