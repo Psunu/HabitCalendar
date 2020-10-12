@@ -1,4 +1,6 @@
 class Utils {
+  static String getFormedDate(DateTime date) =>
+      '${date.month}월 ${date.day}일 (${Utils.getWeekString(date.weekday - 1)})';
   static String getWeekString(int week) {
     switch (week) {
       case 0:

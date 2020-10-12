@@ -6,6 +6,7 @@ import 'package:habit_calendar/enums/completion.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
 import 'package:habit_calendar/utils/utils.dart';
+import 'package:habit_calendar/views/manage_habit.dart';
 import 'package:habit_calendar/widgets/habit_tile.dart';
 
 import '../enums/day_of_the_week.dart';
@@ -27,27 +28,7 @@ class TodayHabitController extends GetxController {
       Map<int, AnimationController>();
 
   // Get Set
-  String get formedToday => '${today.month}월 ${today.day}일 ($weekdayString)';
-  String get weekdayString {
-    switch (today.weekday) {
-      case 1:
-        return '월';
-      case 2:
-        return '화';
-      case 3:
-        return '수';
-      case 4:
-        return '목';
-      case 5:
-        return '금';
-      case 6:
-        return '토';
-      case 7:
-        return '일';
-      default:
-        return null;
-    }
-  }
+  String get formedToday => Utils.getFormedDate(today);
 
   int get completedEvent => todayEvents
       .where((element) => element.completion != Completion.No.index)
@@ -191,6 +172,26 @@ class TodayHabitController extends GetxController {
     if (event != null) {
       _dbService.database.eventDao.deleteEvent(event);
     }
+  }
+
+  void navigateToManage() {
+    final route = PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => ManageHabit(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final begin = Offset(-1.0, 0.0);
+        final end = Offset.zero;
+        final curve = Curves.ease;
+
+        final tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+    Navigator.of(Get.context).push(route);
   }
 
   // Utility Methods

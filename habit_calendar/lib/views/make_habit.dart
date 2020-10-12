@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/widgets/duration_picker.dart';
+import 'package:habit_calendar/widgets/group_circle.dart';
 import 'package:habit_calendar/widgets/time_picker.dart';
 
 import '../controllers/make_habit_controller.dart';
@@ -98,19 +99,10 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                                     Constants.smallBorderRadius,
                                   ),
                                 ),
-                                child: Container(
-                                  width: 30.0,
-                                  height: 30.0,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.grey[400],
-                                      width: 1.5,
-                                    ),
-                                    color: Color(
-                                      controller?.selectedGroup?.value?.color ??
-                                          Colors.white.value,
-                                    ),
+                                child: GroupCircle(
+                                  color: Color(
+                                    controller?.selectedGroup?.value?.color ??
+                                        Colors.white.value,
                                   ),
                                 ),
                               ),
