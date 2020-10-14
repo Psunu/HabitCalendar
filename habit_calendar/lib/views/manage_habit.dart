@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/controllers/manage_habit_controller.dart';
+import 'package:habit_calendar/services/database/app_database.dart';
+import 'package:habit_calendar/widgets/group_card.dart';
 import 'package:habit_calendar/widgets/group_circle.dart';
 
 const _kCardHeight = 90.0;
@@ -13,6 +15,26 @@ class ManageHabit extends StatelessWidget {
     return GetX<ManageHabitController>(
       init: ManageHabitController(),
       builder: (controller) => Scaffold(
+        appBar: AppBar(
+          backgroundColor: Get.theme.scaffoldBackgroundColor,
+          elevation: 0.0,
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Get.textTheme.bodyText1.color,
+            ),
+            onPressed: () => Get.back(),
+          ),
+          title: Text(
+            'GROUPS',
+            style: Get.textTheme.bodyText1,
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: Icon(Icons.add),
+        ),
         body: Container(
           padding: const EdgeInsets.only(
             top: Constants.padding,
@@ -21,91 +43,23 @@ class ManageHabit extends StatelessWidget {
             right: Constants.padding,
           ),
           child: ListView.builder(
-            itemCount: controller.groups.length + 1,
+            itemCount: controller.groups.length,
             itemBuilder: (context, index) {
-              if (index == 0) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Stack(
-                      alignment: Alignment.centerLeft,
-                      children: [
-                        InkWell(
-                          onTap: () => Get.back(),
-                          child: Icon(
-                            Icons.arrow_back,
-                            // color: Get.theme.accentColor,
-                          ),
-                        ),
-                        Center(
-                          child: Text(
-                            'GROUPS',
-                            style: Get.textTheme.bodyText1,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: Constants.padding,
-                    ),
-                  ],
-                );
-              }
+              final group = controller.groups[index];
 
-              final group = controller.groups[index - 1];
-
-              return Card(
-                margin: const EdgeInsets.all(0.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    Constants.mediumBorderRadius,
-                  ),
+              return GroupCard(
+                groupName: Text(
+                  group.name,
+                  style: Get.textTheme.headline6,
                 ),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 15.0,
-                  ),
-                  width: Get.context.width,
-                  height: _kCardHeight,
-                  child: Stack(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 40.0,
-                          ),
-                          Text(
-                            group.name,
-                            style: Get.textTheme.headline6,
-                          ),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                controller.numGroupMembers(group.id).toString(),
-                                style: Get.textTheme.bodyText1,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10.0,
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: GroupCircle(
-                          color: Color(
-                            group.color,
-                          ),
-                          height: _kGroupCircleSize,
-                          width: _kGroupCircleSize,
-                        ),
-                      ),
-                    ],
-                  ),
+                numGroupMembers: Text(
+                  controller.numGroupMembers(group.id).toString(),
+                  style: Get.textTheme.bodyText1,
                 ),
+                groupMembers: controller.groupMembers(group.id),
+                color: Color(group.color),
+                colorCircleSize: _kGroupCircleSize,
+                height: _kCardHeight,
               );
             },
           ),

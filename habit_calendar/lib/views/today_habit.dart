@@ -37,33 +37,33 @@ class _TodayHabitState extends State<TodayHabit> with TickerProviderStateMixin {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-                        onTap: controller.navigateToManage,
-                        child: Icon(
-                          Icons.menu,
-                          // color: Get.theme.accentColor,
-                        ),
-                      ),
-                      // IconButton(
-                      //   alignment: Alignment.centerLeft,
-                      //   padding: EdgeInsets.all(0.0),
-                      //   icon: Icon(
-                      //     Icons.menu,
-                      //   ),
-                      //   onPressed: controller.navigateToManage,
-                      // ),
-                      Text(
-                        controller.formedToday,
-                        style: Get.textTheme.bodyText2,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: Constants.padding,
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     InkWell(
+                  //       onTap: controller.navigateToManage,
+                  //       child: Icon(
+                  //         Icons.menu,
+                  //         // color: Get.theme.accentColor,
+                  //       ),
+                  //     ),
+                  //     // IconButton(
+                  //     //   alignment: Alignment.centerLeft,
+                  //     //   padding: EdgeInsets.all(0.0),
+                  //     //   icon: Icon(
+                  //     //     Icons.menu,
+                  //     //   ),
+                  //     //   onPressed: controller.navigateToManage,
+                  //     // ),
+                  //     Text(
+                  //       controller.formedToday,
+                  //       style: Get.textTheme.bodyText2,
+                  //     ),
+                  //   ],
+                  // ),
+                  // const SizedBox(
+                  //   height: Constants.padding,
+                  // ),
                   Text(
                     '꾸준히 하려면\n작게 해야 합니다',
                     style: Get.textTheme.headline4,

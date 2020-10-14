@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
+import 'package:habit_calendar/views/manage_habit.dart';
 import 'package:habit_calendar/views/today_habit.dart';
 
 import '../enums/day_of_the_week.dart';
@@ -20,7 +21,27 @@ class HomeController extends GetxController {
     ),
   ];
 
-  // Methods
+  // Primary methods
+  void navigateToManage() {
+    final route = PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => ManageHabit(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final begin = Offset(-1.0, 0.0);
+        final end = Offset.zero;
+        final curve = Curves.ease;
+
+        final tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+    Navigator.of(Get.context).push(route);
+  }
+
   void onBottomNavTapped(int index) {
     currentIndex = index;
     update();

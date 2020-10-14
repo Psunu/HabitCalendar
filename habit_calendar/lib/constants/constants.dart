@@ -1,6 +1,6 @@
 class Constants {
   // Layout padding
-  static const padding = 35.0;
+  static const padding = 30.0;
   // Border radius
   static const largeBorderRadius = 16.0;
   static const mediumBorderRadius = 12.0;

@@ -20,4 +20,6 @@ class ManageHabitController extends GetxController {
   // Utility methods
   int numGroupMembers(int groupId) =>
       habits.where((habit) => habit.groupId == groupId).length;
+  List<Habit> groupMembers(int groupId) =>
+      habits.where((habit) => habit.groupId == groupId).toList();
 }

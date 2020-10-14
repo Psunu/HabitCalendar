@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:animations/animations.dart';
+import 'package:habit_calendar/utils/utils.dart';
 import 'package:habit_calendar/widgets/open_container_fab.dart';
 
 import '../controllers/home_controller.dart';
 import '../views/make_habit.dart';
+
+const _kDefaultAppbarPadding = 17.5;
 
 class Home extends StatelessWidget {
   @override
@@ -12,6 +15,26 @@ class Home extends StatelessWidget {
     return GetBuilder<HomeController>(
       init: HomeController(),
       builder: (controller) => Scaffold(
+          appBar: AppBar(
+            backgroundColor: Get.theme.scaffoldBackgroundColor,
+            elevation: 0.0,
+            leading: IconButton(
+              icon: Icon(
+                Icons.menu,
+                color: Get.textTheme.bodyText2.color,
+              ),
+              onPressed: () => controller.navigateToManage(),
+            ),
+            title: Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                Utils.getFormedDate(
+                  DateTime.now(),
+                ),
+                style: Get.textTheme.bodyText2,
+              ),
+            ),
+          ),
           body: PageTransitionSwitcher(
             transitionBuilder: (
               Widget child,
