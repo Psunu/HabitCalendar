@@ -23,6 +23,7 @@ class HabitTile extends StatefulWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 20.0),
     this.width,
     this.height = 90.0,
+    this.childColor,
     @required this.date,
     @required this.name,
     this.checkMark,
@@ -33,6 +34,8 @@ class HabitTile extends StatefulWidget {
     this.onBeforeBackgroundChanged,
     this.onBackgroundChanged,
   })  : assert(key != null),
+        assert(date != null),
+        assert(name != null),
         assert(secondaryBackground != null ? background != null : true),
         super(key: key);
 
@@ -40,6 +43,7 @@ class HabitTile extends StatefulWidget {
   final EdgeInsets padding;
   final double width;
   final double height;
+  final Color childColor;
   final Text date;
   final Text name;
   final Widget checkMark;
@@ -57,6 +61,9 @@ class HabitTile extends StatefulWidget {
 class _HabitTileState extends State<HabitTile> {
   SlidableController _slidableController = SlidableController();
   bool _isBackground;
+
+  double get _width => widget.width ?? Get.context.width;
+  Color get _childColor => widget.childColor ?? Colors.white;
 
   @override
   void initState() {
@@ -126,47 +133,42 @@ class _HabitTileState extends State<HabitTile> {
             : widget.secondaryBackground ?? widget.background,
       ),
       slideThresholds: 0.25,
-      child: Card(
-        margin: const EdgeInsets.all(0.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            Constants.mediumBorderRadius,
-          ),
+      child: Container(
+        width: _width,
+        height: widget.height,
+        decoration: BoxDecoration(
+          color: _childColor,
+          borderRadius: BorderRadius.circular(Constants.mediumBorderRadius),
         ),
-        child: Container(
-          margin: widget.padding,
-          width: widget.width ?? Get.context.width,
-          height: widget.height,
-          child: Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    AnimatedOpacity(
-                      opacity: _isBackground ? 0.0 : 0.8,
-                      duration: Duration(
-                        milliseconds: Constants.smallAnimationSpeed,
-                      ),
-                      curve: Curves.ease,
-                      child: widget.checkMark,
+        child: Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  AnimatedOpacity(
+                    opacity: _isBackground ? 0.0 : 0.8,
+                    duration: Duration(
+                      milliseconds: Constants.smallAnimationSpeed,
                     ),
-                    widget.date,
-                  ],
-                ),
+                    curve: Curves.ease,
+                    child: widget.checkMark,
+                  ),
+                  widget.date,
+                ],
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
-                child: VerticalDivider(),
-              ),
-              Expanded(
-                flex: 3,
-                child: widget.name,
-              ),
-            ],
-          ),
+            ),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
+              child: VerticalDivider(),
+            ),
+            Expanded(
+              flex: 3,
+              child: widget.name,
+            ),
+          ],
         ),
       ),
     );

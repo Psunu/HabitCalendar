@@ -4,9 +4,6 @@ import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/widgets/group_circle.dart';
 
-// TODO implment GroupCard
-// Center text
-// overflow problem
 class GroupCard extends StatefulWidget {
   const GroupCard({
     Key key,
@@ -14,83 +11,116 @@ class GroupCard extends StatefulWidget {
     @required this.numGroupMembers,
     @required this.groupMembers,
     @required this.color,
+    this.backgroundColor,
     this.colorCircleSize = 20.0,
     this.width,
-    this.height = 90.0,
+    this.height = 70.0,
+    this.onHabitTapped,
   }) : super(key: key);
 
   final Text groupName;
   final Text numGroupMembers;
   final List<Habit> groupMembers;
   final Color color;
+  final Color backgroundColor;
   final double colorCircleSize;
   final double width;
   final double height;
+  final void Function(int) onHabitTapped;
 
   @override
   _GroupCardState createState() => _GroupCardState();
 }
 
-class _GroupCardState extends State<GroupCard> {
+class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
+  AnimationController _actionAnimationController;
+  Animation _actionAnimation;
+
   double get _width => widget.width ?? Get.context.width;
+  Color get _backgroundColor => widget.backgroundColor ?? Colors.white;
+
   bool expanded = false;
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(0.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          Constants.mediumBorderRadius,
-        ),
+  void initState() {
+    _actionAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: Constants.smallAnimationSpeed),
+    );
+    _actionAnimation = _actionAnimationController.drive(
+      Tween(begin: 0.0, end: 0.5).chain(
+        CurveTween(curve: Curves.ease),
       ),
-      child: AnimatedContainer(
-        duration: Duration(
-          milliseconds: Constants.mediumAnimationSpeed,
-        ),
-        curve: Curves.ease,
-        margin: const EdgeInsets.only(
-          left: 15.0,
-        ),
-        width: _width,
-        height: expanded
-            ? widget.height + widget.height * widget.groupMembers.length
-            : widget.height,
+    );
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: _backgroundColor,
+        borderRadius: BorderRadius.circular(Constants.mediumBorderRadius),
+      ),
+      width: _width,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15.0),
         child: Stack(
           children: [
-            Column(
-              // mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+            SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: AnimatedSize(
+                alignment: Alignment.topCenter,
+                vsync: this,
+                duration:
+                    Duration(milliseconds: Constants.mediumAnimationSpeed),
+                curve: Curves.ease,
+                child: Column(
                   children: [
                     SizedBox(
-                      width: 40.0,
-                    ),
-                    widget.groupName,
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: widget.numGroupMembers,
+                      height: widget.height,
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 40.0),
+                          widget.groupName,
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: widget.numGroupMembers,
+                            ),
+                          ),
+                          RotationTransition(
+                            turns: _actionAnimation,
+                            child: IconButton(
+                              splashRadius: 0.1,
+                              splashColor: Colors.transparent,
+                              icon: const Icon(Icons.expand_more),
+                              onPressed: () {
+                                setState(
+                                  () {
+                                    if (widget.groupMembers.isEmpty ||
+                                        widget.groupMembers.isNull) return;
+
+                                    if (expanded) {
+                                      _actionAnimationController.reverse();
+                                    } else {
+                                      _actionAnimationController.forward();
+                                    }
+
+                                    expanded = !expanded;
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    IconButton(
-                      splashColor: Colors.transparent,
-                      icon: Icon(
-                        expanded ? Icons.expand_less : Icons.expand_more,
-                      ),
-                      onPressed: () {
-                        setState(
-                          () {
-                            expanded = !expanded;
-                          },
-                        );
-                      },
-                    ),
+                    expanded ? _buildExpand() : Container(),
                   ],
                 ),
-                expanded ? _buildExpand() : Container(),
-              ],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
@@ -107,25 +137,54 @@ class _GroupCardState extends State<GroupCard> {
   }
 
   Widget _buildExpand() {
+    if (widget.groupMembers.isNull || widget.groupMembers.isEmpty) {
+      return Container();
+    }
+
     return Column(
-      children: List.generate(
-        widget.groupMembers.length,
-        (index) => Card(
-          margin: const EdgeInsets.all(0.0),
-          child: Container(
-            width: _width,
-            height: widget.height,
-            child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(height: 0.0),
+        ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: widget.height * 3),
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            child: Column(
               children: [
-                Text(
-                  widget.groupMembers[index].name,
-                  style: Get.textTheme.headline6,
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 10.0,
+                    bottom: 10.0,
+                    right: 16.0,
+                  ),
+                  child: Wrap(
+                    spacing: 16.0,
+                    children: List.generate(
+                      widget.groupMembers.length,
+                      (index) => InkWell(
+                        onTap: () {
+                          if (!widget.onHabitTapped.isNull)
+                            widget.onHabitTapped(widget.groupMembers[index].id);
+                        },
+                        child: Chip(
+                          labelPadding:
+                              const EdgeInsets.symmetric(horizontal: 13.0),
+                          label: Text(
+                            widget.groupMembers[index].name,
+                            style: Get.textTheme.bodyText1,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

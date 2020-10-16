@@ -21,10 +21,7 @@ class _TodayHabitState extends State<TodayHabit> with TickerProviderStateMixin {
           key: controller.listKey,
           physics: BouncingScrollPhysics(),
           padding: const EdgeInsets.only(
-            top: Constants.padding,
-            bottom: Constants.padding + 40.0,
-            left: Constants.padding,
-            right: Constants.padding,
+            bottom: Constants.padding + 50.0,
           ),
 
           /// Basically it has top content at index 0.
@@ -34,51 +31,31 @@ class _TodayHabitState extends State<TodayHabit> with TickerProviderStateMixin {
           itemBuilder: (context, index, animation) {
             // Top Content
             if (index == 0) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     InkWell(
-                  //       onTap: controller.navigateToManage,
-                  //       child: Icon(
-                  //         Icons.menu,
-                  //         // color: Get.theme.accentColor,
-                  //       ),
-                  //     ),
-                  //     // IconButton(
-                  //     //   alignment: Alignment.centerLeft,
-                  //     //   padding: EdgeInsets.all(0.0),
-                  //     //   icon: Icon(
-                  //     //     Icons.menu,
-                  //     //   ),
-                  //     //   onPressed: controller.navigateToManage,
-                  //     // ),
-                  //     Text(
-                  //       controller.formedToday,
-                  //       style: Get.textTheme.bodyText2,
-                  //     ),
-                  //   ],
-                  // ),
-                  // const SizedBox(
-                  //   height: Constants.padding,
-                  // ),
-                  Text(
-                    '꾸준히 하려면\n작게 해야 합니다',
-                    style: Get.textTheme.headline4,
-                  ),
-                  const SizedBox(
-                    height: 50.0,
-                  ),
-                  ProgressBar(
-                    percentage: controller.todayPercentage,
-                    layoutPadding: Constants.padding * 2,
-                  ),
-                  const SizedBox(
-                    height: 50.0,
-                  ),
-                ],
+              return Padding(
+                padding: const EdgeInsets.only(
+                  top: Constants.padding,
+                  left: Constants.padding,
+                  right: Constants.padding,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '꾸준히 하려면\n작게 해야 합니다',
+                      style: Get.textTheme.headline4,
+                    ),
+                    const SizedBox(
+                      height: 50.0,
+                    ),
+                    ProgressBar(
+                      percentage: controller.todayPercentage,
+                      layoutPadding: Constants.padding * 2,
+                    ),
+                    const SizedBox(
+                      height: 50.0,
+                    ),
+                  ],
+                ),
               );
             }
 

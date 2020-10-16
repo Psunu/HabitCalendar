@@ -17,6 +17,12 @@ class ManageHabitController extends GetxController {
     super.onInit();
   }
 
+  // Primary methods
+  void onHabitTapped(int habitId) {
+    _dbService.database.habitDao.deleteHabitById(habitId);
+    update();
+  }
+
   // Utility methods
   int numGroupMembers(int groupId) =>
       habits.where((habit) => habit.groupId == groupId).length;

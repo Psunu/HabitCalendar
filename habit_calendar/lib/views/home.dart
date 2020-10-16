@@ -7,8 +7,6 @@ import 'package:habit_calendar/widgets/open_container_fab.dart';
 import '../controllers/home_controller.dart';
 import '../views/make_habit.dart';
 
-const _kDefaultAppbarPadding = 17.5;
-
 class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

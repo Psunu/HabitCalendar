@@ -21,6 +21,8 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
 
   Future<List<Habit>> getAllHabits() => select(habits).get();
   Stream<List<Habit>> watchAllHabits() => select(habits).watch();
+  Stream<List<Habit>> watchHabitsByGroupId(int groupId) =>
+      (select(habits)..where((tbl) => tbl.groupId.equals(groupId))).watch();
   Stream<List<Habit>> watchHabitsByWeek(DayOfTheWeek dayOfTheWeek) {
     return (select(habits)
           ..orderBy(
@@ -58,6 +60,8 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
   }
 
   Future<int> insertHabit(Habit habit) => into(habits).insert(habit);
-  Future updateHabit(Habit habit) => update(habits).replace(habit);
-  Future deleteHabit(Habit habit) => delete(habits).delete(habit);
+  Future<bool> updateHabit(Habit habit) => update(habits).replace(habit);
+  Future<int> deleteHabit(Habit habit) => delete(habits).delete(habit);
+  Future<int> deleteHabitById(int id) =>
+      (delete(habits)..where((tbl) => tbl.id.equals(id))).go();
 }
