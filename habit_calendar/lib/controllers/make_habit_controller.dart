@@ -82,40 +82,10 @@ class MakeHabitController extends GetxController {
     return result.replaceRange(result.length - 1, result.length, '');
   }
 
-  String get whatTimeString {
-    String result;
+  String get whatTimeString => Utils.getWhatTimeString(whatTime.value);
 
-    if (whatTime.value.hour < 12) {
-      result = '오전 ';
-      result += Utils.twoDigits(whatTime.value.hour);
-    } else {
-      result = '오후 ';
-      if (whatTime.value.hour > 12)
-        result += Utils.twoDigits(whatTime.value.hour - 12).toString();
-      else
-        result += Utils.twoDigits(whatTime.value.hour);
-    }
-
-    result += ' : ${Utils.twoDigits(whatTime.value.minute)}';
-
-    return result;
-  }
-
-  String get notificationTimeString {
-    int hours = notificationTime.value.inHours;
-    int minutes = (notificationTime.value - Duration(hours: hours)).inMinutes;
-
-    String result = '';
-
-    if (hours > 0) {
-      result += '$hours 시간 ';
-    } else if (minutes < 1) {
-      return '즉시 알림';
-    }
-    result += '$minutes 분 전에 알림';
-
-    return result;
-  }
+  String get notificationTimeString =>
+      Utils.getNotificationTimeString(notificationTime.value);
 
   // Controller life cycle
   @override

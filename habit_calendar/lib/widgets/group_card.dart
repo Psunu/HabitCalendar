@@ -4,6 +4,8 @@ import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/widgets/group_circle.dart';
 
+const _kChipPadding = 13.0;
+
 class GroupCard extends StatefulWidget {
   const GroupCard({
     Key key,
@@ -11,7 +13,8 @@ class GroupCard extends StatefulWidget {
     @required this.numGroupMembers,
     @required this.groupMembers,
     @required this.color,
-    this.backgroundColor,
+    this.backgroundColor = Colors.white,
+    this.outlineColor = Colors.grey,
     this.colorCircleSize = 20.0,
     this.width,
     this.height = 70.0,
@@ -23,6 +26,7 @@ class GroupCard extends StatefulWidget {
   final List<Habit> groupMembers;
   final Color color;
   final Color backgroundColor;
+  final Color outlineColor;
   final double colorCircleSize;
   final double width;
   final double height;
@@ -37,7 +41,6 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
   Animation _actionAnimation;
 
   double get _width => widget.width ?? Get.context.width;
-  Color get _backgroundColor => widget.backgroundColor ?? Colors.white;
 
   bool expanded = false;
 
@@ -60,12 +63,12 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: _backgroundColor,
+        color: widget.backgroundColor,
         borderRadius: BorderRadius.circular(Constants.mediumBorderRadius),
       ),
       width: _width,
       child: Padding(
-        padding: const EdgeInsets.only(left: 15.0),
+        padding: const EdgeInsets.only(left: 10.0),
         child: Stack(
           children: [
             SingleChildScrollView(
@@ -128,6 +131,7 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
                 color: widget.color,
                 height: widget.colorCircleSize,
                 width: widget.colorCircleSize,
+                outlineColor: widget.outlineColor,
               ),
             ),
           ],
@@ -167,8 +171,15 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
                             widget.onHabitTapped(widget.groupMembers[index].id);
                         },
                         child: Chip(
-                          labelPadding:
-                              const EdgeInsets.symmetric(horizontal: 13.0),
+                          backgroundColor: widget.backgroundColor,
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(color: widget.outlineColor),
+                            borderRadius: BorderRadius.circular(
+                                Constants.largeBorderRadius),
+                          ),
+                          labelPadding: const EdgeInsets.symmetric(
+                            horizontal: _kChipPadding,
+                          ),
                           label: Text(
                             widget.groupMembers[index].name,
                             style: Get.textTheme.bodyText1,

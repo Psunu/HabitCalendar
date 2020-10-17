@@ -26,6 +26,7 @@ class HabitTile extends StatefulWidget {
     this.childColor,
     @required this.date,
     @required this.name,
+    this.slideThreshold = 0.25,
     this.checkMark,
     this.background,
     this.secondaryBackground,
@@ -46,6 +47,7 @@ class HabitTile extends StatefulWidget {
   final Color childColor;
   final Text date;
   final Text name;
+  final double slideThreshold;
   final Widget checkMark;
   final Widget background;
   final Widget secondaryBackground;
@@ -132,7 +134,7 @@ class _HabitTileState extends State<HabitTile> {
             ? widget.background
             : widget.secondaryBackground ?? widget.background,
       ),
-      slideThresholds: 0.25,
+      slideThresholds: widget.slideThreshold,
       child: Container(
         width: _width,
         height: widget.height,
@@ -143,10 +145,10 @@ class _HabitTileState extends State<HabitTile> {
         child: Row(
           children: [
             Expanded(
-              flex: 1,
               child: Stack(
-                alignment: Alignment.center,
+                alignment: Alignment.centerRight,
                 children: [
+                  widget.date,
                   AnimatedOpacity(
                     opacity: _isBackground ? 0.0 : 0.8,
                     duration: Duration(
@@ -155,13 +157,14 @@ class _HabitTileState extends State<HabitTile> {
                     curve: Curves.ease,
                     child: widget.checkMark,
                   ),
-                  widget.date,
                 ],
               ),
             ),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 5.0,
+                vertical: 10.0,
+              ),
               child: VerticalDivider(),
             ),
             Expanded(

@@ -5,8 +5,8 @@ class GroupCircle extends StatelessWidget {
     Key key,
     this.width = 30.0,
     this.height = 30.0,
-    this.color,
-    this.outlineColor,
+    this.color = Colors.white,
+    this.outlineColor = Colors.grey,
     this.outlineWidth = 1.5,
   }) : super(key: key);
 
@@ -16,9 +16,6 @@ class GroupCircle extends StatelessWidget {
   final Color outlineColor;
   final double outlineWidth;
 
-  Color get _color => color ?? Colors.white;
-  Color get _outlineColor => outlineColor ?? Colors.grey[400];
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -27,10 +24,10 @@ class GroupCircle extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: _outlineColor,
+          color: outlineColor,
           width: outlineWidth,
         ),
-        color: _color,
+        color: color,
       ),
     );
   }

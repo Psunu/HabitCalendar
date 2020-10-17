@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/widgets/duration_picker.dart';
 import 'package:habit_calendar/widgets/group_circle.dart';
+import 'package:habit_calendar/widgets/icon_text.dart';
 import 'package:habit_calendar/widgets/time_picker.dart';
 
 import '../controllers/make_habit_controller.dart';
@@ -159,7 +160,7 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                             child: Divider(),
                           ),
                           // WhatTime
-                          controller.buildIconText(
+                          IconText(
                             iconData: Icons.access_time,
                             text: controller.whatTimeString,
                             isActivated: controller.isWhatTimeActivated,
@@ -185,7 +186,7 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                             },
                           ),
                           // Notification time
-                          controller.buildIconText(
+                          IconText(
                             iconData: Icons.notifications,
                             text: controller.notificationTimeString,
                             isActivated: controller.isNotificationActivated,
