@@ -40,9 +40,9 @@ class MakeHabitController extends GetxController {
   final isWeeksAlertOn = false.obs;
 
   // Ativation variables
-  final isWhatTimeActivated = false.obs;
-  final isNotificationActivated = false.obs;
-  final isDescriptionActivated = false.obs;
+  bool isWhatTimeActivated = false;
+  bool isNotificationActivated = false;
+  bool isDescriptionActivated = false;
 
   // settings
   final weekCardHeight = 60.0;
@@ -54,31 +54,31 @@ class MakeHabitController extends GetxController {
       isNameEmptyAlertOn.value || isNameDuplicatedAlertOn.value;
 
   String get nameErrorString => isNameEmptyAlertOn.value
-      ? '습관 이름을 입력해 주세요'
+      ? '습관 이름을 입력해 주세요'.tr.capitalizeFirst
       : isNameDuplicatedAlertOn.value
-          ? '이미 진행중인 습관입니다'
+          ? '이미 진행중인 습관입니다'.tr.capitalizeFirst
           : '';
 
   String get selectedWeeksString {
-    whatTime.value.toString();
-    if (selectedWeeks.isEmpty) return '반복할 요일을 선택해 주세요';
+    if (selectedWeeks.isEmpty) return '반복할 요일을 선택해 주세요'.tr.capitalizeFirst;
 
     int falses = 0;
     int trues = 0;
 
-    String result = '매주';
+    String result = '매주'.tr.capitalizeFirst;
 
     selectedWeeks.forEach((key, value) {
       if (value) {
-        result += ' ' + Utils.getWeekString(key) + ',';
+        result += ' ' + Utils.getWeekString(key).toLowerCase() + ',';
         trues++;
       } else {
         falses++;
       }
     });
 
-    if (falses == selectedWeeks.length) return '반복할 요일을 선택해 주세요';
-    if (trues == weeksLength) return '매일';
+    if (falses == selectedWeeks.length)
+      return '반복할 요일을 선택해 주세요'.tr.capitalizeFirst;
+    if (trues == weeksLength) return '매일'.tr.capitalizeFirst;
     return result.replaceRange(result.length - 1, result.length, '');
   }
 
@@ -129,12 +129,10 @@ class MakeHabitController extends GetxController {
         statusBarFix: null,
         groupId: selectedGroup.value.id,
         notificationTypeId: null,
-        notificationTime: isNotificationActivated.value
-            ? notificationTime.value.inMinutes
-            : null,
-        whatTime: isWhatTimeActivated.value ? whatTime.value : null,
-        description:
-            isDescriptionActivated.value ? descriptionController.text : null,
+        notificationTime:
+            isNotificationActivated ? notificationTime.value.inMinutes : null,
+        whatTime: isWhatTimeActivated ? whatTime.value : null,
+        description: isDescriptionActivated ? descriptionController.text : null,
       ),
     );
     selectedWeeks.forEach((key, value) async {
@@ -149,6 +147,9 @@ class MakeHabitController extends GetxController {
 
   // Utility Methods
   bool checkNameError() {
+    isNameEmptyAlertOn.value = false;
+    isNameDuplicatedAlertOn.value = false;
+
     if (nameController.text.isEmpty) {
       print('name empty');
       isNameEmptyAlertOn.value = true;
@@ -165,9 +166,10 @@ class MakeHabitController extends GetxController {
   List<PopupMenuEntry<int>> popupMenuEntryBuilder(BuildContext context) {
     final list = List<PopupMenuEntry<int>>();
     list.add(PopupMenuItem(
+      height: Get.textTheme.bodyText1.fontSize + 5.0,
       enabled: false,
       child: Text(
-        '분류',
+        '폴더'.tr.capitalizeFirst,
         style: Get.textTheme.bodyText1,
       ),
     ));
@@ -175,6 +177,7 @@ class MakeHabitController extends GetxController {
 
     groups.forEach((group) {
       list.add(PopupMenuItem(
+        height: Get.textTheme.bodyText1.fontSize + 15.0,
         value: group.id,
         child: Row(
           children: [

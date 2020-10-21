@@ -41,7 +41,7 @@ class _TodayHabitState extends State<TodayHabit> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '꾸준히 하려면\n작게 해야 합니다',
+                      '꾸준히 하려면\n작게 해야 합니다'.tr,
                       style: Get.textTheme.headline4,
                     ),
                     const SizedBox(

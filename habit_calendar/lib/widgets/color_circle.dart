@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-class GroupCircle extends StatelessWidget {
-  const GroupCircle({
+class ColorCircle extends StatelessWidget {
+  const ColorCircle({
     Key key,
     this.width = 30.0,
     this.height = 30.0,
     this.color = Colors.white,
     this.outlineColor = Colors.grey,
     this.outlineWidth = 1.5,
+    this.child,
   }) : super(key: key);
 
   final double width;
@@ -15,6 +16,7 @@ class GroupCircle extends StatelessWidget {
   final Color color;
   final Color outlineColor;
   final double outlineWidth;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +31,7 @@ class GroupCircle extends StatelessWidget {
         ),
         color: color,
       ),
+      child: child,
     );
   }
 }

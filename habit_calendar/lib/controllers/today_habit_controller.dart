@@ -45,7 +45,8 @@ class TodayHabitController extends GetxController {
     today = DateTime(today.year, today.month, today.day);
 
     todayHabits.bindStream(_dbService.database.habitDao
-        .watchHabitsByWeek(DayOfTheWeek.values[today.weekday - 1]));
+        .watchHabitsByWeek(DayOfTheWeek.values[today.weekday - 1])
+        .map((event) => _sortTodayHabits(event)));
     todayEvents
         .bindStream(_dbService.database.eventDao.watchEventsByDate(today));
 
@@ -82,7 +83,6 @@ class TodayHabitController extends GetxController {
 
       // Remove all removed habits from AnimatedList
       removed.forEach((key, value) {
-        print('removed : $value');
         listKey.currentState.removeItem(
           key + 1,
           (context, animation) => buildItem(value, animation),
@@ -92,7 +92,6 @@ class TodayHabitController extends GetxController {
 
       // Insert all added habits to AnimatedList
       added.forEach((key, value) {
-        print('added : $value');
         listKey.currentState.insertItem(
           key + 1,
           duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
@@ -208,8 +207,20 @@ class TodayHabitController extends GetxController {
             padding: const EdgeInsets.symmetric(horizontal: Constants.padding),
             child: HabitTile(
               key: ValueKey(habit.id),
-              date: Text(formWhatTime(habit.whatTime)),
-              name: Text(habit.name),
+              ampm: Text(
+                Utils.getAmPm(habit.whatTime),
+                style: Get.textTheme.bodyText1.copyWith(
+                  fontSize: Get.textTheme.bodyText1.fontSize * 0.8,
+                ),
+              ),
+              whatTime: Text(
+                Utils.getFormedWhatTime(habit.whatTime),
+                style: Get.textTheme.bodyText1,
+              ),
+              name: Text(
+                habit.name,
+                style: Get.textTheme.bodyText1,
+              ),
               checkMark: Icon(
                 Icons.radio_button_unchecked,
                 color: Get.theme.accentColor,
@@ -276,14 +287,6 @@ class TodayHabitController extends GetxController {
     );
   }
 
-  String formWhatTime(DateTime when) {
-    if (when == null) return '오늘안에';
-    if (when.hour - 12 < 1)
-      return 'AM ${Utils.twoDigits(when.hour)}:${Utils.twoDigits(when.minute)}';
-    else
-      return 'PM ${Utils.twoDigits(when.hour - 12)}:${Utils.twoDigits(when.minute)}';
-  }
-
   bool isCompleted(int habitId) {
     return todayEvents
                 .singleWhere(
@@ -301,7 +304,7 @@ class TodayHabitController extends GetxController {
     return event.date.isAtSameMomentAs(today) && event.habitId == habitId;
   }
 
-  void _sortTodayHabits(List<Habit> list) {
+  List<Habit> _sortTodayHabits(List<Habit> list) {
     list.sort((a, b) {
       final aEvent = todayEvents.singleWhere(
           (event) => _eventsWhere(event, a.id),
@@ -335,5 +338,6 @@ class TodayHabitController extends GetxController {
         }
       }
     });
+    return list;
   }
 }

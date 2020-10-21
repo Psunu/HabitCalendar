@@ -3,18 +3,6 @@ import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 
 class WeekCard extends StatefulWidget {
-  final double width;
-  final double height;
-  final Text child;
-  final EdgeInsets padding;
-  final EdgeInsets margin;
-  final double borderRadius;
-  final Color color;
-  final Color selectedColor;
-  final Duration duration;
-  final void Function(bool) onTapped;
-  final Key key;
-
   WeekCard({
     this.width,
     this.height,
@@ -26,15 +14,36 @@ class WeekCard extends StatefulWidget {
     this.selectedColor,
     this.duration,
     this.onTapped,
+    this.initValue,
     this.key,
   }) : super(key: key);
+
+  final double width;
+  final double height;
+  final Text child;
+  final EdgeInsets padding;
+  final EdgeInsets margin;
+  final double borderRadius;
+  final Color color;
+  final Color selectedColor;
+  final Duration duration;
+  final void Function(bool) onTapped;
+  final bool initValue;
+  final Key key;
 
   @override
   _WeekCardState createState() => _WeekCardState();
 }
 
 class _WeekCardState extends State<WeekCard> {
-  bool _selected = false;
+  bool _selected;
+
+  @override
+  void initState() {
+    _selected = widget.initValue ?? false;
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

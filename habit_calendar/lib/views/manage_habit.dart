@@ -22,12 +22,12 @@ class ManageHabit extends StatelessWidget {
             onPressed: () => Get.back(),
           ),
           title: Text(
-            '폴더',
+            '폴더'.tr.capitalizeFirst,
             style: Get.textTheme.headline6,
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: controller.onAddGroupTapped,
           child: Icon(Icons.add),
         ),
         body: Container(
@@ -41,6 +41,7 @@ class ManageHabit extends StatelessWidget {
           /// ListView.builder doesn't update as soon as habits list updated.
           /// The solution is just use ListView
           child: ListView(
+            physics: BouncingScrollPhysics(),
             children: List.generate(
               controller.groups.length,
               (index) {

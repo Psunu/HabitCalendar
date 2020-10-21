@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:habit_calendar/widgets/selector.dart';
 
 class DurationPicker extends StatefulWidget {
-  final double itemExtent;
-  final double height;
-  final TextStyle durationStyle;
-  final TextStyle tagStyle;
-  final Duration initDuration;
-  final void Function(Duration) onDurationChanged;
-
   DurationPicker({
-    this.itemExtent,
+    this.itemExtent = 40.0,
     this.height,
     this.durationStyle,
     this.tagStyle,
@@ -17,6 +12,12 @@ class DurationPicker extends StatefulWidget {
     this.onDurationChanged,
   });
 
+  final double itemExtent;
+  final double height;
+  final TextStyle durationStyle;
+  final TextStyle tagStyle;
+  final Duration initDuration;
+  final void Function(Duration) onDurationChanged;
   @override
   _DurationPickerState createState() => _DurationPickerState();
 }
@@ -27,6 +28,11 @@ class _DurationPickerState extends State<DurationPicker> {
   FixedExtentScrollController secondController;
 
   Duration duration;
+
+  double get _height => widget.height ?? widget.itemExtent * 5;
+  TextStyle get _durationStyle =>
+      widget.durationStyle ?? Get.textTheme.headline5;
+  TextStyle get _tagStyle => widget.tagStyle ?? Get.textTheme.bodyText2;
 
   @override
   void initState() {
@@ -39,9 +45,6 @@ class _DurationPickerState extends State<DurationPicker> {
 
     // Add listener to ScrollController
     if (widget.onDurationChanged != null) {
-      // Send init duration
-      widget.onDurationChanged(duration);
-
       // Add listener to hourController
       hourController.addListener(() {
         duration = Duration(
@@ -68,74 +71,33 @@ class _DurationPickerState extends State<DurationPicker> {
     return Row(
       children: [
         // Hour
-        _buildSelector(
+        Selector(
           controller: hourController,
-          length: 100,
-          tag: '시간',
+          items: List.generate(100, (index) => index.toString()),
+          height: _height,
+          tag: '시'.tr,
+          tagStyle: _tagStyle,
+          selectedStyle: _durationStyle,
+          unselectedStyle: Selector.getUnselectedStyle(_durationStyle),
         ),
-        // Padding to align with Selectors
-        // Padding value = font size + adjustment
         Padding(
-          padding: EdgeInsets.only(top: widget.tagStyle.fontSize + 10.0),
+          padding: EdgeInsets.only(top: _tagStyle.fontSize + 10.0),
           child: Text(
             ':',
             style: widget.durationStyle,
           ),
         ),
         // Minute
-        _buildSelector(
+        Selector(
           controller: minuteController,
-          length: 60,
-          tag: '분',
+          items: List.generate(60, (index) => index.toString()),
+          height: _height,
+          tag: '분'.tr,
+          tagStyle: _tagStyle,
+          selectedStyle: _durationStyle,
+          unselectedStyle: Selector.getUnselectedStyle(_durationStyle),
         ),
       ],
-    );
-  }
-
-  Widget _buildSelector({
-    @required ScrollController controller,
-    @required length,
-    @required tag,
-  }) {
-    return Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              tag,
-              style: widget.tagStyle,
-            ),
-          ),
-          Container(
-            height: widget.height ?? (widget.itemExtent * 3) ?? 120.0,
-            child: ScrollConfiguration(
-              behavior: ScrollBehavior(),
-              child: ListWheelScrollView(
-                perspective: 0.009,
-                controller: controller,
-                physics: FixedExtentScrollPhysics(),
-                itemExtent: widget.itemExtent ?? 40.0,
-                children: List.generate(
-                  length,
-                  (index) {
-                    return Container(
-                      height: widget.itemExtent ?? 40.0,
-                      child: Center(
-                        child: Text(
-                          index.toString(),
-                          style: widget.durationStyle,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

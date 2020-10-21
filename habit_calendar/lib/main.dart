@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
@@ -22,6 +24,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       translations: Messages(),
+      // locale: Locale('en', 'US'),
+      locale: window.locale,
+
+      fallbackLocale: Locale('ko', 'KR'),
       theme: ThemeData.light().copyWith(
         textTheme: context.textTheme
             .apply(

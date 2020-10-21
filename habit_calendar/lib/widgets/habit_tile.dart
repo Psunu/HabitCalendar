@@ -24,7 +24,8 @@ class HabitTile extends StatefulWidget {
     this.width,
     this.height = 90.0,
     this.childColor,
-    @required this.date,
+    this.ampm,
+    @required this.whatTime,
     @required this.name,
     this.slideThreshold = 0.25,
     this.checkMark,
@@ -35,7 +36,7 @@ class HabitTile extends StatefulWidget {
     this.onBeforeBackgroundChanged,
     this.onBackgroundChanged,
   })  : assert(key != null),
-        assert(date != null),
+        assert(whatTime != null),
         assert(name != null),
         assert(secondaryBackground != null ? background != null : true),
         super(key: key);
@@ -45,7 +46,8 @@ class HabitTile extends StatefulWidget {
   final double width;
   final double height;
   final Color childColor;
-  final Text date;
+  final Text ampm;
+  final Text whatTime;
   final Text name;
   final double slideThreshold;
   final Widget checkMark;
@@ -67,9 +69,31 @@ class _HabitTileState extends State<HabitTile> {
   double get _width => widget.width ?? Get.context.width;
   Color get _childColor => widget.childColor ?? Colors.white;
 
+  Text get _whatTime => widget.ampm != null
+      ? Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: widget.ampm.data,
+                style: widget.ampm.style,
+              ),
+              TextSpan(
+                text: ' ',
+                style: widget.whatTime.style,
+              ),
+              TextSpan(
+                text: widget.whatTime.data,
+                style: widget.whatTime.style,
+              ),
+            ],
+          ),
+        )
+      : widget.whatTime;
+
   @override
   void initState() {
     _isBackground = widget.initBackground == HabitTileBackgroundType.background;
+
     super.initState();
   }
 
@@ -130,9 +154,13 @@ class _HabitTileState extends State<HabitTile> {
             }
           }
         },
-        child: _isBackground
-            ? widget.background
-            : widget.secondaryBackground ?? widget.background,
+        // Add padding to prevent showing little border of background
+        child: Padding(
+          padding: const EdgeInsets.all(1.0),
+          child: _isBackground
+              ? widget.background
+              : widget.secondaryBackground ?? widget.background,
+        ),
       ),
       slideThresholds: widget.slideThreshold,
       child: Container(
@@ -146,9 +174,9 @@ class _HabitTileState extends State<HabitTile> {
           children: [
             Expanded(
               child: Stack(
-                alignment: Alignment.centerRight,
+                alignment: Alignment.center,
                 children: [
-                  widget.date,
+                  _whatTime,
                   AnimatedOpacity(
                     opacity: _isBackground ? 0.0 : 0.8,
                     duration: Duration(
@@ -162,14 +190,17 @@ class _HabitTileState extends State<HabitTile> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 5.0,
                 vertical: 10.0,
               ),
-              child: VerticalDivider(),
+              // Remove width to apply padding precisely
+              child: VerticalDivider(width: 0.0),
             ),
             Expanded(
               flex: 3,
-              child: widget.name,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: widget.name,
+              ),
             ),
           ],
         ),

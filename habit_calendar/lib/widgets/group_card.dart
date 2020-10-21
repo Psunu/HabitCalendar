@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
-import 'package:habit_calendar/widgets/group_circle.dart';
+import 'package:habit_calendar/widgets/color_circle.dart';
 
 const _kChipPadding = 13.0;
 
@@ -40,9 +40,11 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
   AnimationController _actionAnimationController;
   Animation _actionAnimation;
 
-  double get _width => widget.width ?? Get.context.width;
-
   bool expanded = false;
+
+  double get _width => widget.width ?? Get.context.width;
+  bool get _isGroupEmptyOrNull =>
+      widget.groupMembers.isEmpty || widget.groupMembers.isNull;
 
   @override
   void initState() {
@@ -61,80 +63,83 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: widget.backgroundColor,
-        borderRadius: BorderRadius.circular(Constants.mediumBorderRadius),
-      ),
-      width: _width,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10.0),
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              physics: NeverScrollableScrollPhysics(),
-              child: AnimatedSize(
-                alignment: Alignment.topCenter,
-                vsync: this,
-                duration:
-                    Duration(milliseconds: Constants.mediumAnimationSpeed),
-                curve: Curves.ease,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: widget.height,
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 40.0),
-                          widget.groupName,
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: widget.numGroupMembers,
-                            ),
-                          ),
-                          RotationTransition(
-                            turns: _actionAnimation,
-                            child: IconButton(
-                              splashRadius: 0.1,
-                              splashColor: Colors.transparent,
-                              icon: const Icon(Icons.expand_more),
-                              onPressed: () {
-                                setState(
-                                  () {
-                                    if (widget.groupMembers.isEmpty ||
-                                        widget.groupMembers.isNull) return;
+    return GestureDetector(
+      onTap: () {
+        setState(
+          () {
+            if (_isGroupEmptyOrNull) return;
 
-                                    if (expanded) {
-                                      _actionAnimationController.reverse();
-                                    } else {
-                                      _actionAnimationController.forward();
-                                    }
+            if (expanded) {
+              _actionAnimationController.reverse();
+            } else {
+              _actionAnimationController.forward();
+            }
 
-                                    expanded = !expanded;
-                                  },
-                                );
-                              },
+            expanded = !expanded;
+          },
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: widget.backgroundColor,
+          borderRadius: BorderRadius.circular(Constants.mediumBorderRadius),
+        ),
+        width: _width,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                physics: NeverScrollableScrollPhysics(),
+                child: AnimatedSize(
+                  alignment: Alignment.topCenter,
+                  vsync: this,
+                  duration:
+                      Duration(milliseconds: Constants.mediumAnimationSpeed),
+                  curve: Curves.ease,
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(vertical: 25.0),
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 40.0),
+                            widget.groupName,
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: widget.numGroupMembers,
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 5.0),
+                            RotationTransition(
+                              turns: _actionAnimation,
+                              child: Icon(
+                                Icons.expand_more,
+                                color: _isGroupEmptyOrNull
+                                    ? Colors.transparent
+                                    : null,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    expanded ? _buildExpand() : Container(),
-                  ],
+                      expanded ? _buildExpand() : Container(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: GroupCircle(
-                color: widget.color,
-                height: widget.colorCircleSize,
-                width: widget.colorCircleSize,
-                outlineColor: widget.outlineColor,
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: ColorCircle(
+                  color: widget.color,
+                  height: widget.colorCircleSize,
+                  width: widget.colorCircleSize,
+                  outlineColor: widget.outlineColor,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
