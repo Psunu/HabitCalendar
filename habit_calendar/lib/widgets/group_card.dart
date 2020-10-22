@@ -158,45 +158,41 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
           constraints: BoxConstraints(maxHeight: widget.height * 3),
           child: SingleChildScrollView(
             physics: BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    top: 10.0,
-                    bottom: 10.0,
-                    right: 16.0,
-                  ),
-                  child: Wrap(
-                    spacing: 16.0,
-                    children: List.generate(
-                      widget.groupMembers.length,
-                      (index) => InkWell(
-                        onTap: () {
-                          if (!widget.onHabitTapped.isNull)
-                            widget.onHabitTapped(widget.groupMembers[index].id);
-                        },
-                        child: Chip(
-                          backgroundColor: widget.backgroundColor,
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(color: widget.outlineColor),
-                            borderRadius: BorderRadius.circular(
-                                Constants.largeBorderRadius),
-                          ),
-                          labelPadding: const EdgeInsets.symmetric(
-                            horizontal: _kChipPadding,
-                          ),
-                          label: Text(
-                            widget.groupMembers[index].name,
-                            style: Get.textTheme.bodyText1,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 10.0,
+                bottom: 10.0,
+                right: 16.0,
+              ),
+              child: Wrap(
+                spacing: 16.0,
+                children: List.generate(
+                  widget.groupMembers.length,
+                  (index) => InkWell(
+                    onTap: () {
+                      if (!widget.onHabitTapped.isNull)
+                        widget.onHabitTapped(widget.groupMembers[index].id);
+                    },
+                    child: Chip(
+                      backgroundColor: widget.backgroundColor,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: widget.outlineColor),
+                        borderRadius:
+                            BorderRadius.circular(Constants.largeBorderRadius),
+                      ),
+                      labelPadding: const EdgeInsets.symmetric(
+                        horizontal: _kChipPadding,
+                      ),
+                      label: Text(
+                        widget.groupMembers[index].name,
+                        style: Get.textTheme.bodyText1,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),

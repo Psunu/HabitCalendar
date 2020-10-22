@@ -4,6 +4,7 @@ import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/widgets/bottom_buttons.dart';
 import 'package:habit_calendar/widgets/color_circle.dart';
 import 'package:habit_calendar/widgets/duration_picker.dart';
+import 'package:habit_calendar/widgets/group_popup_menu.dart';
 import 'package:habit_calendar/widgets/icon_text.dart';
 import 'package:habit_calendar/widgets/time_picker.dart';
 
@@ -105,26 +106,14 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                                   ),
                                 ),
                                 // Group
-                                PopupMenuButton<int>(
-                                  itemBuilder: controller.popupMenuEntryBuilder,
-                                  onCanceled: () => Get.focusScope.unfocus(),
+                                GroupPopupMenu(
+                                  groups: controller.groups,
                                   onSelected: (groupId) {
                                     controller.selectedGroup.value =
                                         controller.groups.singleWhere(
                                             (element) => element.id == groupId);
                                     Get.focusScope.unfocus();
                                   },
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      Constants.smallBorderRadius,
-                                    ),
-                                  ),
-                                  child: ColorCircle(
-                                    color: Color(
-                                      controller?.selectedGroup?.value?.color ??
-                                          Colors.white.value,
-                                    ),
-                                  ),
                                 ),
                               ],
                             ),

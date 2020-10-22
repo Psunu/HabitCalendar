@@ -58,7 +58,20 @@ class ManageHabitController extends GetxController {
   }
 
   void onAddGroupTapped() {
-    customShowModal(builder: (context) => GroupMaker());
+    customShowModal(
+      builder: (context) => GroupMaker(
+        groups: groups,
+        habits: habits,
+        onSave: (group, includedHabits) async {
+          final groupId = await _dbService.database.groupDao.insertGroup(group);
+          includedHabits.forEach((habitId) async {
+            await _dbService.database.habitDao.updateHabit(habits
+                .singleWhere((element) => element.id == habitId)
+                .copyWith(groupId: groupId));
+          });
+        },
+      ),
+    );
   }
 
   void onHabitTapped(int habitId) {
@@ -130,7 +143,8 @@ class ManageHabitController extends GetxController {
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
             child: Container(
-              padding: const EdgeInsets.all(Constants.padding),
+              padding: const EdgeInsets.fromLTRB(Constants.padding,
+                  Constants.padding, Constants.padding, Constants.padding / 2),
               margin: const EdgeInsets.all(Constants.padding),
               decoration: BoxDecoration(
                 color: Colors.white,

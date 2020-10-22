@@ -6,6 +6,7 @@ import 'package:habit_calendar/utils/utils.dart';
 import 'package:habit_calendar/widgets/bottom_buttons.dart';
 import 'package:habit_calendar/widgets/color_circle.dart';
 import 'package:habit_calendar/widgets/duration_picker.dart';
+import 'package:habit_calendar/widgets/group_popup_menu.dart';
 import 'package:habit_calendar/widgets/icon_text.dart';
 import 'package:habit_calendar/widgets/time_picker.dart';
 import 'package:habit_calendar/widgets/week_card.dart';
@@ -143,12 +144,15 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
 
   bool get _isModified {
     bool nameModified = false;
+    bool groupModified = false;
     bool weekModified = false;
     bool whatTimeModified = false;
     bool notificationTimeModified = false;
     bool descriptionModified = false;
 
     nameModified = widget.habit.name.compareTo(_nameController.text) != 0;
+
+    groupModified = widget.habit.groupId != _selectedGroupId;
 
     // If whatTime is set. (whatTime is activated)
     if (widget.habit.whatTime != null) {
@@ -218,6 +222,7 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
     }
 
     return nameModified ||
+        groupModified ||
         weekModified ||
         whatTimeModified ||
         notificationTimeModified ||
@@ -226,7 +231,7 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
 
   Color get _habitColor {
     return Color(widget.groups
-            ?.singleWhere((element) => element.id == widget.habit.groupId)
+            ?.singleWhere((element) => element.id == _selectedGroupId)
             ?.color ??
         Colors.white.value);
   }
@@ -376,56 +381,6 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
     );
   }
 
-  List<PopupMenuEntry<int>> _popupMenuEntryBuilder(BuildContext context) {
-    final list = List<PopupMenuEntry<int>>();
-    list.add(PopupMenuItem(
-      height: Get.textTheme.bodyText1.fontSize + 5.0,
-      enabled: false,
-      child: Text(
-        '폴더'.tr.capitalizeFirst,
-        style: Get.textTheme.bodyText1,
-      ),
-    ));
-
-    if (widget.groups != null && widget.groups.isNotEmpty) {
-      list.add(PopupMenuDivider());
-
-      widget.groups.forEach((group) {
-        list.add(PopupMenuItem(
-          height: Get.textTheme.bodyText1.fontSize + 15.0,
-          value: group.id,
-          child: Row(
-            children: [
-              Text(
-                group.name,
-                style: Get.textTheme.bodyText1,
-              ),
-              SizedBox(
-                width: 10.0,
-              ),
-              Container(
-                width: 24.0,
-                height: 24.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.grey[400],
-                    width: 1.5,
-                  ),
-                  color: Color(
-                    group.color,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ));
-      });
-    }
-
-    return list;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -443,23 +398,14 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
                     // Group
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: PopupMenuButton<int>(
-                        itemBuilder: _popupMenuEntryBuilder,
-                        onCanceled: () => Get.focusScope.unfocus(),
+                      child: GroupPopupMenu(
+                        groups: widget.groups,
                         onSelected: (groupId) {
-                          _selectedGroupId = groupId;
+                          setState(() {
+                            _selectedGroupId = groupId;
+                          });
                           Get.focusScope.unfocus();
                         },
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            Constants.smallBorderRadius,
-                          ),
-                        ),
-                        child: ColorCircle(
-                          color: _habitColor,
-                          width: 20.0,
-                          height: 20.0,
-                        ),
                       ),
                     ),
 
@@ -484,7 +430,9 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
                             ),
                             style: Get.textTheme.headline6,
                             onEditingComplete: () {
-                              _checkNameError();
+                              if (!_checkNameError()) {
+                                Get.focusScope.unfocus();
+                              }
                             },
                           ),
                         ],
@@ -694,8 +642,8 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
             duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
             vsync: this,
             child: BottomButtons(
-              // backgroundColor: widget.backgroundColor,
-              padding: EdgeInsets.all(0.0),
+              margin: const EdgeInsets.all(0.0),
+              padding: const EdgeInsets.all(0.0),
               height: _isModified ? null : 0.0,
               rightButtonAction: () {
                 if (_checkNameError()) {

@@ -9,7 +9,8 @@ class BottomButtons extends StatelessWidget {
   BottomButtons({
     Key key,
     this.backgroundColor,
-    this.padding = const EdgeInsets.all(_kPadding),
+    this.margin = const EdgeInsets.all(_kPadding),
+    this.padding = const EdgeInsets.all(_kButtonPadding),
     this.height,
     this.leftButton,
     this.rightButton,
@@ -20,6 +21,7 @@ class BottomButtons extends StatelessWidget {
   }) : super(key: key);
 
   final Color backgroundColor;
+  final EdgeInsets margin;
   final EdgeInsets padding;
   final double height;
   final Widget leftButton;
@@ -40,14 +42,14 @@ class BottomButtons extends StatelessWidget {
       color: backgroundColor,
       height: height,
       child: Padding(
-        padding: padding,
+        padding: margin,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
               child: leftButton ??
                   FlatButton(
-                    padding: const EdgeInsets.all(_kButtonPadding),
+                    padding: padding,
                     onPressed: _leftButtonAction,
                     child: Text(
                       _leftButtonString,
@@ -59,7 +61,7 @@ class BottomButtons extends StatelessWidget {
             Expanded(
               child: rightButton ??
                   RaisedButton(
-                    padding: const EdgeInsets.all(_kButtonPadding),
+                    padding: padding,
                     color: Get.theme.accentColor,
                     shape: RoundedRectangleBorder(
                       borderRadius:

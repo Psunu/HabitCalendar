@@ -15,7 +15,7 @@ class GroupDao extends DatabaseAccessor<AppDatabase> with _$GroupDaoMixin {
   Stream<List<Group>> watchAllGroups() => select(groups).watch();
   Future<Group> getGroupById(int id) =>
       (select(groups)..where((group) => group.id.equals(id))).getSingle();
-  Future<void> insertGroup(Group group) => into(groups).insert(group);
-  Future<void> updateGroup(Group group) => update(groups).replace(group);
-  Future<void> deleteGroup(Group group) => delete(groups).delete(group);
+  Future<int> insertGroup(Group group) => into(groups).insert(group);
+  Future<bool> updateGroup(Group group) => update(groups).replace(group);
+  Future<int> deleteGroup(Group group) => delete(groups).delete(group);
 }

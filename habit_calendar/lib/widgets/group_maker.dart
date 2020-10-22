@@ -2,18 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
+import 'package:habit_calendar/widgets/bottom_buttons.dart';
 import 'package:habit_calendar/widgets/color_circle.dart';
+
+const _kChipPadding = 13.0;
 
 class GroupMaker extends StatefulWidget {
   GroupMaker({
     Key key,
+    @required this.groups,
+    @required this.habits,
+    this.selectedGroupId,
     this.onSave,
+    this.backgroundColor = Colors.white,
+    this.outlineColor = Colors.grey,
     this.errorNameEmptyString,
     this.errorNameDuplicatedString,
-  }) : super(key: key);
+  })  : assert(groups != null),
+        assert(habits != null),
+        super(key: key);
 
-  final void Function(Group) onSave;
+  // Group list to check group name duplicated
+  final List<Group> groups;
+
+  final List<Habit> habits;
+
+  /// Group id that used to recognize which habits are included in that group
+  /// and init habitChipSelection
+  final int selectedGroupId;
+
+  final Color backgroundColor;
+
+  final void Function(Group, List<int>) onSave;
+
+  final Color outlineColor;
+
   final String errorNameEmptyString;
+
   final String errorNameDuplicatedString;
 
   @override
@@ -21,20 +46,20 @@ class GroupMaker extends StatefulWidget {
 }
 
 class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
-  bool isNameAlertOn = false;
   bool isNameEmptyAlertOn = false;
   bool isNameDuplicatedAlertOn = false;
   bool isExpanded = false;
 
-  TextEditingController nameController;
-  FocusNode nameFocusNode;
+  TextEditingController nameController = TextEditingController();
   Color selectedColor;
+  Map<int, bool> habitChipSelection = Map<int, bool>();
+
+  bool get isNameAlertOn => isNameEmptyAlertOn || isNameDuplicatedAlertOn;
 
   String get nameErrorString => isNameEmptyAlertOn
-      ? widget.errorNameEmptyString ?? '습관 이름을 입력해 주세요'.tr.capitalizeFirst
+      ? widget.errorNameEmptyString ?? '폴더 이름을 입력해 주세요'.tr.capitalizeFirst
       : isNameDuplicatedAlertOn
-          ? widget.errorNameDuplicatedString ??
-              '이미 진행중인 습관입니다'.tr.capitalizeFirst
+          ? widget.errorNameDuplicatedString ?? '폴더가 이미 있습니다'.tr.capitalizeFirst
           : '';
 
   Widget _buildCircleRow(
@@ -125,6 +150,91 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildHabitsWrap() {
+    return Wrap(
+      spacing: 16.0,
+      children: List.generate(
+        widget.habits.length,
+        (index) => GestureDetector(
+          onTap: () {},
+          child: FilterChip(
+            elevation: habitChipSelection[widget.habits[index].id] ? 7.0 : 0.0,
+            selected: habitChipSelection[widget.habits[index].id],
+            onSelected: (selected) {
+              setState(() {
+                habitChipSelection[widget.habits[index].id] = selected;
+              });
+            },
+            backgroundColor: widget.backgroundColor,
+            selectedColor: widget.backgroundColor,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(color: widget.outlineColor),
+              borderRadius: BorderRadius.circular(Constants.largeBorderRadius),
+            ),
+            labelPadding: const EdgeInsets.symmetric(
+              horizontal: _kChipPadding,
+            ),
+            label: Text(
+              widget.habits[index].name,
+              style: Get.textTheme.bodyText1,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Name validation
+  bool _checkNameError() {
+    isNameEmptyAlertOn = false;
+    isNameDuplicatedAlertOn = false;
+
+    if (nameController.text.isEmpty) {
+      print('name empty');
+      setState(() {
+        isNameEmptyAlertOn = true;
+      });
+      return true;
+    } else if (_isNameDuplicated) {
+      print('name duplicated');
+      setState(() {
+        isNameDuplicatedAlertOn = true;
+      });
+      return true;
+    }
+
+    return false;
+  }
+
+  bool get _isNameDuplicated {
+    for (int i = 0; i < widget.groups.length; i++) {
+      if (widget.selectedGroupId != null &&
+          widget.groups[i].id == widget.selectedGroupId) continue;
+      if (widget.groups[i].name.compareTo(nameController.text) == 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @override
+  void initState() {
+    // Init habitChipSelection
+    widget.habits.forEach((element) {
+      if (widget.selectedGroupId != null &&
+          element.groupId == widget.selectedGroupId) {
+        habitChipSelection[element.id] = true;
+      } else {
+        habitChipSelection[element.id] = false;
+      }
+    });
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -142,6 +252,7 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Name error
                         AnimatedSize(
                           vsync: this,
                           duration: const Duration(
@@ -152,7 +263,7 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                               Icon(
                                 Icons.error_outline,
                                 size: isNameAlertOn
-                                    ? Get.textTheme.headline6.fontSize * 0.45
+                                    ? Get.textTheme.headline6.fontSize * 0.65
                                     : 0.0,
                                 color: Colors.red,
                               ),
@@ -163,7 +274,7 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                                 nameErrorString,
                                 style: Get.textTheme.bodyText2.copyWith(
                                   fontSize: isNameAlertOn
-                                      ? Get.textTheme.headline6.fontSize * 0.45
+                                      ? Get.textTheme.headline6.fontSize * 0.65
                                       : 0.0,
                                   color: Colors.red,
                                 ),
@@ -171,9 +282,9 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                             ],
                           ),
                         ),
+                        // Name text
                         TextField(
                           controller: nameController,
-                          focusNode: nameFocusNode,
                           decoration: InputDecoration(
                             hintText: '폴더'.tr.capitalizeFirst + ' ' + '이름'.tr,
                             border: InputBorder.none,
@@ -185,6 +296,11 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                               isNameDuplicatedAlertOn = false;
                             });
                           },
+                          onEditingComplete: () {
+                            if (!_checkNameError()) {
+                              Get.focusScope.unfocus();
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -192,14 +308,15 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                   // Group
                   ColorCircle(
                     color: selectedColor ?? Colors.white,
-                    width: Get.textTheme.headline6.fontSize,
-                    height: Get.textTheme.headline6.fontSize,
+                    width: Get.textTheme.headline6.fontSize * 1.2,
+                    height: Get.textTheme.headline6.fontSize * 1.2,
                   ),
                 ],
               ),
               SizedBox(
                 height: 20.0,
               ),
+              // Color
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: _buildCircleRow(
@@ -213,6 +330,7 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                   expand: Icon(Icons.expand_more),
                 ),
               ),
+              // Color expand
               AnimatedSize(
                 duration: Duration(
                   milliseconds: Constants.mediumAnimationSpeed,
@@ -245,8 +363,33 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                   ),
                 ),
               ),
-              // Weeks
               Divider(),
+              // Habits
+              _buildHabitsWrap(),
+              // Buttons
+              BottomButtons(
+                margin: const EdgeInsets.all(0.0),
+                padding: const EdgeInsets.all(0.0),
+                rightButtonAction: () {
+                  if (_checkNameError()) return;
+
+                  final group = Group(
+                    id: widget.selectedGroupId,
+                    name: nameController.text,
+                    color: selectedColor.value,
+                  );
+
+                  final includedHabitId = List<int>();
+                  habitChipSelection.forEach((key, value) {
+                    if (value) includedHabitId.add(key);
+                  });
+
+                  if (widget.onSave != null)
+                    widget.onSave(group, includedHabitId);
+
+                  Get.back();
+                },
+              ),
             ],
           ),
         ],
@@ -289,8 +432,6 @@ class SelectableColorCircle<T> extends StatelessWidget {
       onTap: enable ?? true
           ? () {
               if (onChanged != null) onChanged(value);
-
-              // if (widget.onTap != null) widget.onTap(_selected);
             }
           : null,
       child: Stack(
@@ -302,45 +443,4 @@ class SelectableColorCircle<T> extends StatelessWidget {
       ),
     );
   }
-  // @override
-  // _SelectableColorCircleState<T> createState() =>
-  //     _SelectableColorCircleState<T>();
 }
-
-// class _SelectableColorCircleState<T> extends State<SelectableColorCircle<T>> {
-//   bool _selected;
-
-//   @override
-//   void initState() {
-//     _selected = widget.initStatus ?? false;
-//     super.initState();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final selected = widget.value == widget.groupValue;
-
-//     return InkWell(
-//       borderRadius: BorderRadius.circular(Constants.largeBorderRadius),
-//       onTap: widget.enable ?? true
-//           ? () {
-//               // setState(() {
-//               //   _selected = !_selected;
-//               // });
-
-//               if (_selected && widget.onChanged != null)
-//                 widget.onChanged(widget.value);
-
-//               if (widget.onTap != null) widget.onTap(_selected);
-//             }
-//           : null,
-//       child: Stack(
-//         alignment: Alignment.center,
-//         children: [
-//           widget.colorCircle,
-//           selected ? widget.checkMark ?? Container() : Container(),
-//         ],
-//       ),
-//     );
-//   }
-// }

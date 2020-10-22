@@ -163,53 +163,6 @@ class MakeHabitController extends GetxController {
     return false;
   }
 
-  List<PopupMenuEntry<int>> popupMenuEntryBuilder(BuildContext context) {
-    final list = List<PopupMenuEntry<int>>();
-    list.add(PopupMenuItem(
-      height: Get.textTheme.bodyText1.fontSize + 5.0,
-      enabled: false,
-      child: Text(
-        '폴더'.tr.capitalizeFirst,
-        style: Get.textTheme.bodyText1,
-      ),
-    ));
-    list.add(PopupMenuDivider());
-
-    groups.forEach((group) {
-      list.add(PopupMenuItem(
-        height: Get.textTheme.bodyText1.fontSize + 15.0,
-        value: group.id,
-        child: Row(
-          children: [
-            Text(
-              group.name,
-              style: Get.textTheme.bodyText1,
-            ),
-            SizedBox(
-              width: 10.0,
-            ),
-            Container(
-              width: 24.0,
-              height: 24.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.grey[400],
-                  width: 1.5,
-                ),
-                color: Color(
-                  group.color,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ));
-    });
-
-    return list;
-  }
-
   List<Widget> buildWeekTiles(int length) {
     weeksLength = length;
     EdgeInsets margin = const EdgeInsets.only(right: 2.0);

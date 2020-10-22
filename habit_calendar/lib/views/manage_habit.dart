@@ -48,20 +48,23 @@ class ManageHabit extends StatelessWidget {
                 final group = controller.groups[index];
                 final groupMembers = controller.groupMembers(group.id);
 
-                return GroupCard(
-                  groupName: Text(
-                    group.name,
-                    style: Get.textTheme.headline6,
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: GroupCard(
+                    groupName: Text(
+                      group.name,
+                      style: Get.textTheme.headline6,
+                    ),
+                    numGroupMembers: Text(
+                      groupMembers.length.toString(),
+                      style: Get.textTheme.bodyText1,
+                    ),
+                    groupMembers: groupMembers,
+                    color: Color(group.color),
+                    colorCircleSize: 20.0,
+                    height: 70.0,
+                    onHabitTapped: controller.onHabitTapped,
                   ),
-                  numGroupMembers: Text(
-                    groupMembers.length.toString(),
-                    style: Get.textTheme.bodyText1,
-                  ),
-                  groupMembers: groupMembers,
-                  color: Color(group.color),
-                  colorCircleSize: 20.0,
-                  height: 70.0,
-                  onHabitTapped: controller.onHabitTapped,
                 );
               },
             ),
