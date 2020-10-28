@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
-import 'package:habit_calendar/widgets/auto_colored_icon.dart';
-import 'package:habit_calendar/widgets/bottom_buttons.dart';
-import 'package:habit_calendar/widgets/color_circle.dart';
+import '../general_purpose/auto_colored_icon.dart';
+import './bottom_buttons.dart';
+import '../general_purpose/color_circle.dart';
 
 const _kChipPadding = 13.0;
 

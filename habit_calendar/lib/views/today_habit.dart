@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
-
 import 'package:habit_calendar/controllers/today_habit_controller.dart';
-import 'package:habit_calendar/widgets/progress_bar.dart';
+
+import '../widgets/general_purpose/progress_bar.dart';
 
 class TodayHabit extends StatefulWidget {
   @override

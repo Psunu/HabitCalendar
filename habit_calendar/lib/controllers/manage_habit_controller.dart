@@ -1,13 +1,11 @@
-import 'dart:collection';
-
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
-import 'package:habit_calendar/widgets/group_maker.dart';
-import 'package:habit_calendar/widgets/habit_info_widget.dart';
+import 'package:habit_calendar/widgets/project_purpose/group_maker.dart';
+import 'package:habit_calendar/widgets/project_purpose/habit_info_widget.dart';
 
 const _kIconSize = 22.0;
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
-import 'package:habit_calendar/widgets/auto_colored_text.dart';
+import '../general_purpose/auto_colored_text.dart';
 
 const _kPadding = 20.0;
 const _kButtonPadding = 13.0;

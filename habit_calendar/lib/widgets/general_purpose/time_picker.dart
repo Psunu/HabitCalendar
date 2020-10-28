@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_calendar/widgets/selector.dart';
+
+import './selector.dart';
 
 class TimePicker extends StatefulWidget {
   TimePicker({

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/utils/utils.dart';
-import 'package:habit_calendar/widgets/week_card.dart';
+import 'package:habit_calendar/widgets/general_purpose/week_card.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
 import '../services/database/db_service.dart';

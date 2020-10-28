@@ -3,12 +3,13 @@ import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/utils/utils.dart';
-import 'package:habit_calendar/widgets/bottom_buttons.dart';
-import 'package:habit_calendar/widgets/duration_picker.dart';
-import 'package:habit_calendar/widgets/group_popup_menu.dart';
-import 'package:habit_calendar/widgets/icon_text.dart';
-import 'package:habit_calendar/widgets/time_picker.dart';
-import 'package:habit_calendar/widgets/week_card.dart';
+
+import './bottom_buttons.dart';
+import './group_popup_menu.dart';
+import '../general_purpose/duration_picker.dart';
+import '../general_purpose/icon_text.dart';
+import '../general_purpose/time_picker.dart';
+import '../general_purpose/week_card.dart';
 
 const _kIconSize = 25.0;
 const _kWeekLength = 7;

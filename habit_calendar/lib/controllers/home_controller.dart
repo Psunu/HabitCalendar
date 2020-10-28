@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
-import 'package:habit_calendar/views/manage_habit_edit.dart';
+import 'package:habit_calendar/views/manage_habit.dart';
 import 'package:habit_calendar/views/today_habit.dart';
 
 import '../enums/day_of_the_week.dart';

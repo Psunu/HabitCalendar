@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/controllers/manage_habit_controller.dart';
-import 'package:habit_calendar/widgets/auto_colored_icon.dart';
-import 'package:habit_calendar/widgets/auto_colored_text.dart';
-import 'package:habit_calendar/widgets/reorderable.dart';
-import 'package:habit_calendar/widgets/group_card.dart';
+import 'package:reorderables/reorderables.dart';
+
+import '../widgets/general_purpose/auto_colored_icon.dart';
+import '../widgets/general_purpose/auto_colored_text.dart';
+import '../widgets/project_purpose/group_card.dart';
 
 class ManageHabit extends StatelessWidget {
   @override
@@ -64,46 +65,48 @@ class ManageHabit extends StatelessWidget {
               left: Constants.padding,
               right: Constants.padding,
             ),
-
-            /// ListView.builder doesn't update as soon as habits list updated.
-            /// The solution is just use ListView
-            child: ListView(
+            child: CustomScrollView(
               physics: BouncingScrollPhysics(),
-              // enableOneDraggable: true,
-              // selectedKey: controller.selectedGroupKey.value,
-              // onReorder: (oldIndex, newIndex) {},
-              children: List.generate(
-                controller.groups.length,
-                (index) {
-                  final group = controller.groups[index];
+              slivers: [
+                ReorderableSliverList(
+                  delegate: ReorderableSliverChildBuilderDelegate(
+                    (context, index) {
+                      final group = controller.groups[index];
 
-                  return Reorderable(
-                    // enabled: group.id == controller.selectedGroupId.value,
-                    data: group.id,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: GroupCard(
-                        group: group,
-                        habits: controller.habits,
-                        colorCircleSize: 20.0,
-                        height: 70.0,
-                        // isSelected:
-                        // controller.selectedGroups[group.id] ?? false,
-                        onHabitTapped: controller.onHabitTapped,
-                        isEditMode: controller.isEditMode.value,
-                        // selectedGroupId: controller.selectedGroupId.value,
-                        onLongPress: (groupId, isSelected) {
-                          controller.isEditMode.value = true;
-                          // controller.selectedGroups[groupId] = isSelected;
-                        },
-                        onTapAfterLongPress: (groupId, isSelected) {
-                          // controller.selectedGroups[groupId] = isSelected;
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
+                      return Padding(
+                        key: ValueKey(group.id),
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: GroupCard(
+                          group: group,
+                          habits: controller.habits,
+                          colorCircleSize: 20.0,
+                          height: 70.0,
+                          latestPadding: controller.latestPaddingOf(group.id),
+                          isSelected: controller.isSelected(group.id),
+                          onHabitTapped: controller.onHabitTapped,
+                          isEditMode: controller.isEditMode.value,
+                          onLongPress: controller.onLongPress,
+                          onTapAfterLongPress: controller.onTapAfterLongPress,
+                          onPaddingChanged: controller.onPaddingChanged,
+                        ),
+                      );
+                    },
+                    childCount: controller.groups.length,
+                  ),
+                  onReorder: (int oldIndex, int newIndex) {
+                    var group;
+                    group = controller.groups.removeAt(oldIndex);
+                    controller.groups.insert(newIndex, group);
+                  },
+                  buildDraggableFeedback: (context, constraints, widget) {
+                    return Container(
+                      width: constraints.maxWidth,
+                      child: widget,
+                    );
+                  },
+                  needsLongPressDraggable: !controller.isEditMode.value,
+                ),
+              ],
             ),
           ),
         ),

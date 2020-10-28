@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_calendar/widgets/selector.dart';
+import 'package:habit_calendar/widgets/general_purpose/selector.dart';
 
 class DurationPicker extends StatefulWidget {
   DurationPicker({

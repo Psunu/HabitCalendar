@@ -7,7 +7,7 @@ import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
 import 'package:habit_calendar/utils/utils.dart';
 import 'package:habit_calendar/views/manage_habit.dart';
-import 'package:habit_calendar/widgets/habit_tile.dart';
+import 'package:habit_calendar/widgets/project_purpose/habit_tile.dart';
 
 import '../enums/day_of_the_week.dart';
 

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
-import 'package:habit_calendar/widgets/bottom_buttons.dart';
-import 'package:habit_calendar/widgets/duration_picker.dart';
-import 'package:habit_calendar/widgets/group_popup_menu.dart';
-import 'package:habit_calendar/widgets/icon_text.dart';
-import 'package:habit_calendar/widgets/time_picker.dart';
 
+import '../widgets/project_purpose/bottom_buttons.dart';
+import '../widgets/project_purpose/group_popup_menu.dart';
+import '../widgets/general_purpose/duration_picker.dart';
+import '../widgets/general_purpose/icon_text.dart';
+import '../widgets/general_purpose/time_picker.dart';
 import '../controllers/make_habit_controller.dart';
 
 const _kIconTextPadding = 20.0;
