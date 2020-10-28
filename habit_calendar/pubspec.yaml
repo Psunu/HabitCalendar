@@ -27,6 +27,10 @@ dependencies:
   get:
   moor_flutter:
   animations:
+  reorderables:
+    git:
+      url: https://github.com/Psunu/reorderables.git
+      ref: master
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

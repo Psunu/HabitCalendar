@@ -6,7 +6,7 @@ class Constants {
   static const mediumBorderRadius = 12.0;
   static const smallBorderRadius = 8.0;
   // Animation speed (millisconds)
-  static const smallAnimationSpeed = 200;
+  static const smallAnimationSpeed = 150;
   static const mediumAnimationSpeed = 250;
   static const largeAnimationSpeed = 300;
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/widgets/bottom_buttons.dart';
-import 'package:habit_calendar/widgets/color_circle.dart';
 import 'package:habit_calendar/widgets/duration_picker.dart';
 import 'package:habit_calendar/widgets/group_popup_menu.dart';
 import 'package:habit_calendar/widgets/icon_text.dart';

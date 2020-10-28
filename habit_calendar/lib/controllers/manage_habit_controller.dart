@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,12 +15,38 @@ enum _PopupItemType {
   delete,
 }
 
+class GroupCardInfo {
+  GroupCardInfo(this.groupId, this.latestPadding, this.isSelected);
+
+  int groupId;
+  double latestPadding;
+  bool isSelected;
+}
+
 class ManageHabitController extends GetxController {
+  static ManageHabitController get to => Get.find(); // add this line
+
   final groups = List<Group>().obs;
   final habits = List<Habit>().obs;
   final weeks = List<HabitWeek>().obs;
+  final isEditMode = false.obs;
+  // key : group id / value : isSelected
+  final selectedGroups = Set<GroupCardInfo>().obs;
 
   final DbService _dbService = Get.find<DbService>();
+
+  bool _delete = false;
+  Habit _habitBeforeDelete;
+
+  int get numSelectedGroup {
+    int selected = 0;
+
+    selectedGroups.forEach((info) {
+      if (info.isSelected) selected += 1;
+    });
+
+    return selected;
+  }
 
   // Controller life cycle
   @override
@@ -26,6 +54,15 @@ class ManageHabitController extends GetxController {
     groups.bindStream(_dbService.database.groupDao.watchAllGroups());
     habits.bindStream(_dbService.database.habitDao.watchAllHabits());
     weeks.bindStream(_dbService.database.habitWeekDao.watchAllHabitWeeks());
+
+    /// Clear selectedGroup when longPress mode end
+    /// if skip clearing selectedGroup, then same selectedGroup will be used
+    /// next longPress mode
+    // isEditMode.listen((value) {
+    //   if (value) {
+    //     selectedGroups.value = Set<GroupCardInfo>();
+    //   }
+    // });
 
     super.onInit();
   }
@@ -55,6 +92,52 @@ class ManageHabitController extends GetxController {
     });
 
     Get.back();
+  }
+
+  void _updateGroupCardInfo(int groupId, bool isSelected, {double padding}) {
+    final info = selectedGroups.singleWhere((info) => info.groupId == groupId,
+        orElse: () => null);
+
+    if (info == null)
+      selectedGroups.add(GroupCardInfo(groupId, padding ?? 0.0, isSelected));
+    else {
+      if (padding != null) info.latestPadding = padding;
+      info.isSelected = isSelected;
+      selectedGroups.add(info);
+    }
+  }
+
+  void onLongPress(int groupId, bool isSelected) {
+    isEditMode.value = true;
+    selectedGroups.value = Set<GroupCardInfo>();
+
+    _updateGroupCardInfo(groupId, isSelected);
+  }
+
+  void onTapAfterLongPress(int groupId, bool isSelected) {
+    _updateGroupCardInfo(groupId, isSelected);
+  }
+
+  void onPaddingChanged(int groupId, double padding) {
+    _updateGroupCardInfo(groupId, isSelected(groupId), padding: padding);
+  }
+
+  double latestPaddingOf(int groupId) {
+    final info = selectedGroups.singleWhere((info) => info.groupId == groupId,
+        orElse: () => null);
+
+    if (info == null)
+      return 0.0;
+    else
+      return info.latestPadding;
+  }
+
+  bool isSelected(int groupId) {
+    final info = selectedGroups.singleWhere((info) => info.groupId == groupId,
+        orElse: () => null);
+
+    if (info == null) return false;
+    return info.isSelected;
   }
 
   void onAddGroupTapped() {
@@ -98,9 +181,33 @@ class ManageHabitController extends GetxController {
               onSelected: (type) {
                 switch (type) {
                   case _PopupItemType.delete:
-                    // TODO add snackbar
-                    delete(habitId);
-                    Navigator.pop(context);
+                    Get.back();
+
+                    beforeDelete(habitId);
+                    Get.rawSnackbar(
+                      message: '삭제되었습니다',
+                      mainButton: FlatButton(
+                        onPressed: () {
+                          _delete = false;
+                          Get.back();
+                          habits.add(_habitBeforeDelete);
+                        },
+                        child: Text(
+                          '되돌리기',
+                          style: Get.textTheme.bodyText2
+                              .copyWith(color: Colors.white),
+                        ),
+                      ),
+                      snackbarStatus: (status) {
+                        if (status == SnackbarStatus.OPEN) {
+                          _delete = true;
+                        }
+                        if (status == SnackbarStatus.CLOSED && _delete) {
+                          delete(habitId);
+                        }
+                      },
+                    );
+
                     break;
                 }
               },
@@ -120,11 +227,25 @@ class ManageHabitController extends GetxController {
     );
   }
 
+  void beforeDelete(int habitId) {
+    _habitBeforeDelete = habits.singleWhere((habit) => habit.id == habitId);
+    habits.removeWhere((habit) => habit.id == habitId);
+  }
+
   void delete(int habitId) {
     _dbService.database.habitDao.deleteHabitById(habitId);
   }
 
   // Utility methods
+  Future<bool> onWillPop() async {
+    if (isEditMode.value) {
+      isEditMode.value = false;
+      return false;
+    }
+
+    return true;
+  }
+
   int numGroupMembers(int groupId) =>
       habits.where((habit) => habit.groupId == groupId).length;
   List<Habit> groupMembers(int groupId) =>

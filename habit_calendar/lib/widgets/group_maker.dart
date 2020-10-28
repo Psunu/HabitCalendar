@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
+import 'package:habit_calendar/widgets/auto_colored_icon.dart';
 import 'package:habit_calendar/widgets/bottom_buttons.dart';
 import 'package:habit_calendar/widgets/color_circle.dart';
 
@@ -51,8 +52,13 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
   bool isExpanded = false;
 
   TextEditingController nameController = TextEditingController();
-  Color selectedColor;
+  Color selectedColor = Colors.white;
   Map<int, bool> habitChipSelection = Map<int, bool>();
+
+  AnimationController colorExpandController;
+  Animation colorExpandAnimation;
+  AnimationController colorController;
+  Animation colorAnimation;
 
   bool get isNameAlertOn => isNameEmptyAlertOn || isNameDuplicatedAlertOn;
 
@@ -78,9 +84,11 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
             color: placeHolder ? Colors.white : colors[i],
             outlineColor: placeHolder ? Colors.white : Colors.grey,
           ),
-          checkMark: Icon(
-            Icons.check,
-            color: Colors.white,
+          checkMark: AutoColoredIcon(
+            backgroundColor: placeHolder ? Colors.white : colors[i],
+            child: Icon(
+              Icons.check,
+            ),
           ),
           value: placeHolder ? Colors.white : colors[i],
           groupValue: selectedColor,
@@ -103,10 +111,18 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
       children.add(
         InkWell(
           borderRadius: BorderRadius.circular(Constants.largeBorderRadius),
-          onTap: () {
+          onTap: () async {
             setState(() {
               isExpanded = !isExpanded;
             });
+
+            if (isExpanded) {
+              await colorController.forward();
+              await colorExpandController.forward();
+            } else {
+              await colorExpandController.reverse();
+              await colorController.reverse();
+            }
           },
           child: ColorCircle(
             child: expand,
@@ -115,32 +131,37 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
       );
     }
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: children,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: children,
+      ),
     );
   }
 
-  Widget _buildExpandColumn(
-      {@required List<Color> colors, @required int rowLength}) {
+  Widget _buildExpandColumn({
+    @required List<Color> colors,
+    @required int rowLength,
+    Widget firstRow,
+  }) {
     if (colors.isNull || rowLength.isNull) return Container();
 
     List<Widget> rows = List<Widget>();
 
+    if (firstRow != null) rows.add(firstRow);
+
     for (int i = 0; i < (colors.length / rowLength).ceil(); i++) {
       rows.add(
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: _buildCircleRow(
-            colors: colors
-                .getRange(
-                    i * rowLength,
-                    ((i * rowLength) + rowLength) >= colors.length
-                        ? colors.length
-                        : (i * rowLength) + rowLength)
-                .toList(),
-            length: rowLength,
-          ),
+        _buildCircleRow(
+          colors: colors
+              .getRange(
+                  i * rowLength,
+                  ((i * rowLength) + rowLength) >= colors.length
+                      ? colors.length
+                      : (i * rowLength) + rowLength)
+              .toList(),
+          length: rowLength,
         ),
       );
     }
@@ -232,7 +253,36 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
       }
     });
 
+    colorExpandController = AnimationController(
+      duration: Duration(
+        milliseconds: Constants.mediumAnimationSpeed,
+      ),
+      vsync: this,
+    );
+    colorExpandAnimation = Tween(begin: 0.0, end: 1.0)
+        .chain(CurveTween(curve: Curves.ease))
+        .animate(colorExpandController);
+
+    colorController = AnimationController(
+      duration: Duration(
+        milliseconds: Constants.mediumAnimationSpeed,
+      ),
+      vsync: this,
+    );
+    colorAnimation = Tween(begin: 1.0, end: 0.0)
+        .chain(CurveTween(curve: Curves.ease))
+        .animate(colorController);
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    colorExpandController.dispose();
+    colorController.dispose();
+    nameController.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -316,52 +366,69 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
               SizedBox(
                 height: 20.0,
               ),
-              // Color
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: _buildCircleRow(
-                  colors: [
-                    Colors.red,
-                    Colors.orange,
-                    Colors.yellow,
-                    Colors.green,
-                    Colors.blue,
-                  ],
-                  expand: Icon(Icons.expand_more),
-                ),
-              ),
-              // Color expand
-              AnimatedSize(
-                duration: Duration(
-                  milliseconds: Constants.mediumAnimationSpeed,
-                ),
-                vsync: this,
-                curve: Curves.ease,
-                child: Container(
-                  height: isExpanded ? null : 0.0,
-                  child: _buildExpandColumn(
-                    colors: [
-                      Colors.red,
-                      Colors.orange,
-                      Colors.yellow,
-                      Colors.green,
-                      Colors.blue,
-                      Colors.purple,
-                      Colors.red,
-                      Colors.orange,
-                      Colors.yellow,
-                      Colors.green,
-                      Colors.blue,
-                      Colors.purple,
-                      Colors.red,
-                      Colors.orange,
-                      Colors.yellow,
-                      Colors.green,
-                      Colors.blue,
-                    ],
-                    rowLength: 6,
+              Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  // Color
+                  FadeTransition(
+                    opacity: colorAnimation,
+                    child: SizeTransition(
+                      sizeFactor: colorAnimation,
+                      child: _buildCircleRow(
+                        colors: [
+                          Colors.red,
+                          Colors.orange,
+                          Colors.yellow,
+                          Colors.green,
+                          Colors.blue,
+                        ],
+                        expand: Icon(Icons.expand_more),
+                      ),
+                    ),
                   ),
-                ),
+                  // Color expand
+                  FadeTransition(
+                    opacity: colorExpandAnimation,
+                    child: SizeTransition(
+                      sizeFactor: colorExpandAnimation,
+                      child: Container(
+                        // height: isExpanded ? null : 0.0,
+                        child: _buildExpandColumn(
+                          firstRow: _buildCircleRow(
+                            colors: [
+                              Colors.red,
+                              Colors.orange,
+                              Colors.yellow,
+                              Colors.green,
+                              Colors.blue,
+                            ],
+                            expand: Icon(Icons.expand_less),
+                          ),
+                          colors: [
+                            Colors.red,
+                            Colors.orange,
+                            Colors.yellow,
+                            Colors.green,
+                            Colors.blue,
+                            Colors.purple,
+                            Colors.red,
+                            Colors.orange,
+                            Colors.yellow,
+                            Colors.green,
+                            Colors.blue,
+                            Colors.purple,
+                            Colors.red,
+                            Colors.orange,
+                            Colors.yellow,
+                            Colors.green,
+                            Colors.blue,
+                          ],
+                          rowLength: 6,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               Divider(),
               // Habits

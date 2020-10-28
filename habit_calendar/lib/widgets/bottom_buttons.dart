@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
+import 'package:habit_calendar/widgets/auto_colored_text.dart';
 
 const _kPadding = 20.0;
 const _kButtonPadding = 13.0;
@@ -68,10 +69,12 @@ class BottomButtons extends StatelessWidget {
                           BorderRadius.circular(Constants.mediumBorderRadius),
                     ),
                     onPressed: rightButtonAction,
-                    child: Text(
-                      _rightButtonString,
-                      style: Get.textTheme.headline6
-                          .copyWith(color: Get.theme.scaffoldBackgroundColor),
+                    child: AutoColoredText(
+                      backgroundColor: Get.theme.accentColor,
+                      child: Text(
+                        _rightButtonString,
+                        style: Get.textTheme.headline6,
+                      ),
                     ),
                   ),
             ),

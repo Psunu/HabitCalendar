@@ -15,6 +15,7 @@ Future<void> main() async {
 Future<void> _initServices() async {
   print('starting services ...');
   Get.lazyPut(() => DbService().init());
+  // Get.lazyPut(() => ManageHabitController());
   print('All services started...');
 }
 

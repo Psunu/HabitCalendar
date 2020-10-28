@@ -4,7 +4,6 @@ import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/utils/utils.dart';
 import 'package:habit_calendar/widgets/bottom_buttons.dart';
-import 'package:habit_calendar/widgets/color_circle.dart';
 import 'package:habit_calendar/widgets/duration_picker.dart';
 import 'package:habit_calendar/widgets/group_popup_menu.dart';
 import 'package:habit_calendar/widgets/icon_text.dart';
@@ -229,12 +228,11 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
         descriptionModified;
   }
 
-  Color get _habitColor {
-    return Color(widget.groups
-            ?.singleWhere((element) => element.id == _selectedGroupId)
-            ?.color ??
-        Colors.white.value);
-  }
+  Color _getGroupColor() => Color(widget.groups
+          .singleWhere((element) => element.id == widget.habit.groupId,
+              orElse: () => null)
+          ?.color ??
+      Colors.white.value);
 
   // Name validation
   bool _checkNameError() {
@@ -400,6 +398,7 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
                       padding: const EdgeInsets.only(right: 8.0),
                       child: GroupPopupMenu(
                         groups: widget.groups,
+                        initColor: _getGroupColor(),
                         onSelected: (groupId) {
                           setState(() {
                             _selectedGroupId = groupId;
