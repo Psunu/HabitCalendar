@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_reorderable_list/flutter_reorderable_list.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
@@ -29,7 +30,7 @@ class ManageHabitController extends GetxController {
   final weeks = List<HabitWeek>().obs;
   final isEditMode = false.obs;
   // key : group id / value : isSelected
-  final selectedGroups = Set<GroupCardInfo>().obs;
+  final selectedGroups = Map<int, bool>().obs;
 
   final DbService _dbService = Get.find<DbService>();
 
@@ -39,8 +40,8 @@ class ManageHabitController extends GetxController {
   int get numSelectedGroup {
     int selected = 0;
 
-    selectedGroups.forEach((info) {
-      if (info.isSelected) selected += 1;
+    selectedGroups.forEach((groupId, isSelected) {
+      if (isSelected) selected += 1;
     });
 
     return selected;
@@ -56,13 +57,78 @@ class ManageHabitController extends GetxController {
     /// Clear selectedGroup when longPress mode end
     /// if skip clearing selectedGroup, then same selectedGroup will be used
     /// next longPress mode
-    // isEditMode.listen((value) {
-    //   if (value) {
-    //     selectedGroups.value = Set<GroupCardInfo>();
-    //   }
-    // });
+    isEditMode.listen((value) {
+      if (!value) {
+        selectedGroups.value = Map<int, bool>();
+      }
+    });
+
+    habits.listen((list) {
+      print('habits changed');
+    });
 
     super.onInit();
+  }
+
+  // Reorder methods
+  // Returns index of item with given key
+  int _indexOfKey(Key key) {
+    int groupId = (key as ValueKey<int>).value;
+    return groups.indexWhere((group) => group.id == groupId);
+  }
+
+  bool reorderCallback(Key item, Key newPosition) {
+    int draggingIndex = _indexOfKey(item);
+    int newPositionIndex = _indexOfKey(newPosition);
+
+    // Uncomment to allow only even target reorder possition
+    // if (newPositionIndex % 2 == 1)
+    //   return false;
+
+    final draggedItem = groups[draggingIndex];
+
+    print("Reordering $item -> $newPosition");
+    groups.removeAt(draggingIndex);
+    groups.insert(newPositionIndex, draggedItem);
+
+    return true;
+  }
+
+  void reorderDone(Key item) async {
+    final draggedItem = groups[_indexOfKey(item)];
+
+    print("Reordering finished for ${draggedItem.name}}");
+  }
+
+  Widget buildReorderItemChild(
+    Widget child,
+    BuildContext context,
+    ReorderableItemState state,
+  ) {
+    if (state == ReorderableItemState.dragProxy ||
+        state == ReorderableItemState.dragProxyFinished) {
+      // slightly transparent when it dragged
+      return Opacity(
+        opacity: 0.3,
+        child: child,
+      );
+    }
+
+    return child;
+  }
+
+  // GroupCard methods
+  void onLongPress(int groupId, bool isSelected) {
+    isEditMode.value = true;
+    selectedGroups[groupId] = isSelected;
+  }
+
+  void onTapAfterLongPress(int groupId, bool isSelected) {
+    selectedGroups[groupId] = isSelected;
+  }
+
+  List<Habit> groupMembersOf(int groupId) {
+    return habits.where((habit) => habit.groupId == groupId).toList();
   }
 
   // Primary methods
@@ -90,52 +156,6 @@ class ManageHabitController extends GetxController {
     });
 
     Get.back();
-  }
-
-  void _updateGroupCardInfo(int groupId, bool isSelected, {double padding}) {
-    final info = selectedGroups.singleWhere((info) => info.groupId == groupId,
-        orElse: () => null);
-
-    if (info == null)
-      selectedGroups.add(GroupCardInfo(groupId, padding ?? 0.0, isSelected));
-    else {
-      if (padding != null) info.latestPadding = padding;
-      info.isSelected = isSelected;
-      selectedGroups.add(info);
-    }
-  }
-
-  void onLongPress(int groupId, bool isSelected) {
-    isEditMode.value = true;
-    selectedGroups.value = Set<GroupCardInfo>();
-
-    _updateGroupCardInfo(groupId, isSelected);
-  }
-
-  void onTapAfterLongPress(int groupId, bool isSelected) {
-    _updateGroupCardInfo(groupId, isSelected);
-  }
-
-  void onPaddingChanged(int groupId, double padding) {
-    _updateGroupCardInfo(groupId, isSelected(groupId), padding: padding);
-  }
-
-  double latestPaddingOf(int groupId) {
-    final info = selectedGroups.singleWhere((info) => info.groupId == groupId,
-        orElse: () => null);
-
-    if (info == null)
-      return 0.0;
-    else
-      return info.latestPadding;
-  }
-
-  bool isSelected(int groupId) {
-    final info = selectedGroups.singleWhere((info) => info.groupId == groupId,
-        orElse: () => null);
-
-    if (info == null) return false;
-    return info.isSelected;
   }
 
   void onAddGroupTapped() {

@@ -1591,6 +1591,199 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
   }
 }
 
+class IndexGroup extends DataClass implements Insertable<IndexGroup> {
+  final int groupId;
+  final int index;
+  IndexGroup({@required this.groupId, @required this.index});
+  factory IndexGroup.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
+    final intType = db.typeSystem.forDartType<int>();
+    return IndexGroup(
+      groupId:
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}group_id']),
+      index: intType.mapFromDatabaseResponse(data['${effectivePrefix}index']),
+    );
+  }
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (!nullToAbsent || groupId != null) {
+      map['group_id'] = Variable<int>(groupId);
+    }
+    if (!nullToAbsent || index != null) {
+      map['index'] = Variable<int>(index);
+    }
+    return map;
+  }
+
+  IndexGroupsCompanion toCompanion(bool nullToAbsent) {
+    return IndexGroupsCompanion(
+      groupId: groupId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(groupId),
+      index:
+          index == null && nullToAbsent ? const Value.absent() : Value(index),
+    );
+  }
+
+  factory IndexGroup.fromJson(Map<String, dynamic> json,
+      {ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return IndexGroup(
+      groupId: serializer.fromJson<int>(json['groupId']),
+      index: serializer.fromJson<int>(json['index']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'groupId': serializer.toJson<int>(groupId),
+      'index': serializer.toJson<int>(index),
+    };
+  }
+
+  IndexGroup copyWith({int groupId, int index}) => IndexGroup(
+        groupId: groupId ?? this.groupId,
+        index: index ?? this.index,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('IndexGroup(')
+          ..write('groupId: $groupId, ')
+          ..write('index: $index')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => $mrjf($mrjc(groupId.hashCode, index.hashCode));
+  @override
+  bool operator ==(dynamic other) =>
+      identical(this, other) ||
+      (other is IndexGroup &&
+          other.groupId == this.groupId &&
+          other.index == this.index);
+}
+
+class IndexGroupsCompanion extends UpdateCompanion<IndexGroup> {
+  final Value<int> groupId;
+  final Value<int> index;
+  const IndexGroupsCompanion({
+    this.groupId = const Value.absent(),
+    this.index = const Value.absent(),
+  });
+  IndexGroupsCompanion.insert({
+    this.groupId = const Value.absent(),
+    @required int index,
+  }) : index = Value(index);
+  static Insertable<IndexGroup> custom({
+    Expression<int> groupId,
+    Expression<int> index,
+  }) {
+    return RawValuesInsertable({
+      if (groupId != null) 'group_id': groupId,
+      if (index != null) 'index': index,
+    });
+  }
+
+  IndexGroupsCompanion copyWith({Value<int> groupId, Value<int> index}) {
+    return IndexGroupsCompanion(
+      groupId: groupId ?? this.groupId,
+      index: index ?? this.index,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (groupId.present) {
+      map['group_id'] = Variable<int>(groupId.value);
+    }
+    if (index.present) {
+      map['index'] = Variable<int>(index.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IndexGroupsCompanion(')
+          ..write('groupId: $groupId, ')
+          ..write('index: $index')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $IndexGroupsTable extends IndexGroups
+    with TableInfo<$IndexGroupsTable, IndexGroup> {
+  final GeneratedDatabase _db;
+  final String _alias;
+  $IndexGroupsTable(this._db, [this._alias]);
+  final VerificationMeta _groupIdMeta = const VerificationMeta('groupId');
+  GeneratedIntColumn _groupId;
+  @override
+  GeneratedIntColumn get groupId => _groupId ??= _constructGroupId();
+  GeneratedIntColumn _constructGroupId() {
+    return GeneratedIntColumn('group_id', $tableName, false,
+        $customConstraints:
+            'REFERENCES groups (id) ON UPDATE CASCADE ON DELETE CASCADE');
+  }
+
+  final VerificationMeta _indexMeta = const VerificationMeta('index');
+  GeneratedIntColumn _index;
+  @override
+  GeneratedIntColumn get index => _index ??= _constructIndex();
+  GeneratedIntColumn _constructIndex() {
+    return GeneratedIntColumn(
+      'index',
+      $tableName,
+      false,
+    );
+  }
+
+  @override
+  List<GeneratedColumn> get $columns => [groupId, index];
+  @override
+  $IndexGroupsTable get asDslTable => this;
+  @override
+  String get $tableName => _alias ?? 'index_groups';
+  @override
+  final String actualTableName = 'index_groups';
+  @override
+  VerificationContext validateIntegrity(Insertable<IndexGroup> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('group_id')) {
+      context.handle(_groupIdMeta,
+          groupId.isAcceptableOrUnknown(data['group_id'], _groupIdMeta));
+    }
+    if (data.containsKey('index')) {
+      context.handle(
+          _indexMeta, index.isAcceptableOrUnknown(data['index'], _indexMeta));
+    } else if (isInserting) {
+      context.missing(_indexMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {groupId};
+  @override
+  IndexGroup map(Map<String, dynamic> data, {String tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
+    return IndexGroup.fromData(data, _db, prefix: effectivePrefix);
+  }
+
+  @override
+  $IndexGroupsTable createAlias(String alias) {
+    return $IndexGroupsTable(_db, alias);
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   $GroupsTable _groups;
@@ -1606,6 +1799,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $HabitWeeksTable get habitWeeks => _habitWeeks ??= $HabitWeeksTable(this);
   $EventsTable _events;
   $EventsTable get events => _events ??= $EventsTable(this);
+  $IndexGroupsTable _indexGroups;
+  $IndexGroupsTable get indexGroups => _indexGroups ??= $IndexGroupsTable(this);
   GroupDao _groupDao;
   GroupDao get groupDao => _groupDao ??= GroupDao(this as AppDatabase);
   NotificationTypeDao _notificationTypeDao;
@@ -1620,9 +1815,19 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       _habitWeekDao ??= HabitWeekDao(this as AppDatabase);
   EventDao _eventDao;
   EventDao get eventDao => _eventDao ??= EventDao(this as AppDatabase);
+  IndexGroupDao _indexGroupDao;
+  IndexGroupDao get indexGroupDao =>
+      _indexGroupDao ??= IndexGroupDao(this as AppDatabase);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [groups, notificationTypes, weeks, habits, habitWeeks, events];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        groups,
+        notificationTypes,
+        weeks,
+        habits,
+        habitWeeks,
+        events,
+        indexGroups
+      ];
 }

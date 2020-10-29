@@ -102,6 +102,8 @@ class MakeHabitController extends GetxController {
     }
 
     Get.focusScope.requestFocus(nameFocusNode);
+
+    super.onInit();
   }
 
   @override

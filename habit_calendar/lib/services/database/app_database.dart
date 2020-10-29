@@ -1,5 +1,6 @@
 import 'package:habit_calendar/services/database/daos/event_dao.dart';
 import 'package:habit_calendar/services/database/daos/group_dao.dart';
+import 'package:habit_calendar/services/database/daos/index_group_dao.dart';
 import 'package:habit_calendar/services/database/daos/notification_type_dao.dart';
 import 'package:habit_calendar/services/database/daos/habit_dao.dart';
 import 'package:habit_calendar/services/database/daos/habit_week_dao.dart';
@@ -8,6 +9,7 @@ import 'package:habit_calendar/services/database/tables/events.dart';
 import 'package:habit_calendar/services/database/tables/groups.dart';
 import 'package:habit_calendar/services/database/tables/habits.dart';
 import 'package:habit_calendar/services/database/tables/habit_weeks.dart';
+import 'package:habit_calendar/services/database/tables/index_groups.dart';
 import 'package:habit_calendar/services/database/tables/notification_types.dart';
 import 'package:habit_calendar/services/database/tables/weeks.dart';
 import 'package:moor_flutter/moor_flutter.dart';
@@ -22,6 +24,7 @@ part 'app_database.g.dart';
     Habits,
     HabitWeeks,
     Events,
+    IndexGroups,
   ],
   daos: [
     GroupDao,
@@ -30,6 +33,7 @@ part 'app_database.g.dart';
     HabitDao,
     HabitWeekDao,
     EventDao,
+    IndexGroupDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {

@@ -12,27 +12,26 @@ class GroupCard extends StatefulWidget {
   const GroupCard({
     Key key,
     @required this.group,
-    @required this.habits,
+    @required this.memberHabits,
     this.nameStyle,
     this.numStyle,
     this.backgroundColor = Colors.white,
     this.outlineColor = Colors.grey,
     this.colorCircleSize = 20.0,
     this.height = 70.0,
-    this.latestPadding = 0.0,
     this.isSelected = false,
+    this.editModeAction,
     this.onHabitTapped,
     this.isEditMode = false,
     this.onTapAfterLongPress,
     this.onLongPress,
-    this.onPaddingChanged,
   })  : assert(group != null),
-        assert(habits != null),
+        assert(memberHabits != null),
         super(key: key);
 
   final Group group;
 
-  final List<Habit> habits;
+  final List<Habit> memberHabits;
 
   final TextStyle nameStyle;
 
@@ -46,8 +45,6 @@ class GroupCard extends StatefulWidget {
 
   final double height;
 
-  final double latestPadding;
-
   final bool isSelected;
 
   // parameter : habit id
@@ -55,14 +52,13 @@ class GroupCard extends StatefulWidget {
 
   final bool isEditMode;
 
+  final Widget editModeAction;
+
   // parameters : group id, isSelected
   final void Function(int, bool) onTapAfterLongPress;
 
   // parameters : group id, isSelected
   final void Function(int, bool) onLongPress;
-
-  // parameters : group id, latest padding
-  final void Function(int, double) onPaddingChanged;
 
   @override
   _GroupCardState createState() => _GroupCardState();
@@ -74,24 +70,14 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
   AnimationController _editModeController;
   Animation<double> _toEditModeAnimation;
   Animation<double> _toNormalModeAnimation;
-  AnimationController _paddingController;
-  Animation<double> _paddingAnimation;
 
   bool _isExpanded = false;
   bool _isSelected = false;
 
-  double _padding = 0.0;
-  final _paddingValue = 8.0;
-
-  int get _numGroupMembers =>
-      widget.habits.where((habit) => habit.groupId == widget.group.id).length;
-  List<Habit> get _groupMembers =>
-      widget.habits.where((habit) => habit.groupId == widget.group.id).toList();
+  bool get _hasNoMembers => widget.memberHabits.length < 1;
 
   @override
   void initState() {
-    print(widget.group.name);
-    print('init');
     _isSelected = widget.isSelected;
 
     _actionController = AnimationController(
@@ -119,12 +105,6 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
       ),
     );
 
-    _paddingController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: Constants.smallAnimationSpeed),
-    );
-    _setPadding();
-
     super.initState();
   }
 
@@ -132,51 +112,8 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
   void dispose() {
     _actionController.dispose();
     _editModeController.dispose();
-    _paddingController.dispose();
 
     super.dispose();
-  }
-
-  void _setPadding() {
-    double begin = 0.0;
-    double end = 0.0;
-
-    print(widget.group.name + ' ' + widget.latestPadding.toString());
-
-    if (widget.isEditMode) {
-      if (!_isSelected) {
-        begin = widget.latestPadding;
-        end = _paddingValue;
-      } else {
-        begin = widget.latestPadding;
-        end = 0.0;
-      }
-    } else {
-      // print(widget.group.name);
-      // print(widget.latestPadding);
-      begin = widget.latestPadding;
-      end = 0.0;
-    }
-
-    setState(() {
-      _paddingAnimation = _paddingController.drive(
-        Tween(begin: begin, end: end).chain(
-          CurveTween(curve: Curves.ease),
-        ),
-      )..addListener(() {
-          setState(() {
-            _padding = _paddingAnimation.value;
-          });
-
-          if (widget.onPaddingChanged != null)
-            widget.onPaddingChanged(widget.group.id, _padding);
-        });
-    });
-
-    if (_paddingController != null && !_paddingController.isAnimating) {
-      _paddingController.reset();
-      _paddingController.forward();
-    }
   }
 
   void _onTap() {
@@ -191,13 +128,11 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
         });
       }
 
-      _setPadding();
-
       if (widget.onTapAfterLongPress != null) {
         widget.onTapAfterLongPress(widget.group.id, _isSelected);
       }
     } else {
-      if (_numGroupMembers < 1) return;
+      if (_hasNoMembers) return;
 
       if (_isExpanded) {
         _actionController.reverse();
@@ -223,7 +158,7 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
   }
 
   Widget _buildExpand() {
-    if (_numGroupMembers < 0 || _groupMembers.isNull) {
+    if (_hasNoMembers) {
       return Container();
     }
 
@@ -244,11 +179,11 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
               child: Wrap(
                 spacing: 16.0,
                 children: List.generate(
-                  _groupMembers.length,
+                  widget.memberHabits.length,
                   (index) => InkWell(
                     onTap: () {
                       if (!widget.onHabitTapped.isNull)
-                        widget.onHabitTapped(_groupMembers[index].id);
+                        widget.onHabitTapped(widget.memberHabits[index].id);
                     },
                     child: Chip(
                       backgroundColor: widget.backgroundColor,
@@ -263,7 +198,7 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
                       label: AutoColoredText(
                         backgroundColor: widget.backgroundColor,
                         child: Text(
-                          _groupMembers[index].name,
+                          widget.memberHabits[index].name,
                           style: Get.textTheme.bodyText1,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -282,7 +217,6 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.group.name + ' build');
     if (!widget.isEditMode) {
       _isSelected = false;
       _editModeController.reverse();
@@ -295,7 +229,7 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
       onLongPress: !widget.isEditMode ? _onLongPress : null,
       child: AnimatedPadding(
         padding: EdgeInsets.all(
-          _padding,
+          widget.isEditMode && !_isSelected ? 5.0 : 0.0,
         ),
         duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
         curve: Curves.ease,
@@ -344,7 +278,8 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
                                               backgroundColor:
                                                   widget.backgroundColor,
                                               child: Text(
-                                                _numGroupMembers.toString(),
+                                                widget.memberHabits.length
+                                                    .toString(),
                                                 style: widget.numStyle ??
                                                     Get.textTheme.bodyText1,
                                               ),
@@ -355,7 +290,7 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
                                               turns: _actionAnimation,
                                               child: Icon(
                                                 Icons.expand_more,
-                                                color: _numGroupMembers < 1
+                                                color: _hasNoMembers
                                                     ? Colors.transparent
                                                     : null,
                                               ),
@@ -365,16 +300,21 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
                                       )
                                     : Container(),
                                 // Drag icon
-                                FadeTransition(
-                                  opacity: _toEditModeAnimation,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: AutoColoredIcon(
-                                      backgroundColor: widget.backgroundColor,
-                                      child: Icon(Icons.drag_handle),
-                                    ),
-                                  ),
-                                ),
+                                widget.isEditMode
+                                    ? FadeTransition(
+                                        opacity: _toEditModeAnimation,
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 8.0),
+                                          child: widget.editModeAction ??
+                                              AutoColoredIcon(
+                                                backgroundColor:
+                                                    widget.backgroundColor,
+                                                child: Icon(Icons.reorder),
+                                              ),
+                                        ),
+                                      )
+                                    : Container(),
                               ],
                             ),
                           ],
