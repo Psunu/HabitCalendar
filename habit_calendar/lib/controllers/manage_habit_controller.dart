@@ -95,9 +95,21 @@ class ManageHabitController extends GetxController {
   }
 
   void reorderDone(Key item) async {
-    final draggedItem = groups[_indexOfKey(item)];
+    // Update IndexGroups table if reordered
+    final dbGroups = await _dbService.database.groupDao.getAllGroups();
+    List<IndexGroup> needUpdate = List<IndexGroup>();
 
-    print("Reordering finished for ${draggedItem.name}}");
+    for (int i = 0; i < groups.length; i++) {
+      if (groups[i].id != dbGroups[i].id) {
+        needUpdate.add(IndexGroup(groupId: groups[i].id, indx: i));
+      }
+    }
+
+    await _dbService.database.indexGroupDao.updateAllIndexGroups(needUpdate);
+
+    needUpdate.forEach((element) {
+      print('Reordering finished for ${element.groupId} - ${element.indx}');
+    });
   }
 
   Widget buildReorderItemChild(

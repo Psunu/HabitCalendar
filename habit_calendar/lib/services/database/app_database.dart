@@ -60,6 +60,7 @@ class AppDatabase extends _$AppDatabase {
             // Insert default group value
             await into(groups)
                 .insert(Group(id: 0, name: 'default', color: 0xffffff));
+            await into(indexGroups).insert(IndexGroup(groupId: 0, indx: 0));
             // Insert default notification type value
             await into(notificationTypes)
                 .insert(NotificationType(id: 0, type: 'none'));

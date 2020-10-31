@@ -13,11 +13,26 @@ class IndexGroupDao extends DatabaseAccessor<AppDatabase>
   IndexGroupDao(this.db) : super(db);
 
   Future<List<IndexGroup>> getAllIndexGroups() => select(indexGroups).get();
+  Future<IndexGroup> getIndexGroupByGroupId(int groupId) =>
+      (select(indexGroups)..where((tbl) => tbl.groupId.equals(groupId)))
+          .getSingle();
   Stream<List<IndexGroup>> watchAllIndexGroups() => select(indexGroups).watch();
-  Future insertIndexGroup(IndexGroup indexGroup) =>
+  Future<int> insertIndexGroup(IndexGroup indexGroup) =>
       into(indexGroups).insert(indexGroup);
-  Future updateIndexGroup(IndexGroup indexGroup) =>
+  Future<bool> updateIndexGroup(IndexGroup indexGroup) =>
       update(indexGroups).replace(indexGroup);
-  Future deleteIndexGroup(IndexGroup indexGroup) =>
+  Future<bool> updateAllIndexGroups(List<IndexGroup> indxGroups) {
+    return transaction(() async {
+      bool result;
+
+      for (final indexGroup in indxGroups) {
+        result = await update(indexGroups).replace(indexGroup);
+      }
+
+      return result;
+    });
+  }
+
+  Future<int> deleteIndexGroup(IndexGroup indexGroup) =>
       delete(indexGroups).delete(indexGroup);
 }

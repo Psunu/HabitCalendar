@@ -1593,8 +1593,8 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
 
 class IndexGroup extends DataClass implements Insertable<IndexGroup> {
   final int groupId;
-  final int index;
-  IndexGroup({@required this.groupId, @required this.index});
+  final int indx;
+  IndexGroup({@required this.groupId, @required this.indx});
   factory IndexGroup.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -1602,7 +1602,7 @@ class IndexGroup extends DataClass implements Insertable<IndexGroup> {
     return IndexGroup(
       groupId:
           intType.mapFromDatabaseResponse(data['${effectivePrefix}group_id']),
-      index: intType.mapFromDatabaseResponse(data['${effectivePrefix}index']),
+      indx: intType.mapFromDatabaseResponse(data['${effectivePrefix}indx']),
     );
   }
   @override
@@ -1611,8 +1611,8 @@ class IndexGroup extends DataClass implements Insertable<IndexGroup> {
     if (!nullToAbsent || groupId != null) {
       map['group_id'] = Variable<int>(groupId);
     }
-    if (!nullToAbsent || index != null) {
-      map['index'] = Variable<int>(index);
+    if (!nullToAbsent || indx != null) {
+      map['indx'] = Variable<int>(indx);
     }
     return map;
   }
@@ -1622,8 +1622,7 @@ class IndexGroup extends DataClass implements Insertable<IndexGroup> {
       groupId: groupId == null && nullToAbsent
           ? const Value.absent()
           : Value(groupId),
-      index:
-          index == null && nullToAbsent ? const Value.absent() : Value(index),
+      indx: indx == null && nullToAbsent ? const Value.absent() : Value(indx),
     );
   }
 
@@ -1632,7 +1631,7 @@ class IndexGroup extends DataClass implements Insertable<IndexGroup> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return IndexGroup(
       groupId: serializer.fromJson<int>(json['groupId']),
-      index: serializer.fromJson<int>(json['index']),
+      indx: serializer.fromJson<int>(json['indx']),
     );
   }
   @override
@@ -1640,58 +1639,58 @@ class IndexGroup extends DataClass implements Insertable<IndexGroup> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'groupId': serializer.toJson<int>(groupId),
-      'index': serializer.toJson<int>(index),
+      'indx': serializer.toJson<int>(indx),
     };
   }
 
-  IndexGroup copyWith({int groupId, int index}) => IndexGroup(
+  IndexGroup copyWith({int groupId, int indx}) => IndexGroup(
         groupId: groupId ?? this.groupId,
-        index: index ?? this.index,
+        indx: indx ?? this.indx,
       );
   @override
   String toString() {
     return (StringBuffer('IndexGroup(')
           ..write('groupId: $groupId, ')
-          ..write('index: $index')
+          ..write('indx: $indx')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(groupId.hashCode, index.hashCode));
+  int get hashCode => $mrjf($mrjc(groupId.hashCode, indx.hashCode));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is IndexGroup &&
           other.groupId == this.groupId &&
-          other.index == this.index);
+          other.indx == this.indx);
 }
 
 class IndexGroupsCompanion extends UpdateCompanion<IndexGroup> {
   final Value<int> groupId;
-  final Value<int> index;
+  final Value<int> indx;
   const IndexGroupsCompanion({
     this.groupId = const Value.absent(),
-    this.index = const Value.absent(),
+    this.indx = const Value.absent(),
   });
   IndexGroupsCompanion.insert({
     this.groupId = const Value.absent(),
-    @required int index,
-  }) : index = Value(index);
+    @required int indx,
+  }) : indx = Value(indx);
   static Insertable<IndexGroup> custom({
     Expression<int> groupId,
-    Expression<int> index,
+    Expression<int> indx,
   }) {
     return RawValuesInsertable({
       if (groupId != null) 'group_id': groupId,
-      if (index != null) 'index': index,
+      if (indx != null) 'indx': indx,
     });
   }
 
-  IndexGroupsCompanion copyWith({Value<int> groupId, Value<int> index}) {
+  IndexGroupsCompanion copyWith({Value<int> groupId, Value<int> indx}) {
     return IndexGroupsCompanion(
       groupId: groupId ?? this.groupId,
-      index: index ?? this.index,
+      indx: indx ?? this.indx,
     );
   }
 
@@ -1701,8 +1700,8 @@ class IndexGroupsCompanion extends UpdateCompanion<IndexGroup> {
     if (groupId.present) {
       map['group_id'] = Variable<int>(groupId.value);
     }
-    if (index.present) {
-      map['index'] = Variable<int>(index.value);
+    if (indx.present) {
+      map['indx'] = Variable<int>(indx.value);
     }
     return map;
   }
@@ -1711,7 +1710,7 @@ class IndexGroupsCompanion extends UpdateCompanion<IndexGroup> {
   String toString() {
     return (StringBuffer('IndexGroupsCompanion(')
           ..write('groupId: $groupId, ')
-          ..write('index: $index')
+          ..write('indx: $indx')
           ..write(')'))
         .toString();
   }
@@ -1732,20 +1731,20 @@ class $IndexGroupsTable extends IndexGroups
             'REFERENCES groups (id) ON UPDATE CASCADE ON DELETE CASCADE');
   }
 
-  final VerificationMeta _indexMeta = const VerificationMeta('index');
-  GeneratedIntColumn _index;
+  final VerificationMeta _indxMeta = const VerificationMeta('indx');
+  GeneratedIntColumn _indx;
   @override
-  GeneratedIntColumn get index => _index ??= _constructIndex();
-  GeneratedIntColumn _constructIndex() {
+  GeneratedIntColumn get indx => _indx ??= _constructIndx();
+  GeneratedIntColumn _constructIndx() {
     return GeneratedIntColumn(
-      'index',
+      'indx',
       $tableName,
       false,
     );
   }
 
   @override
-  List<GeneratedColumn> get $columns => [groupId, index];
+  List<GeneratedColumn> get $columns => [groupId, indx];
   @override
   $IndexGroupsTable get asDslTable => this;
   @override
@@ -1761,11 +1760,11 @@ class $IndexGroupsTable extends IndexGroups
       context.handle(_groupIdMeta,
           groupId.isAcceptableOrUnknown(data['group_id'], _groupIdMeta));
     }
-    if (data.containsKey('index')) {
+    if (data.containsKey('indx')) {
       context.handle(
-          _indexMeta, index.isAcceptableOrUnknown(data['index'], _indexMeta));
+          _indxMeta, indx.isAcceptableOrUnknown(data['indx'], _indxMeta));
     } else if (isInserting) {
-      context.missing(_indexMeta);
+      context.missing(_indxMeta);
     }
     return context;
   }

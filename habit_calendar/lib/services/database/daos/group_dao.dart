@@ -12,28 +12,76 @@ class GroupDao extends DatabaseAccessor<AppDatabase> with _$GroupDaoMixin {
   // Called by the AppDatabase class
   GroupDao(this.db) : super(db);
 
-  // TODO order by indexgroup
-  Future<List<Group>> getAllGroups() => (select(groups)
-        ..orderBy(
-          [
-            (t) => OrderingTerm(expression: t.id),
-          ],
-        ))
-      .get();
-  Stream<List<Group>> watchAllGroups() => (select(groups)
-        ..orderBy(
-          [
-            (t) => OrderingTerm(expression: t.id),
-          ],
-        ))
-      .watch();
+  Future<List<Group>> getAllGroups() => (select(groups).join(
+        [
+          leftOuterJoin(
+            indexGroups,
+            indexGroups.groupId.equalsExp(groups.id),
+          )
+        ],
+      )..orderBy(
+              [
+                // First order : index
+                OrderingTerm(
+                  expression: indexGroups.indx,
+                  mode: OrderingMode.asc,
+                ),
+
+                /// When index is mixed and some groups are removed and added
+                /// index can be duplicated.
+                /// Second order is groups id. because latest group id is
+                /// awalys heighest
+                OrderingTerm(
+                  expression: groups.id,
+                  mode: OrderingMode.asc,
+                ),
+              ],
+            ))
+          .map((row) => row.readTable(groups))
+          .get();
+  Stream<List<Group>> watchAllGroups() => (select(groups).join(
+        [
+          leftOuterJoin(
+            indexGroups,
+            indexGroups.groupId.equalsExp(groups.id),
+          ),
+        ],
+      )..orderBy(
+              [
+                // First order : index
+                OrderingTerm(
+                  expression: indexGroups.indx,
+                  mode: OrderingMode.asc,
+                ),
+
+                /// When index is mixed and some groups are removed and added
+                /// index can be duplicated.
+                /// Second order is groups id. because latest group id is
+                /// awalys heighest
+                OrderingTerm(
+                  expression: groups.id,
+                  mode: OrderingMode.asc,
+                ),
+              ],
+            ))
+          .watch()
+          .map(
+            (rows) => rows
+                .map(
+                  (row) => row.readTable(groups),
+                )
+                .toList(),
+          );
+
   Future<Group> getGroupById(int id) =>
       (select(groups)..where((group) => group.id.equals(id))).getSingle();
   Future<int> insertGroup(Group group) async {
-    final int id = await into(groups).insert(group);
-    await into(indexGroups).insert(IndexGroup(groupId: id, index: id));
+    return transaction<int>(() async {
+      final int id = await into(groups).insert(group);
+      await into(indexGroups).insert(IndexGroup(groupId: id, indx: id));
 
-    return id;
+      return id;
+    });
   }
 
   Future<bool> updateGroup(Group group) => update(groups).replace(group);
