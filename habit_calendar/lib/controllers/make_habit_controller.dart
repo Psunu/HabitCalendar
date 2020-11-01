@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/utils/utils.dart';
+import 'package:habit_calendar/widgets/general_purpose/duration_picker.dart';
+import 'package:habit_calendar/widgets/general_purpose/time_picker.dart';
 import 'package:habit_calendar/widgets/general_purpose/week_card.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
@@ -147,6 +149,66 @@ class MakeHabitController extends GetxController {
     Get.back();
   }
 
+  void onGroupSelected(int groupId) {
+    selectedGroup.value =
+        groups.singleWhere((element) => element.id == groupId);
+    Get.focusScope.unfocus();
+  }
+
+  void onWhatTimeValueChanged(bool value) {
+    isWhatTimeActivated = value;
+  }
+
+  void onWhatTimeTapped() {
+    if (isWhatTimeActivated) {
+      Utils.customShowModalBottomSheet(
+        builder: (context) {
+          return Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: TimePicker(
+              ampmStyle: Get.textTheme.bodyText1,
+              timeStyle: Get.textTheme.headline5,
+              initTime: whatTime.value,
+              height: 200.0,
+              onTimeChanged: (time) {
+                whatTime.value = time;
+              },
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  void onNotificationTimeValueChanged(bool value) {
+    isNotificationActivated = value;
+  }
+
+  void onNotificationTimeTapped() {
+    if (isNotificationActivated) {
+      Utils.customShowModalBottomSheet(
+        builder: (context) {
+          return Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: DurationPicker(
+              height: 200.0,
+              durationStyle: Get.textTheme.headline5,
+              tagStyle: Get.textTheme.bodyText1,
+              initDuration: notificationTime.value,
+              onDurationChanged: (duration) {
+                notificationTime.value = duration;
+              },
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  void onDescriptionValueChanged(bool value) {
+    isDescriptionActivated = value;
+  }
+
   // Utility Methods
   bool checkNameError() {
     isNameEmptyAlertOn.value = false;
@@ -237,20 +299,6 @@ class MakeHabitController extends GetxController {
           ),
         ],
       ),
-    );
-  }
-
-  Future<T> customShowModalBottomSheet<T>(
-      {@required void Function(BuildContext) builder}) {
-    return showModalBottomSheet<T>(
-      context: Get.context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(Constants.largeBorderRadius),
-          topRight: const Radius.circular(Constants.largeBorderRadius),
-        ),
-      ),
-      builder: builder,
     );
   }
 

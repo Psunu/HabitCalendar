@@ -85,5 +85,26 @@ class GroupDao extends DatabaseAccessor<AppDatabase> with _$GroupDaoMixin {
   }
 
   Future<bool> updateGroup(Group group) => update(groups).replace(group);
-  Future<int> deleteGroup(Group group) => delete(groups).delete(group);
+  Future<int> deleteGroup(Group group) async {
+    // Prevent to delete default folder
+    if (group.id == 0) return 0;
+
+    return delete(groups).delete(group);
+  }
+
+  Future<int> deleteAllGroupsById(List<int> groupIds) async {
+    return transaction(() async {
+      int numDeleted = 0;
+
+      for (final groupId in groupIds) {
+        // Prevent to delete default folder
+        if (groupId == 0) continue;
+
+        numDeleted +=
+            await (delete(groups)..where((tbl) => tbl.id.equals(groupId))).go();
+      }
+
+      return numDeleted;
+    });
+  }
 }

@@ -61,11 +61,15 @@ class Messages extends Translations {
           '저장': 'save',
           '확인': 'ok',
           '삭제': 'delete',
+          '수정': 'edit',
           '시': 'hour',
           '분': 'minute',
           '꾸준히 하려면\n작게 해야 합니다': 'Make it small \nto do constantly',
           '폴더 이름을 입력해 주세요': 'Please type folder name',
           '폴더가 이미 있습니다': 'Aleady exists',
+          '삭제되었습니다': 'Deleted',
+          '되돌리기': 'Undo',
+          '삭제하시겠어요?': 'Are you sure to delete?',
         },
       };
 }

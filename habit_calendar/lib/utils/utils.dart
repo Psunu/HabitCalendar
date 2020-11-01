@@ -1,4 +1,7 @@
+import 'package:animations/animations.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_calendar/constants/constants.dart';
 
 class Utils {
   static String getFormedDate(DateTime date) {
@@ -113,5 +116,49 @@ class Utils {
   static String twoDigits(int n) {
     if (n >= 10) return "$n";
     return "0$n";
+  }
+
+  static Future<T> customShowModalBottomSheet<T>(
+      {@required void Function(BuildContext) builder}) {
+    return showModalBottomSheet<T>(
+      context: Get.context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(Constants.largeBorderRadius),
+          topRight: const Radius.circular(Constants.largeBorderRadius),
+        ),
+      ),
+      builder: builder,
+    );
+  }
+
+  static Future<T> customShowModal<T>(
+      {Widget Function(BuildContext context) builder}) {
+    return showModal<T>(
+      context: Get.context,
+      configuration: FadeScaleTransitionConfiguration(),
+      builder: (context) => Center(
+        child: SingleChildScrollView(
+          // This padding works like resizeToAvoidBottomInset
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(Constants.padding,
+                  Constants.padding, Constants.padding, Constants.padding / 2),
+              margin: const EdgeInsets.all(Constants.padding),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(
+                  Constants.largeBorderRadius,
+                ),
+              ),
+              child: builder(context),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

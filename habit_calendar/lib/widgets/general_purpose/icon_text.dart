@@ -84,7 +84,9 @@ class _IconTextState extends State<IconText> {
 
   @override
   void dispose() {
-    if (widget.focusNode != null) widget.focusNode.dispose();
+    _focusNode.dispose();
+    _descriptionController.dispose();
+
     super.dispose();
   }
 
@@ -96,7 +98,9 @@ class _IconTextState extends State<IconText> {
         InkWell(
           customBorder: const CircleBorder(),
           onTap: () {
-            _value = !_value;
+            setState(() {
+              _value = !_value;
+            });
 
             if (widget.onValueChanged != null) {
               widget.onValueChanged(_value);
@@ -134,7 +138,9 @@ class _IconTextState extends State<IconText> {
         return InkWell(
           onTap: () {
             if (!_value) {
-              _value = !_value;
+              setState(() {
+                _value = true;
+              });
 
               if (widget.onValueChanged != null) widget.onValueChanged(_value);
             }
@@ -182,19 +188,18 @@ class _IconTextState extends State<IconText> {
             if (text.isEmpty) {
               setState(() {
                 _value = false;
-                if (widget.onValueChanged != null)
-                  widget.onValueChanged(_value);
-
-                if (widget.onTextChanged != null) widget.onTextChanged(text);
               });
+              if (widget.onValueChanged != null) widget.onValueChanged(_value);
+
+              if (widget.onTextChanged != null) widget.onTextChanged(text);
             } else if (!_value) {
               setState(() {
                 _value = true;
-                if (widget.onValueChanged != null)
-                  widget.onValueChanged(_value);
-
-                if (widget.onTextChanged != null) widget.onTextChanged(text);
               });
+
+              if (widget.onValueChanged != null) widget.onValueChanged(_value);
+
+              if (widget.onTextChanged != null) widget.onTextChanged(text);
             }
           },
           onEditingComplete: () {

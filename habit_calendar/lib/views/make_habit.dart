@@ -4,9 +4,7 @@ import 'package:habit_calendar/constants/constants.dart';
 
 import '../widgets/project_purpose/bottom_buttons.dart';
 import '../widgets/project_purpose/group_popup_menu.dart';
-import '../widgets/general_purpose/duration_picker.dart';
 import '../widgets/general_purpose/icon_text.dart';
-import '../widgets/general_purpose/time_picker.dart';
 import '../controllers/make_habit_controller.dart';
 
 const _kIconTextPadding = 20.0;
@@ -107,12 +105,7 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                                 // Group
                                 GroupPopupMenu(
                                   groups: controller.groups,
-                                  onSelected: (groupId) {
-                                    controller.selectedGroup.value =
-                                        controller.groups.singleWhere(
-                                            (element) => element.id == groupId);
-                                    Get.focusScope.unfocus();
-                                  },
+                                  onSelected: controller.onGroupSelected,
                                 ),
                               ],
                             ),
@@ -176,29 +169,9 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                                 icon: Icon(Icons.access_time),
                                 text: Text(controller.whatTimeString),
                                 initValue: controller.isWhatTimeActivated,
-                                onValueChanged: (value) {
-                                  controller.isWhatTimeActivated = value;
-                                },
-                                onTap: () {
-                                  if (controller.isWhatTimeActivated) {
-                                    controller.customShowModalBottomSheet(
-                                      builder: (context) {
-                                        return Padding(
-                                          padding: const EdgeInsets.all(30.0),
-                                          child: TimePicker(
-                                            ampmStyle: Get.textTheme.bodyText1,
-                                            timeStyle: Get.textTheme.headline5,
-                                            initTime: controller.whatTime.value,
-                                            height: 200.0,
-                                            onTimeChanged: (time) {
-                                              controller.whatTime.value = time;
-                                            },
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  }
-                                },
+                                onValueChanged:
+                                    controller.onWhatTimeValueChanged,
+                                onTap: controller.onWhatTimeTapped,
                               ),
                             ),
                             // Notification time
@@ -209,32 +182,9 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                                 icon: Icon(Icons.notifications),
                                 text: Text(controller.notificationTimeString),
                                 initValue: controller.isNotificationActivated,
-                                onValueChanged: (value) {
-                                  controller.isNotificationActivated = value;
-                                },
-                                onTap: () {
-                                  if (controller.isNotificationActivated) {
-                                    controller.customShowModalBottomSheet(
-                                      builder: (context) {
-                                        return Padding(
-                                          padding: const EdgeInsets.all(30.0),
-                                          child: DurationPicker(
-                                            height: 200.0,
-                                            durationStyle:
-                                                Get.textTheme.headline5,
-                                            tagStyle: Get.textTheme.bodyText1,
-                                            initDuration: controller
-                                                .notificationTime.value,
-                                            onDurationChanged: (duration) {
-                                              controller.notificationTime
-                                                  .value = duration;
-                                            },
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  }
-                                },
+                                onValueChanged:
+                                    controller.onNotificationTimeValueChanged,
+                                onTap: controller.onNotificationTimeTapped,
                               ),
                             ),
                             // Description
@@ -247,9 +197,8 @@ class _MakeHabitState extends State<MakeHabit> with TickerProviderStateMixin {
                                 descriptionController:
                                     controller.descriptionController,
                                 initValue: controller.isDescriptionActivated,
-                                onValueChanged: (value) {
-                                  controller.isDescriptionActivated = value;
-                                },
+                                onValueChanged:
+                                    controller.onDescriptionValueChanged,
                               ),
                             ),
                           ],
