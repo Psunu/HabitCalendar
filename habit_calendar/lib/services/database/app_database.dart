@@ -83,6 +83,8 @@ class AppDatabase extends _$AppDatabase {
           // Print inserted values from groups, notification_types, weeks
           print('<groups>');
           (await select(groups).get()).forEach((element) => print(element));
+          print('<index_groups>');
+          (await select(groups).get()).forEach((element) => print(element));
           print('<notification_types>');
           (await select(notificationTypes).get())
               .forEach((element) => print(element));

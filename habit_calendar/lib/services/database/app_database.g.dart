@@ -1015,7 +1015,7 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
   GeneratedIntColumn _constructGroupId() {
     return GeneratedIntColumn('group_id', $tableName, false,
         $customConstraints:
-            'REFERENCES groups(id) ON UPDATE CASCADE ON DELETE SET DEFAULT',
+            'DEFAULT 0 REFERENCES groups(id) ON UPDATE CASCADE ON DELETE SET DEFAULT',
         defaultValue: const Constant(0));
   }
 
@@ -1028,7 +1028,7 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
   GeneratedIntColumn _constructNotificationTypeId() {
     return GeneratedIntColumn('notification_type_id', $tableName, false,
         $customConstraints:
-            'REFERENCES notification_types (id) ON UPDATE CASCADE ON DELETE SET DEFAULT',
+            'DEFAULT 0 REFERENCES notification_types (id) ON UPDATE CASCADE ON DELETE SET DEFAULT',
         defaultValue: const Constant(0));
   }
 

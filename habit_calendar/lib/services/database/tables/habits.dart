@@ -9,10 +9,10 @@ class Habits extends Table {
   BoolColumn get statusBarFix => boolean().withDefault(const Constant(false))();
   IntColumn get groupId =>
       integer().withDefault(const Constant(0)).customConstraint(
-          'REFERENCES groups(id) ON UPDATE CASCADE ON DELETE SET DEFAULT')();
+          'DEFAULT 0 REFERENCES groups(id) ON UPDATE CASCADE ON DELETE SET DEFAULT')();
   IntColumn get notificationTypeId =>
       integer().withDefault(const Constant(0)).customConstraint(
-          'REFERENCES notification_types (id) ON UPDATE CASCADE ON DELETE SET DEFAULT')();
+          'DEFAULT 0 REFERENCES notification_types (id) ON UPDATE CASCADE ON DELETE SET DEFAULT')();
 
   @override
   Set<Column> get primaryKey => {id};

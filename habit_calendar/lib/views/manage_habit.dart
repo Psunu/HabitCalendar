@@ -3,6 +3,7 @@ import 'package:flutter_reorderable_list/flutter_reorderable_list.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/controllers/manage_habit_controller.dart';
+import 'package:habit_calendar/utils/utils.dart';
 import 'package:habit_calendar/widgets/project_purpose/bottom_bar.dart';
 import 'package:habit_calendar/widgets/project_purpose/delete_confirm_dialog.dart';
 
@@ -19,67 +20,45 @@ class _ManageHabitState extends State<ManageHabit>
     with TickerProviderStateMixin {
   AnimationController _bottomBarController;
   Animation _bottomBarAnimation;
-  AnimationController _confirmController;
-  Animation _confirmAnimation;
 
   OverlayEntry _bottomBar;
-  OverlayEntry _confirmDialog;
 
   ManageHabitController _controller;
 
   void _showConfirmDialog() async {
-    try {
-      Overlay.of(context).insert(_confirmDialog);
-    } catch (e) {
-      print('ERROR: Overlay is not inserted');
-    }
-
     await _bottomBarController.reverse();
-    await _confirmController.forward();
-  }
 
-  void _closeConfirmDialog({@required bool isCanceled}) async {
-    await _confirmController.reverse();
-    await _bottomBarController.forward();
-
-    try {
-      _confirmDialog.remove();
-    } catch (e) {
-      print('ERROR: Overlay is not inserted');
-    }
-
-    if (!isCanceled) _controller.isEditMode.value = false;
-  }
-
-  void _buildConfirmDialog() {
-    _confirmDialog = OverlayEntry(builder: (context) {
-      return Positioned(
-        bottom: 0.0,
-        child: SizeTransition(
-          sizeFactor: _confirmAnimation,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 16.0),
-            child: DeleteConfirmDialog(
-              message: AutoColoredText(
-                backgroundColor: Get.theme.scaffoldBackgroundColor,
-                child: Text(
-                  '삭제하시겠어요?'.tr,
-                  style: Get.textTheme.bodyText1,
-                ),
-              ),
-              backgroundColor: Get.theme.scaffoldBackgroundColor,
-              onCancelTap: () {
-                _closeConfirmDialog(isCanceled: true);
-              },
-              onDeleteTap: () {
-                _closeConfirmDialog(isCanceled: false);
-                _controller.onDeleteTapped();
-              },
+    final bool isCanceled =
+        await Utils.customShowModalBottomSheet<bool>(builder: (context) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 16.0),
+        child: DeleteConfirmDialog(
+          message: AutoColoredText(
+            backgroundColor: Get.theme.scaffoldBackgroundColor,
+            child: Text(
+              '삭제하시겠어요?'.tr,
+              style: Get.textTheme.bodyText1,
             ),
           ),
+          backgroundColor: Get.theme.scaffoldBackgroundColor,
+          onCancelTap: () {
+            Get.back(result: true);
+          },
+          onDeleteTap: () {
+            Get.back(result: false);
+            _controller.onDeleteTapped();
+          },
         ),
       );
     });
+
+    _closeConfirmDialog(isCanceled: isCanceled ?? true);
+  }
+
+  void _closeConfirmDialog({@required bool isCanceled}) async {
+    await _bottomBarController.forward();
+
+    if (!isCanceled) _controller.isEditMode.value = false;
   }
 
   void _showBottomBar() {
@@ -108,10 +87,12 @@ class _ManageHabitState extends State<ManageHabit>
           sizeFactor: _bottomBarAnimation,
           child: Padding(
             padding: const EdgeInsets.only(top: 16.0),
-            child: BottomBar(
-              backgroundColor: Get.theme.scaffoldBackgroundColor,
-              onDeleteTap: _showConfirmDialog,
-            ),
+            child: Obx(() => BottomBar(
+                  displayOnlyDelete: _controller.numSelectedGroup > 1,
+                  backgroundColor: Get.theme.scaffoldBackgroundColor,
+                  onEditTap: _controller.onEditGroupTapped,
+                  onDeleteTap: _showConfirmDialog,
+                )),
           ),
         ),
       );
@@ -122,8 +103,7 @@ class _ManageHabitState extends State<ManageHabit>
   void initState() {
     // Init Get controller
     _controller = ManageHabitController();
-    // Init LayoutEntries
-    _buildConfirmDialog();
+    // Init LayoutEntry
     _buildBottomBar();
 
     // Init Animations
@@ -132,14 +112,6 @@ class _ManageHabitState extends State<ManageHabit>
       vsync: this,
     );
     _bottomBarAnimation = _bottomBarController.drive(
-      Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.ease)),
-    );
-
-    _confirmController = AnimationController(
-      duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
-      vsync: this,
-    );
-    _confirmAnimation = _confirmController.drive(
       Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.ease)),
     );
 
@@ -194,7 +166,6 @@ class _ManageHabitState extends State<ManageHabit>
                 ),
               ),
               onPressed: () {
-                // _closeBottomBar();
                 controller.isEditMode.value = false;
                 Get.back();
               },
@@ -227,7 +198,7 @@ class _ManageHabitState extends State<ManageHabit>
             duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
             opacity: controller.isEditMode.value ? 0.0 : 1.0,
             child: FloatingActionButton(
-              onPressed: controller.onAddGroupTapped,
+              onPressed: _controller.onAddGroupTapped,
               child: Icon(Icons.add),
             ),
           ),
@@ -256,36 +227,41 @@ class _ManageHabitState extends State<ManageHabit>
                         /// Maybe because it is returned from builder.
                         /// it is at out of GetX Widget.
                         /// so it can't listen to controller's Rx property
-                        Obx(() => Padding(
-                              key: ValueKey(group.id),
-                              padding: const EdgeInsets.fromLTRB(
-                                Constants.padding,
-                                0.0,
-                                Constants.padding,
-                                8.0,
-                              ),
-                              child: GroupCard(
-                                group: group,
-                                memberHabits: controller.groupMembersOf(
-                                  group.id,
-                                ),
-                                colorCircleSize: 20.0,
-                                height: 70.0,
-                                editModeAction: ReorderableListener(
-                                  child: Center(
-                                    child: Icon(Icons.reorder),
-                                  ),
-                                ),
-                                isSelected:
-                                    controller.selectedGroups[group.id] ??
-                                        false,
-                                onHabitTapped: controller.onHabitTapped,
-                                isEditMode: controller.isEditMode.value,
-                                onLongPress: controller.onLongPress,
-                                onTapAfterLongPress:
-                                    controller.onTapAfterLongPress,
-                              ),
-                            )),
+                        Padding(
+                          key: ValueKey(group.id),
+                          padding: const EdgeInsets.fromLTRB(
+                            Constants.padding,
+                            0.0,
+                            Constants.padding,
+                            8.0,
+                          ),
+                          child: DragTarget<int>(
+                            builder: (context, candidateData, rejectedData) =>
+                                Obx(() => GroupCard(
+                                      group: group,
+                                      memberHabits: controller.groupMembersOf(
+                                        group.id,
+                                      ),
+                                      colorCircleSize: 20.0,
+                                      height: 70.0,
+                                      editModeAction: ReorderableListener(
+                                        child: Center(
+                                          child: Icon(Icons.reorder),
+                                        ),
+                                      ),
+                                      isSelected:
+                                          controller.selectedGroups[group.id] ??
+                                              false,
+                                      onHabitTapped: controller.onHabitTapped,
+                                      isEditMode: controller.isEditMode.value,
+                                      onLongPress: controller.onLongPress,
+                                      onTapAfterLongPress:
+                                          controller.onTapAfterLongPress,
+                                    )),
+                            onAccept: (data) =>
+                                controller.onAcceptHabit(data, group.id),
+                          ),
+                        ),
                         context,
                         state,
                       );

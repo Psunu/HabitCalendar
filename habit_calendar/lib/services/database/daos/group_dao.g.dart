@@ -9,4 +9,5 @@ part of 'group_dao.dart';
 mixin _$GroupDaoMixin on DatabaseAccessor<AppDatabase> {
   $GroupsTable get groups => attachedDatabase.groups;
   $IndexGroupsTable get indexGroups => attachedDatabase.indexGroups;
+  $HabitsTable get habits => attachedDatabase.habits;
 }

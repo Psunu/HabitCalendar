@@ -13,12 +13,13 @@ class GroupMaker extends StatefulWidget {
     Key key,
     @required this.groups,
     @required this.habits,
-    this.selectedGroupId,
+    this.selectedGroup,
     this.onSave,
     this.backgroundColor = Colors.white,
     this.outlineColor = Colors.grey,
     this.errorNameEmptyString,
     this.errorNameDuplicatedString,
+    this.duration = const Duration(milliseconds: Constants.largeAnimationSpeed),
   })  : assert(groups != null),
         assert(habits != null),
         super(key: key);
@@ -30,7 +31,7 @@ class GroupMaker extends StatefulWidget {
 
   /// Group id that used to recognize which habits are included in that group
   /// and init habitChipSelection
-  final int selectedGroupId;
+  final Group selectedGroup;
 
   final Color backgroundColor;
 
@@ -42,29 +43,31 @@ class GroupMaker extends StatefulWidget {
 
   final String errorNameDuplicatedString;
 
+  final Duration duration;
+
   @override
   _GroupMakerState createState() => _GroupMakerState();
 }
 
 class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
-  bool isNameEmptyAlertOn = false;
-  bool isNameDuplicatedAlertOn = false;
-  bool isExpanded = false;
+  bool _isNameEmptyAlertOn = false;
+  bool _isNameDuplicatedAlertOn = false;
+  bool _isExpanded = false;
 
-  TextEditingController nameController = TextEditingController();
-  Color selectedColor = Colors.white;
-  Map<int, bool> habitChipSelection = Map<int, bool>();
+  TextEditingController _nameController = TextEditingController();
+  Color _selectedColor = Colors.white;
+  Map<int, bool> _habitChipSelection = Map<int, bool>();
 
-  AnimationController colorExpandController;
-  Animation colorExpandAnimation;
-  AnimationController colorController;
-  Animation colorAnimation;
+  AnimationController _colorExpandController;
+  Animation _colorExpandAnimation;
+  AnimationController _colorController;
+  Animation _colorAnimation;
 
-  bool get isNameAlertOn => isNameEmptyAlertOn || isNameDuplicatedAlertOn;
+  bool get _isNameAlertOn => _isNameEmptyAlertOn || _isNameDuplicatedAlertOn;
 
-  String get nameErrorString => isNameEmptyAlertOn
+  String get _nameErrorString => _isNameEmptyAlertOn
       ? widget.errorNameEmptyString ?? '폴더 이름을 입력해 주세요'.tr.capitalizeFirst
-      : isNameDuplicatedAlertOn
+      : _isNameDuplicatedAlertOn
           ? widget.errorNameDuplicatedString ?? '폴더가 이미 있습니다'.tr.capitalizeFirst
           : '';
 
@@ -79,30 +82,27 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
     for (int i = 0; i < _length; i++) {
       placeHolder = i >= colors.length;
       children.add(
-        SelectableColorCircle<Color>(
+        SelectableColorCircle<int>(
           colorCircle: ColorCircle(
             color: placeHolder ? Colors.white : colors[i],
             outlineColor: placeHolder ? Colors.white : Colors.grey,
           ),
-          checkMark: AutoColoredIcon(
-            backgroundColor: placeHolder ? Colors.white : colors[i],
-            child: Icon(
-              Icons.check,
-            ),
-          ),
-          value: placeHolder ? Colors.white : colors[i],
-          groupValue: selectedColor,
+          checkMark: placeHolder
+              ? null
+              : AutoColoredIcon(
+                  backgroundColor: placeHolder ? Colors.white : colors[i],
+                  child: Icon(
+                    Icons.check,
+                  ),
+                ),
+          value: placeHolder ? Colors.white.value : colors[i].value,
+          groupValue: _selectedColor.value,
           onChanged: (value) {
             setState(() {
-              selectedColor = value;
+              _selectedColor = Color(value);
             });
           },
           enable: !placeHolder,
-          onTap: (selected) {
-            setState(() {
-              selectedColor = colors[i];
-            });
-          },
         ),
       );
     }
@@ -113,15 +113,15 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
           borderRadius: BorderRadius.circular(Constants.largeBorderRadius),
           onTap: () async {
             setState(() {
-              isExpanded = !isExpanded;
+              _isExpanded = !_isExpanded;
             });
 
-            if (isExpanded) {
-              await colorController.forward();
-              await colorExpandController.forward();
+            if (_isExpanded) {
+              await _colorController.forward();
+              await _colorExpandController.forward();
             } else {
-              await colorExpandController.reverse();
-              await colorController.reverse();
+              await _colorExpandController.reverse();
+              await _colorController.reverse();
             }
           },
           child: ColorCircle(
@@ -176,16 +176,23 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
       spacing: 16.0,
       children: List.generate(
         widget.habits.length,
-        (index) => GestureDetector(
-          onTap: () {},
-          child: FilterChip(
-            elevation: habitChipSelection[widget.habits[index].id] ? 7.0 : 0.0,
-            selected: habitChipSelection[widget.habits[index].id],
-            onSelected: (selected) {
-              setState(() {
-                habitChipSelection[widget.habits[index].id] = selected;
-              });
-            },
+        (index) {
+          /// edit mode and default group is selected and this habit is in default group
+          /// this filter chip will be disabled (text will be grey and can not be tapped)
+          final bool isDefaultGroup = widget.habits[index].groupId == 0 &&
+                  widget.selectedGroup?.id == 0 ??
+              false;
+
+          return FilterChip(
+            elevation: _habitChipSelection[widget.habits[index].id] ? 7.0 : 0.0,
+            selected: _habitChipSelection[widget.habits[index].id],
+            onSelected: isDefaultGroup
+                ? null
+                : (selected) {
+                    setState(() {
+                      _habitChipSelection[widget.habits[index].id] = selected;
+                    });
+                  },
             backgroundColor: widget.backgroundColor,
             selectedColor: widget.backgroundColor,
             shape: RoundedRectangleBorder(
@@ -197,31 +204,56 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
             ),
             label: Text(
               widget.habits[index].name,
-              style: Get.textTheme.bodyText1,
+              style: isDefaultGroup
+                  ? Get.textTheme.bodyText1.copyWith(color: Colors.grey)
+                  : Get.textTheme.bodyText1,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
+  void _onSave() {
+    if (_checkNameError()) return;
+
+    /// Instatiate Group
+    /// If add group. then group.id is null (auto increment)
+    /// if edit group. then group id is selected group.id
+    final group = Group(
+      id: widget.selectedGroup?.id,
+      name: _nameController.text,
+      color: _selectedColor.value,
+    );
+
+    /// Make selected habits to list
+    final includedHabitId = List<int>();
+    _habitChipSelection.forEach((key, value) {
+      if (value) includedHabitId.add(key);
+    });
+
+    if (widget.onSave != null) widget.onSave(group, includedHabitId);
+
+    Get.back();
+  }
+
   // Name validation
   bool _checkNameError() {
-    isNameEmptyAlertOn = false;
-    isNameDuplicatedAlertOn = false;
+    _isNameEmptyAlertOn = false;
+    _isNameDuplicatedAlertOn = false;
 
-    if (nameController.text.isEmpty) {
+    if (_nameController.text.isEmpty) {
       print('name empty');
       setState(() {
-        isNameEmptyAlertOn = true;
+        _isNameEmptyAlertOn = true;
       });
       return true;
     } else if (_isNameDuplicated) {
       print('name duplicated');
       setState(() {
-        isNameDuplicatedAlertOn = true;
+        _isNameDuplicatedAlertOn = true;
       });
       return true;
     }
@@ -231,9 +263,9 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
 
   bool get _isNameDuplicated {
     for (int i = 0; i < widget.groups.length; i++) {
-      if (widget.selectedGroupId != null &&
-          widget.groups[i].id == widget.selectedGroupId) continue;
-      if (widget.groups[i].name.compareTo(nameController.text) == 0) {
+      if (widget.selectedGroup != null &&
+          widget.groups[i].id == widget.selectedGroup.id) continue;
+      if (widget.groups[i].name.compareTo(_nameController.text) == 0) {
         return true;
       }
     }
@@ -245,42 +277,49 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
   void initState() {
     // Init habitChipSelection
     widget.habits.forEach((element) {
-      if (widget.selectedGroupId != null &&
-          element.groupId == widget.selectedGroupId) {
-        habitChipSelection[element.id] = true;
+      if (widget.selectedGroup != null &&
+          element.groupId == widget.selectedGroup.id) {
+        _habitChipSelection[element.id] = true;
       } else {
-        habitChipSelection[element.id] = false;
+        _habitChipSelection[element.id] = false;
       }
     });
 
-    colorExpandController = AnimationController(
+    // Init animations
+    _colorExpandController = AnimationController(
       duration: Duration(
         milliseconds: Constants.mediumAnimationSpeed,
       ),
       vsync: this,
     );
-    colorExpandAnimation = Tween(begin: 0.0, end: 1.0)
+    _colorExpandAnimation = Tween(begin: 0.0, end: 1.0)
         .chain(CurveTween(curve: Curves.ease))
-        .animate(colorExpandController);
+        .animate(_colorExpandController);
 
-    colorController = AnimationController(
+    _colorController = AnimationController(
       duration: Duration(
         milliseconds: Constants.mediumAnimationSpeed,
       ),
       vsync: this,
     );
-    colorAnimation = Tween(begin: 1.0, end: 0.0)
+    _colorAnimation = Tween(begin: 1.0, end: 0.0)
         .chain(CurveTween(curve: Curves.ease))
-        .animate(colorController);
+        .animate(_colorController);
+
+    // When edit group
+    if (widget.selectedGroup != null) {
+      _nameController.text = widget.selectedGroup.name;
+      _selectedColor = Color(widget.selectedGroup.color);
+    }
 
     super.initState();
   }
 
   @override
   void dispose() {
-    colorExpandController.dispose();
-    colorController.dispose();
-    nameController.dispose();
+    _colorExpandController.dispose();
+    _colorController.dispose();
+    _nameController.dispose();
 
     super.dispose();
   }
@@ -312,7 +351,7 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                             children: [
                               Icon(
                                 Icons.error_outline,
-                                size: isNameAlertOn
+                                size: _isNameAlertOn
                                     ? Get.textTheme.headline6.fontSize * 0.65
                                     : 0.0,
                                 color: Colors.red,
@@ -321,9 +360,9 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                                 width: 5.0,
                               ),
                               Text(
-                                nameErrorString,
+                                _nameErrorString,
                                 style: Get.textTheme.bodyText2.copyWith(
-                                  fontSize: isNameAlertOn
+                                  fontSize: _isNameAlertOn
                                       ? Get.textTheme.headline6.fontSize * 0.65
                                       : 0.0,
                                   color: Colors.red,
@@ -334,7 +373,7 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                         ),
                         // Name text
                         TextField(
-                          controller: nameController,
+                          controller: _nameController,
                           decoration: InputDecoration(
                             hintText: '폴더'.tr.capitalizeFirst + ' ' + '이름'.tr,
                             border: InputBorder.none,
@@ -342,8 +381,8 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                           style: Get.textTheme.headline6,
                           onTap: () {
                             setState(() {
-                              isNameEmptyAlertOn = false;
-                              isNameDuplicatedAlertOn = false;
+                              _isNameEmptyAlertOn = false;
+                              _isNameDuplicatedAlertOn = false;
                             });
                           },
                           onEditingComplete: () {
@@ -357,7 +396,7 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                   ),
                   // Group
                   ColorCircle(
-                    color: selectedColor ?? Colors.white,
+                    color: _selectedColor ?? Colors.white,
                     width: Get.textTheme.headline6.fontSize * 1.2,
                     height: Get.textTheme.headline6.fontSize * 1.2,
                   ),
@@ -371,9 +410,9 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                 children: [
                   // Color
                   FadeTransition(
-                    opacity: colorAnimation,
+                    opacity: _colorAnimation,
                     child: SizeTransition(
-                      sizeFactor: colorAnimation,
+                      sizeFactor: _colorAnimation,
                       child: _buildCircleRow(
                         colors: [
                           Colors.red,
@@ -388,9 +427,9 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
                   ),
                   // Color expand
                   FadeTransition(
-                    opacity: colorExpandAnimation,
+                    opacity: _colorExpandAnimation,
                     child: SizeTransition(
-                      sizeFactor: colorExpandAnimation,
+                      sizeFactor: _colorExpandAnimation,
                       child: Container(
                         // height: isExpanded ? null : 0.0,
                         child: _buildExpandColumn(
@@ -437,25 +476,7 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
               BottomButtons(
                 margin: const EdgeInsets.all(0.0),
                 padding: const EdgeInsets.all(0.0),
-                rightButtonAction: () {
-                  if (_checkNameError()) return;
-
-                  final group = Group(
-                    id: widget.selectedGroupId,
-                    name: nameController.text,
-                    color: selectedColor.value,
-                  );
-
-                  final includedHabitId = List<int>();
-                  habitChipSelection.forEach((key, value) {
-                    if (value) includedHabitId.add(key);
-                  });
-
-                  if (widget.onSave != null)
-                    widget.onSave(group, includedHabitId);
-
-                  Get.back();
-                },
+                rightButtonAction: _onSave,
               ),
             ],
           ),
@@ -473,11 +494,8 @@ class SelectableColorCircle<T> extends StatelessWidget {
     @required this.value,
     @required this.groupValue,
     @required this.onChanged,
-    this.onTap,
-    this.initStatus,
     this.enable,
   })  : assert(colorCircle != null),
-        assert(checkMark != null),
         assert(onChanged != null ? value != null : true),
         super(key: key);
 
@@ -486,8 +504,6 @@ class SelectableColorCircle<T> extends StatelessWidget {
   final T value;
   final T groupValue;
   final void Function(T) onChanged;
-  final void Function(bool) onTap;
-  final bool initStatus;
   final bool enable;
 
   @override

@@ -1,11 +1,12 @@
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/tables/groups.dart';
+import 'package:habit_calendar/services/database/tables/habits.dart';
 import 'package:habit_calendar/services/database/tables/index_groups.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
 part 'group_dao.g.dart';
 
-@UseDao(tables: [Groups, IndexGroups])
+@UseDao(tables: [Groups, IndexGroups, Habits])
 class GroupDao extends DatabaseAccessor<AppDatabase> with _$GroupDaoMixin {
   final AppDatabase db;
 
@@ -89,6 +90,7 @@ class GroupDao extends DatabaseAccessor<AppDatabase> with _$GroupDaoMixin {
     // Prevent to delete default folder
     if (group.id == 0) return 0;
 
+    await _moveMembersToDefault(group.id);
     return delete(groups).delete(group);
   }
 
@@ -100,11 +102,22 @@ class GroupDao extends DatabaseAccessor<AppDatabase> with _$GroupDaoMixin {
         // Prevent to delete default folder
         if (groupId == 0) continue;
 
+        await _moveMembersToDefault(groupId);
         numDeleted +=
             await (delete(groups)..where((tbl) => tbl.id.equals(groupId))).go();
       }
 
       return numDeleted;
+    });
+  }
+
+  Future<void> _moveMembersToDefault(int groupId) async {
+    final members = await (select(habits)
+          ..where((tbl) => tbl.groupId.equals(groupId)))
+        .get();
+
+    members.forEach((member) async {
+      await db.habitDao.updateHabit(member.copyWith(groupId: 0));
     });
   }
 }

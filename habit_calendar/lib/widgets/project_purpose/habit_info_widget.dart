@@ -15,7 +15,6 @@ const _kIconSize = 25.0;
 const _kWeekLength = 7;
 const _kIconTextPadding = 20.0;
 
-// TODO modify save function
 class HabitInfoWidget extends StatefulWidget {
   HabitInfoWidget({
     Key key,

@@ -61,6 +61,10 @@ class ManageHabitController extends GetxController {
       }
     });
 
+    selectedGroups.listen((value) {
+      print('selectedGroup : ' + value.toString());
+    });
+
     super.onInit();
   }
 
@@ -71,21 +75,10 @@ class ManageHabitController extends GetxController {
 
   // Primary methods
   Future<void> saveHabit(Habit habit, List<HabitWeek> changedWeeks) async {
-    print(await _dbService.database.habitDao.updateHabit(
-      Habit(
-        id: habit.id,
-        name: habit.name,
-        statusBarFix: habit.statusBarFix,
-        groupId: habit.groupId,
-        notificationTypeId: habit.notificationTypeId,
-        notificationTime: habit.notificationTime,
-        whatTime: habit.whatTime,
-        description: habit.description,
-      ),
-    ));
+    print(await _dbService.database.habitDao.updateHabit(habit));
 
     weeks
-        .where((element) => element.habitId == habit.id)
+        .where((element) => element?.habitId == habit.id)
         .forEach((element) async {
       await _dbService.database.habitWeekDao.deleteHabitWeek(element);
     });
@@ -113,10 +106,50 @@ class ManageHabitController extends GetxController {
     );
   }
 
+  void onEditGroupTapped() {
+    isEditMode.value = false;
+
+    int selectedGroupId;
+    selectedGroups.forEach((groupId, isSelected) {
+      if (isSelected) selectedGroupId = groupId;
+    });
+
+    Utils.customShowModal(
+      builder: (context) => GroupMaker(
+        selectedGroup: groups.singleWhere(
+          (group) => group.id == selectedGroupId,
+          orElse: null,
+        ),
+        groups: groups,
+        habits: habits,
+        onSave: (group, includedHabitIds) async {
+          // Move unselected habits to default folder
+          final orgHabits = habits.where((habit) => habit?.groupId == group.id);
+          orgHabits.forEach((element) async {
+            if (!includedHabitIds.contains(element.id)) {
+              await _dbService.database.habitDao
+                  .updateHabit(element.copyWith(groupId: 0));
+            }
+          });
+
+          // Update group
+          await _dbService.database.groupDao.updateGroup(group);
+
+          // Move selected habits to this group
+          includedHabitIds.forEach((habitId) async {
+            await _dbService.database.habitDao.updateHabit(habits
+                .singleWhere((element) => element.id == habitId)
+                .copyWith(groupId: group.id));
+          });
+        },
+      ),
+    );
+  }
+
   void onHabitTapped(int habitId) {
     Utils.customShowModal(
       builder: (context) => HabitInfoWidget(
-        habit: habits.singleWhere((habit) => habit.id == habitId),
+        habit: habits.singleWhere((habit) => habit?.id == habitId),
         habits: habits,
         groups: groups,
         weeks: weeks,
@@ -208,6 +241,19 @@ class ManageHabitController extends GetxController {
     _dbService.database.groupDao.deleteAllGroupsById(groupIds);
   }
 
+  void onAcceptHabit(int habitId, int groupId) async {
+    final habit = habits.singleWhere(
+      (habit) => habit?.id == habitId,
+      orElse: () => null,
+    );
+
+    if (habit == null) return;
+
+    await _dbService.database.habitDao.updateHabit(
+      habit.copyWith(groupId: groupId),
+    );
+  }
+
   // Reorder methods
   // Returns index of item with given key
   int _indexOfKey(Key key) {
@@ -278,7 +324,7 @@ class ManageHabitController extends GetxController {
   }
 
   List<Habit> groupMembersOf(int groupId) {
-    return habits.where((habit) => habit.groupId == groupId).toList();
+    return habits.where((habit) => habit?.groupId == groupId).toList();
   }
 
   // Utility methods
@@ -292,7 +338,7 @@ class ManageHabitController extends GetxController {
   }
 
   int numGroupMembers(int groupId) =>
-      habits.where((habit) => habit.groupId == groupId).length;
+      habits.where((habit) => habit?.groupId == groupId).length;
   List<Habit> groupMembers(int groupId) =>
-      habits.where((habit) => habit.groupId == groupId).toList();
+      habits.where((habit) => habit?.groupId == groupId).toList();
 }

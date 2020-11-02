@@ -13,13 +13,6 @@ import '../services/database/db_service.dart';
 class MakeHabitController extends GetxController {
   final _dbService = Get.find<DbService>();
 
-  // Groups variables
-  final groups = List<Group>().obs;
-  final selectedGroup = Rx<Group>();
-
-  // Habits variable
-  final habits = List<Habit>().obs;
-
   // TextField Controllers
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -27,6 +20,13 @@ class MakeHabitController extends GetxController {
   // TextField FocusNode
   final nameFocusNode = FocusNode();
   final descriptionFocusNode = FocusNode();
+
+  // Groups variables
+  final groups = List<Group>().obs;
+  final selectedGroup = Rx<Group>();
+
+  // Habits variable
+  final habits = List<Habit>().obs;
 
   // Weeks input
   final selectedWeeks = Map<int, bool>().obs;
@@ -92,6 +92,7 @@ class MakeHabitController extends GetxController {
   // Controller life cycle
   @override
   void onInit() async {
+    print('init');
     groups.bindStream(_dbService.database.groupDao.watchAllGroups());
     // when use groups variable right after bindStream() it doesn't work because of database query delay
     // so selectedGroup variable initiated by getGroupById()
@@ -106,12 +107,6 @@ class MakeHabitController extends GetxController {
     Get.focusScope.requestFocus(nameFocusNode);
 
     super.onInit();
-  }
-
-  @override
-  void onClose() {
-    nameController.dispose();
-    descriptionController.dispose();
   }
 
   // Primary Methods

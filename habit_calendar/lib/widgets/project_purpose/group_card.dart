@@ -162,6 +162,32 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
       return Container();
     }
 
+    Widget buildChild(int index, bool onElevation) {
+      return Material(
+        type: MaterialType.transparency,
+        child: Chip(
+          elevation: onElevation ? 5.0 : 0.0,
+          backgroundColor: widget.backgroundColor,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: widget.outlineColor),
+            borderRadius: BorderRadius.circular(Constants.largeBorderRadius),
+          ),
+          labelPadding: const EdgeInsets.symmetric(
+            horizontal: _kChipPadding,
+          ),
+          label: AutoColoredText(
+            backgroundColor: widget.backgroundColor,
+            child: Text(
+              widget.memberHabits[index].name,
+              style: Get.textTheme.bodyText1,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -181,29 +207,18 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
                 children: List.generate(
                   widget.memberHabits.length,
                   (index) => InkWell(
+                    borderRadius: BorderRadius.circular(
+                      100.0,
+                    ),
                     onTap: () {
                       if (!widget.onHabitTapped.isNull)
                         widget.onHabitTapped(widget.memberHabits[index].id);
                     },
-                    child: Chip(
-                      backgroundColor: widget.backgroundColor,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(color: widget.outlineColor),
-                        borderRadius:
-                            BorderRadius.circular(Constants.largeBorderRadius),
-                      ),
-                      labelPadding: const EdgeInsets.symmetric(
-                        horizontal: _kChipPadding,
-                      ),
-                      label: AutoColoredText(
-                        backgroundColor: widget.backgroundColor,
-                        child: Text(
-                          widget.memberHabits[index].name,
-                          style: Get.textTheme.bodyText1,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
+                    child: LongPressDraggable<int>(
+                      child: buildChild(index, false),
+                      feedback: buildChild(index, true),
+                      childWhenDragging: buildChild(index, true),
+                      data: widget.memberHabits[index].id,
                     ),
                   ),
                 ),
@@ -217,6 +232,7 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    print('build');
     if (!widget.isEditMode) {
       _isSelected = false;
       _editModeController.reverse();
