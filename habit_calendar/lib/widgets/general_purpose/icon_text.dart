@@ -164,7 +164,7 @@ class _IconTextState extends State<IconText> {
         return TextField(
           controller: _descriptionController,
           focusNode: _focusNode,
-          keyboardType: TextInputType.text,
+          keyboardType: TextInputType.multiline,
           style: widget.style?.copyWith(
                 color: _value ? Colors.black87 : Colors.grey,
               ) ??

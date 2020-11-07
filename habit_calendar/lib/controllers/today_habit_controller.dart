@@ -6,7 +6,7 @@ import 'package:habit_calendar/enums/completion.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
 import 'package:habit_calendar/utils/utils.dart';
-import 'package:habit_calendar/views/manage_habit.dart';
+import 'package:habit_calendar/views/manage_habit_view.dart';
 import 'package:habit_calendar/widgets/project_purpose/habit_tile.dart';
 
 import '../enums/day_of_the_week.dart';
@@ -175,7 +175,8 @@ class TodayHabitController extends GetxController {
 
   void navigateToManage() {
     final route = PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => ManageHabit(),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          ManageHabitView(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         final begin = Offset(-1.0, 0.0);
         final end = Offset.zero;

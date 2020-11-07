@@ -138,23 +138,30 @@ class Utils {
       context: Get.context,
       configuration: FadeScaleTransitionConfiguration(),
       builder: (context) => Center(
-        child: SingleChildScrollView(
-          // This padding works like resizeToAvoidBottomInset
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(Constants.padding,
-                  Constants.padding, Constants.padding, Constants.padding / 2),
-              margin: const EdgeInsets.all(Constants.padding),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(
-                  Constants.largeBorderRadius,
-                ),
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            // This padding works like resizeToAvoidBottomInset
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: builder(context),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(
+                    Constants.padding,
+                    Constants.padding,
+                    Constants.padding,
+                    Constants.padding / 2),
+                margin: const EdgeInsets.all(Constants.padding),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(
+                    Constants.largeBorderRadius,
+                  ),
+                ),
+                child: builder(context),
+              ),
             ),
           ),
         ),

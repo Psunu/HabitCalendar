@@ -283,12 +283,13 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
         child: WeekCard(
           margin: margin,
           height: widget.weekCardHeight * 0.8,
-          borderRadius: Constants.smallBorderRadius,
           initValue: _weeks[index],
           child: Text(
             Utils.getWeekString(index),
           ),
-          onTapped: (selected) {
+          onTap: (selected) {
+            Get.focusScope.unfocus();
+
             setState(() {
               _isWeekUnselectedAlertOn = false;
               _weeks[index] = selected;
@@ -299,7 +300,6 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
     });
   }
 
-  // Widget lifecycle methods
   @override
   void initState() {
     // Init name
@@ -381,303 +381,309 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      type: MaterialType.transparency,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    // Group
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: GroupPopupMenu(
-                        groups: widget.groups,
-                        initColor: _getGroupColor(),
-                        onSelected: (groupId) {
-                          setState(() {
-                            _selectedGroupId = groupId;
-                          });
-                          Get.focusScope.unfocus();
-                        },
-                      ),
-                    ),
-
-                    // Name
-                    Expanded(
-                      child: Column(
-                        children: [
-                          // Name text error
-                          AnimatedSize(
-                            vsync: this,
-                            duration: const Duration(
-                              milliseconds: Constants.smallAnimationSpeed,
-                            ),
-                            child:
-                                _getErrorText(_isNameAlertOn, _nameErrorString),
-                          ),
-                          // Name text
-                          TextField(
-                            controller: _nameController,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                            ),
-                            style: Get.textTheme.headline6,
-                            onEditingComplete: () {
-                              if (!_checkNameError()) {
-                                Get.focusScope.unfocus();
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Actions
-              Row(
-                children: widget.actions ?? [Container()],
-              )
-            ],
-          ),
-          Divider(),
-          // Week
-          Padding(
-            padding: const EdgeInsets.only(bottom: _kIconTextPadding),
-            child: GestureDetector(
-              onTap: () async {
-                setState(() {
-                  _displayWeekCard = !_displayWeekCard;
-                });
-
-                if (_displayWeekCard) {
-                  await _weekTextController.forward();
-                  await _weekCardController.forward();
-                }
-              },
-              child: Stack(
-                alignment: Alignment.topCenter,
-                children: [
-                  // Week Text
-                  FadeTransition(
-                    opacity: _weekTextAnimation,
-                    child: SizeTransition(
-                      sizeFactor: _weekTextAnimation,
-                      child: Container(
-                        width: double.infinity,
-                        child: Text(
-                          _selectedWeeksString,
-                          style: Get.textTheme.bodyText1,
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Week Cards
-                  Column(
+    return GestureDetector(
+      child: Material(
+        type: MaterialType.transparency,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
                     children: [
-                      // Week Error
-                      AnimatedSize(
-                        vsync: this,
-                        duration: const Duration(
-                          milliseconds: Constants.smallAnimationSpeed,
-                        ),
-                        child: Container(
-                          height: _isWeekUnselectedAlertOn ? null : 0.0,
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              right: _isWeekUnselectedAlertOn ? 0.0 : 0.0,
-                            ),
-                            child: _getErrorText(
-                              _isWeekUnselectedAlertOn,
-                              _errorWeekUnselectedString,
-                            ),
-                          ),
+                      // Group
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: GroupPopupMenu(
+                          groups: widget.groups,
+                          initColor: _getGroupColor(),
+                          colorCirclePadding:
+                              const EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 8.0),
+                          onSelected: (groupId) {
+                            Get.focusScope.unfocus();
+
+                            setState(() {
+                              _selectedGroupId = groupId;
+                            });
+                          },
                         ),
                       ),
-                      // Week Cards
-                      Container(
-                        child: FadeTransition(
-                          opacity: _weekCardAnimation,
-                          child: SizeTransition(
-                            sizeFactor: _weekCardAnimation,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: _weekCards,
+
+                      // Name
+                      Expanded(
+                        child: Column(
+                          children: [
+                            // Name text error
+                            AnimatedSize(
+                              vsync: this,
+                              duration: const Duration(
+                                milliseconds: Constants.smallAnimationSpeed,
+                              ),
+                              child: _getErrorText(
+                                  _isNameAlertOn, _nameErrorString),
                             ),
-                          ),
+                            // Name text
+                            TextField(
+                              controller: _nameController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                              ),
+                              style: Get.textTheme.headline6,
+                              onEditingComplete: () {
+                                if (!_checkNameError()) {
+                                  Get.focusScope.unfocus();
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ],
-                  )
-                ],
-              ),
-            ),
-          ),
-          // WhatTime
-          Padding(
-            padding: const EdgeInsets.only(bottom: _kIconTextPadding),
-            child: IconText(
-              icon: Icon(
-                Icons.access_time,
-                size: _kIconSize,
-              ),
-              text: Text(
-                Utils.getWhatTimeString(_whatTime ?? DateTime(0)),
-                style: Get.textTheme.bodyText1,
-              ),
-              initValue: _isWhatTimeActivated,
-              onValueChanged: (value) {
-                setState(() {
-                  _isWhatTimeActivated = value;
-                });
-              },
-              onTap: () {
-                if (_isWhatTimeActivated) {
-                  showModalBottomSheet(
-                    context: Get.context,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft:
-                            const Radius.circular(Constants.largeBorderRadius),
-                        topRight:
-                            const Radius.circular(Constants.largeBorderRadius),
-                      ),
-                    ),
-                    builder: (context) {
-                      return Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: TimePicker(
-                          ampmStyle: Get.textTheme.bodyText1,
-                          timeStyle: Get.textTheme.headline5,
-                          initTime: _whatTime,
-                          onTimeChanged: (time) {
-                            setState(() {
-                              _whatTime = time;
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  );
-                }
-              },
-            ),
-          ),
-          // Notification Time
-          Padding(
-            padding: const EdgeInsets.only(bottom: _kIconTextPadding),
-            child: IconText(
-              icon: Icon(
-                Icons.notifications,
-                size: _kIconSize,
-              ),
-              text: Text(
-                Utils.getNotificationTimeString(_notificationTime),
-                style: Get.textTheme.bodyText1,
-              ),
-              initValue: _isNotificationActivated,
-              onValueChanged: (value) {
-                setState(() {
-                  _isNotificationActivated = value;
-                });
-              },
-              onTap: () {
-                if (_isWhatTimeActivated) {
-                  showModalBottomSheet(
-                    context: Get.context,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft:
-                            const Radius.circular(Constants.largeBorderRadius),
-                        topRight:
-                            const Radius.circular(Constants.largeBorderRadius),
-                      ),
-                    ),
-                    builder: (context) {
-                      return Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: DurationPicker(
-                          durationStyle: Get.textTheme.headline5,
-                          initDuration: _notificationTime,
-                          onDurationChanged: (duration) {
-                            setState(() {
-                              _notificationTime = duration;
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  );
-                }
-              },
-            ),
-          ),
-          // Description
-          Padding(
-            padding: const EdgeInsets.only(bottom: _kIconTextPadding),
-            child: IconText.description(
-              icon: Icon(
-                Icons.description,
-                size: _kIconSize,
-              ),
-              style: Get.textTheme.bodyText1,
-              descriptionController: _descriptionController,
-              initValue: _isDescriptionActivated,
-              onValueChanged: (value) {
-                setState(() {
-                  _isDescriptionActivated = value;
-                });
-              },
-            ),
-          ),
-          // Bottom buttons
-          AnimatedSize(
-            duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
-            vsync: this,
-            child: BottomButtons(
-              margin: const EdgeInsets.all(0.0),
-              padding: const EdgeInsets.all(0.0),
-              height: _isModified ? null : 0.0,
-              rightButtonAction: () {
-                if (_checkNameError()) {
-                  return;
-                }
-
-                if (!_isWeekSelected) {
-                  setState(() {
-                    _isWeekUnselectedAlertOn = true;
-                  });
-                  return;
-                }
-
-                widget.onSave(
-                  Habit(
-                    id: widget.habit.id,
-                    name: _nameController.text,
-                    statusBarFix: widget.habit.statusBarFix,
-                    groupId: _selectedGroupId,
-                    notificationTypeId: widget.habit.notificationTypeId,
-                    notificationTime: _isNotificationActivated
-                        ? _notificationTime.inMinutes
-                        : null,
-                    whatTime:
-                        _isWhatTimeActivated ? _whatTime ?? DateTime(0) : null,
-                    description: _isDescriptionActivated
-                        ? _descriptionController.text
-                        : null,
                   ),
-                  _listHabitWeek,
-                );
-              },
+                ),
+                // Actions
+                Row(
+                  children: widget.actions ?? [Container()],
+                )
+              ],
             ),
-          ),
-        ],
+            Divider(),
+            // Week
+            Padding(
+              padding: const EdgeInsets.only(bottom: _kIconTextPadding),
+              child: GestureDetector(
+                onTap: () async {
+                  setState(() {
+                    _displayWeekCard = !_displayWeekCard;
+                  });
+
+                  if (_displayWeekCard) {
+                    await _weekTextController.forward();
+                    await _weekCardController.forward();
+                  }
+                },
+                child: Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    // Week Text
+                    FadeTransition(
+                      opacity: _weekTextAnimation,
+                      child: SizeTransition(
+                        sizeFactor: _weekTextAnimation,
+                        child: Container(
+                          width: double.infinity,
+                          child: Text(
+                            _selectedWeeksString,
+                            style: Get.textTheme.bodyText1,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Week Cards
+                    Column(
+                      children: [
+                        // Week Error
+                        AnimatedSize(
+                          vsync: this,
+                          duration: const Duration(
+                            milliseconds: Constants.smallAnimationSpeed,
+                          ),
+                          child: Container(
+                            height: _isWeekUnselectedAlertOn ? null : 0.0,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                right: _isWeekUnselectedAlertOn ? 0.0 : 0.0,
+                              ),
+                              child: _getErrorText(
+                                _isWeekUnselectedAlertOn,
+                                _errorWeekUnselectedString,
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Week Cards
+                        Container(
+                          child: FadeTransition(
+                            opacity: _weekCardAnimation,
+                            child: SizeTransition(
+                              sizeFactor: _weekCardAnimation,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: _weekCards,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+            // WhatTime
+            Padding(
+              padding: const EdgeInsets.only(bottom: _kIconTextPadding),
+              child: IconText(
+                icon: Icon(
+                  Icons.access_time,
+                  size: _kIconSize,
+                ),
+                text: Text(
+                  Utils.getWhatTimeString(_whatTime ?? DateTime(0)),
+                  style: Get.textTheme.bodyText1,
+                ),
+                initValue: _isWhatTimeActivated,
+                onValueChanged: (value) {
+                  setState(() {
+                    _isWhatTimeActivated = value;
+                  });
+                },
+                onTap: () {
+                  if (_isWhatTimeActivated) {
+                    showModalBottomSheet(
+                      context: Get.context,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(
+                              Constants.largeBorderRadius),
+                          topRight: const Radius.circular(
+                              Constants.largeBorderRadius),
+                        ),
+                      ),
+                      builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: TimePicker(
+                            ampmStyle: Get.textTheme.bodyText1,
+                            timeStyle: Get.textTheme.headline5,
+                            initTime: _whatTime,
+                            onTimeChanged: (time) {
+                              setState(() {
+                                _whatTime = time;
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
+            ),
+            // Notification Time
+            Padding(
+              padding: const EdgeInsets.only(bottom: _kIconTextPadding),
+              child: IconText(
+                icon: Icon(
+                  Icons.notifications,
+                  size: _kIconSize,
+                ),
+                text: Text(
+                  Utils.getNotificationTimeString(_notificationTime),
+                  style: Get.textTheme.bodyText1,
+                ),
+                initValue: _isNotificationActivated,
+                onValueChanged: (value) {
+                  setState(() {
+                    _isNotificationActivated = value;
+                  });
+                },
+                onTap: () {
+                  if (_isWhatTimeActivated) {
+                    showModalBottomSheet(
+                      context: Get.context,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(
+                              Constants.largeBorderRadius),
+                          topRight: const Radius.circular(
+                              Constants.largeBorderRadius),
+                        ),
+                      ),
+                      builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: DurationPicker(
+                            durationStyle: Get.textTheme.headline5,
+                            initDuration: _notificationTime,
+                            onDurationChanged: (duration) {
+                              setState(() {
+                                _notificationTime = duration;
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
+            ),
+            // Description
+            Padding(
+              padding: const EdgeInsets.only(bottom: _kIconTextPadding),
+              child: IconText.description(
+                icon: Icon(
+                  Icons.description,
+                  size: _kIconSize,
+                ),
+                style: Get.textTheme.bodyText1,
+                descriptionController: _descriptionController,
+                initValue: _isDescriptionActivated,
+                onValueChanged: (value) {
+                  setState(() {
+                    _isDescriptionActivated = value;
+                  });
+                },
+              ),
+            ),
+            // Bottom buttons
+            AnimatedSize(
+              duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
+              vsync: this,
+              child: BottomButtons(
+                margin: const EdgeInsets.all(0.0),
+                padding: const EdgeInsets.all(0.0),
+                height: _isModified ? null : 0.0,
+                rightButtonAction: () {
+                  if (_checkNameError()) {
+                    return;
+                  }
+
+                  if (!_isWeekSelected) {
+                    setState(() {
+                      _isWeekUnselectedAlertOn = true;
+                    });
+                    return;
+                  }
+
+                  widget.onSave(
+                    Habit(
+                      id: widget.habit.id,
+                      name: _nameController.text,
+                      statusBarFix: widget.habit.statusBarFix,
+                      groupId: _selectedGroupId,
+                      notificationTypeId: widget.habit.notificationTypeId,
+                      notificationTime: _isNotificationActivated
+                          ? _notificationTime.inMinutes
+                          : null,
+                      whatTime: _isWhatTimeActivated
+                          ? _whatTime ?? DateTime(0)
+                          : null,
+                      description: _isDescriptionActivated
+                          ? _descriptionController.text
+                          : null,
+                    ),
+                    _listHabitWeek,
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

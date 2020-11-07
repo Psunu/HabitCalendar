@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
-import 'package:habit_calendar/views/manage_habit.dart';
-import 'package:habit_calendar/views/today_habit.dart';
+import 'package:habit_calendar/views/manage_habit_view.dart';
+import 'package:habit_calendar/views/today_habit_view.dart';
 
 import '../enums/day_of_the_week.dart';
 import '../services/database/app_database.dart';
@@ -15,7 +15,7 @@ class HomeController extends GetxController {
   int currentIndex = 0;
 
   final List<Widget> pages = <Widget>[
-    TodayHabit(),
+    TodayHabitView(),
     Container(
       child: Text('Page2'),
     ),
@@ -24,7 +24,8 @@ class HomeController extends GetxController {
   // Primary methods
   void navigateToManage() {
     final route = PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => ManageHabit(),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          ManageHabitView(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         final begin = Offset(-1.0, 0.0);
         final end = Offset.zero;

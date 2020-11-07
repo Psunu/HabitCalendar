@@ -222,9 +222,10 @@ class MakeHabitController extends GetxController {
     return false;
   }
 
-  List<Widget> buildWeekTiles(int length) {
+  List<Widget> buildWeekCards(BuildContext context, int length) {
     weeksLength = length;
     EdgeInsets margin = const EdgeInsets.only(right: 2.0);
+
     return List.generate(length, (index) {
       if (index == length - 1)
         margin = const EdgeInsets.only(left: 2.0);
@@ -234,11 +235,11 @@ class MakeHabitController extends GetxController {
         child: WeekCard(
           margin: margin,
           height: weekCardHeight,
-          borderRadius: Constants.smallBorderRadius,
           child: Text(
             Utils.getWeekString(index),
           ),
-          onTapped: (selected) {
+          onTap: (selected) {
+            FocusScope.of(context).unfocus();
             selectedWeeks[index] = selected;
             isWeeksAlertOn.value = false;
           },

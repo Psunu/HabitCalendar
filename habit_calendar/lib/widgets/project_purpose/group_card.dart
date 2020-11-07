@@ -232,7 +232,6 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    print('build');
     if (!widget.isEditMode) {
       _isSelected = false;
       _editModeController.reverse();
@@ -265,76 +264,77 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
                   curve: Curves.ease,
                   child: Column(
                     children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(vertical: 25.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Group name
-                            Padding(
-                              padding: const EdgeInsets.only(left: 40.0),
-                              child: AutoColoredText(
-                                backgroundColor: widget.backgroundColor,
-                                child: Text(
-                                  widget.group.name,
-                                  style: widget.nameStyle ??
-                                      Get.textTheme.headline6,
-                                ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Group name
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 40.0,
+                              top: 25.0,
+                              bottom: 25.0,
+                            ),
+                            child: AutoColoredText(
+                              backgroundColor: widget.backgroundColor,
+                              child: Text(
+                                widget.group.name,
+                                style:
+                                    widget.nameStyle ?? Get.textTheme.headline6,
                               ),
                             ),
-                            Stack(
-                              children: [
-                                !widget.isEditMode
-                                    ? FadeTransition(
-                                        opacity: _toNormalModeAnimation,
-                                        child: Row(
-                                          children: [
-                                            // Group memebers number
-                                            AutoColoredText(
+                          ),
+                          Stack(
+                            children: [
+                              !widget.isEditMode
+                                  ? FadeTransition(
+                                      opacity: _toNormalModeAnimation,
+                                      child: Row(
+                                        children: [
+                                          // Group memebers number
+                                          AutoColoredText(
+                                            backgroundColor:
+                                                widget.backgroundColor,
+                                            child: Text(
+                                              widget.memberHabits.length
+                                                  .toString(),
+                                              style: widget.numStyle ??
+                                                  Get.textTheme.bodyText1,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 5.0),
+                                          // Expand button
+                                          RotationTransition(
+                                            turns: _actionAnimation,
+                                            child: Icon(
+                                              Icons.expand_more,
+                                              color: _hasNoMembers
+                                                  ? Colors.transparent
+                                                  : null,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Container(),
+                              // Drag icon
+                              widget.isEditMode
+                                  ? FadeTransition(
+                                      opacity: _toEditModeAnimation,
+                                      child: widget.editModeAction ??
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 8.0),
+                                            child: AutoColoredIcon(
                                               backgroundColor:
                                                   widget.backgroundColor,
-                                              child: Text(
-                                                widget.memberHabits.length
-                                                    .toString(),
-                                                style: widget.numStyle ??
-                                                    Get.textTheme.bodyText1,
-                                              ),
+                                              child: Icon(Icons.reorder),
                                             ),
-                                            const SizedBox(width: 5.0),
-                                            // Expand button
-                                            RotationTransition(
-                                              turns: _actionAnimation,
-                                              child: Icon(
-                                                Icons.expand_more,
-                                                color: _hasNoMembers
-                                                    ? Colors.transparent
-                                                    : null,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    : Container(),
-                                // Drag icon
-                                widget.isEditMode
-                                    ? FadeTransition(
-                                        opacity: _toEditModeAnimation,
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 8.0),
-                                          child: widget.editModeAction ??
-                                              AutoColoredIcon(
-                                                backgroundColor:
-                                                    widget.backgroundColor,
-                                                child: Icon(Icons.reorder),
-                                              ),
-                                        ),
-                                      )
-                                    : Container(),
-                              ],
-                            ),
-                          ],
-                        ),
+                                          ),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
+                        ],
                       ),
                       // Expand part
                       _isExpanded ? _buildExpand() : Container(),

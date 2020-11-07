@@ -70,6 +70,7 @@ class Messages extends Translations {
           '삭제되었습니다': 'Deleted',
           '되돌리기': 'Undo',
           '삭제하시겠어요?': 'Are you sure to delete?',
+          '다음': 'next',
         },
       };
 }

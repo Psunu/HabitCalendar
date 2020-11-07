@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
-import '../general_purpose/auto_colored_text.dart';
 
 const _kPadding = 20.0;
 const _kButtonPadding = 13.0;
@@ -45,35 +44,36 @@ class BottomButtons extends StatelessWidget {
       child: Padding(
         padding: margin,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
               child: leftButton ??
                   FlatButton(
                     padding: padding,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(Constants.smallBorderRadius),
+                    ),
                     onPressed: _leftButtonAction,
                     child: Text(
                       _leftButtonString,
-                      style: Get.textTheme.headline6
-                          .copyWith(color: Colors.grey[700]),
+                      style: Get.textTheme.bodyText1,
                     ),
                   ),
             ),
             Expanded(
               child: rightButton ??
-                  RaisedButton(
+                  FlatButton(
                     padding: padding,
-                    color: Get.theme.accentColor,
                     shape: RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.circular(Constants.mediumBorderRadius),
+                          BorderRadius.circular(Constants.smallBorderRadius),
                     ),
                     onPressed: rightButtonAction,
-                    child: AutoColoredText(
-                      backgroundColor: Get.theme.accentColor,
-                      child: Text(
-                        _rightButtonString,
-                        style: Get.textTheme.headline6,
+                    child: Text(
+                      _rightButtonString,
+                      style: Get.textTheme.bodyText1.copyWith(
+                        color: Get.theme.accentColor,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),

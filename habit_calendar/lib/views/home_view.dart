@@ -5,9 +5,9 @@ import 'package:habit_calendar/utils/utils.dart';
 
 import '../widgets/general_purpose/open_container_fab.dart';
 import '../controllers/home_controller.dart';
-import '../views/make_habit.dart';
+import '../views/make_habit_view_edit.dart';
 
-class Home extends StatelessWidget {
+class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<HomeController>(
@@ -62,7 +62,7 @@ class Home extends StatelessWidget {
             ],
           ),
           floatingActionButton: OpenContainerFab(
-            openPage: MakeHabit(),
+            openPage: MakeHabitView(),
             icon: Icon(
               Icons.add,
               color: Colors.white,

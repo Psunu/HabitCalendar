@@ -11,12 +11,12 @@ import '../widgets/general_purpose/auto_colored_icon.dart';
 import '../widgets/general_purpose/auto_colored_text.dart';
 import '../widgets/project_purpose/group_card.dart';
 
-class ManageHabit extends StatefulWidget {
+class ManageHabitView extends StatefulWidget {
   @override
-  _ManageHabitState createState() => _ManageHabitState();
+  _ManageHabitViewState createState() => _ManageHabitViewState();
 }
 
-class _ManageHabitState extends State<ManageHabit>
+class _ManageHabitViewState extends State<ManageHabitView>
     with TickerProviderStateMixin {
   AnimationController _bottomBarController;
   Animation _bottomBarAnimation;
@@ -245,7 +245,14 @@ class _ManageHabitState extends State<ManageHabit>
                                       colorCircleSize: 20.0,
                                       height: 70.0,
                                       editModeAction: ReorderableListener(
-                                        child: Center(
+                                        child: Container(
+                                          color: Colors.transparent,
+                                          padding: const EdgeInsets.only(
+                                            left: 12.0,
+                                            right: 8.0,
+                                            top: 25.0,
+                                            bottom: 25.0,
+                                          ),
                                           child: Icon(Icons.reorder),
                                         ),
                                       ),

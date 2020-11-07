@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
 import 'package:habit_calendar/translations/messages.dart';
 
-import 'package:habit_calendar/views/home.dart';
+import 'package:habit_calendar/views/home_view.dart';
 
 Future<void> main() async {
   await _initServices();
@@ -35,8 +35,7 @@ class MyApp extends StatelessWidget {
               displayColor: Colors.black87,
             )
             .copyWith(
-              headline5: context.textTheme.headline4.copyWith(
-                fontSize: 30.0,
+              headline5: context.textTheme.headline5.copyWith(
                 color: Colors.black87,
               ),
               headline6: context.textTheme.headline6.copyWith(
@@ -49,7 +48,7 @@ class MyApp extends StatelessWidget {
               ),
             ),
       ),
-      home: Home(),
+      home: HomeView(),
     );
   }
 }

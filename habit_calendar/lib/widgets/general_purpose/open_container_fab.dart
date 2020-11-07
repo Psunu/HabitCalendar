@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:animations/animations.dart';
+import 'package:habit_calendar/constants/constants.dart';
 
 class OpenContainerFab extends StatelessWidget {
   static const double _mobileFabDimension = 56;
@@ -14,6 +15,9 @@ class OpenContainerFab extends StatelessWidget {
   Widget build(BuildContext context) {
     return OpenContainer(
       openBuilder: (context, closedContainer) => openPage,
+      transitionDuration: const Duration(
+        milliseconds: Constants.largeAnimationSpeed,
+      ),
       closedShape: _circleFabBorder,
       closedColor: Get.theme.accentColor,
       closedElevation: 6,

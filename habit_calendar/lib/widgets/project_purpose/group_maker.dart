@@ -22,12 +22,30 @@ class GroupMaker extends StatefulWidget {
     this.duration = const Duration(milliseconds: Constants.largeAnimationSpeed),
   })  : assert(groups != null),
         assert(habits != null),
+        showHabits = true,
+        super(key: key);
+
+  GroupMaker.hideHabits({
+    Key key,
+    @required this.groups,
+    this.selectedGroup,
+    this.onSave,
+    this.backgroundColor = Colors.white,
+    this.outlineColor = Colors.grey,
+    this.errorNameEmptyString,
+    this.errorNameDuplicatedString,
+    this.duration = const Duration(milliseconds: Constants.largeAnimationSpeed),
+  })  : assert(groups != null),
+        habits = List<Habit>(),
+        showHabits = true,
         super(key: key);
 
   // Group list to check group name duplicated
   final List<Group> groups;
 
   final List<Habit> habits;
+
+  final bool showHabits;
 
   /// Group id that used to recognize which habits are included in that group
   /// and init habitChipSelection
@@ -471,7 +489,7 @@ class _GroupMakerState extends State<GroupMaker> with TickerProviderStateMixin {
               ),
               Divider(),
               // Habits
-              _buildHabitsWrap(),
+              widget.showHabits ? _buildHabitsWrap() : Container(),
               // Buttons
               BottomButtons(
                 margin: const EdgeInsets.all(0.0),

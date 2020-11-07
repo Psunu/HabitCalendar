@@ -5,12 +5,13 @@ import 'package:habit_calendar/controllers/today_habit_controller.dart';
 
 import '../widgets/general_purpose/progress_bar.dart';
 
-class TodayHabit extends StatefulWidget {
+class TodayHabitView extends StatefulWidget {
   @override
-  _TodayHabitState createState() => _TodayHabitState();
+  _TodayHabitViewState createState() => _TodayHabitViewState();
 }
 
-class _TodayHabitState extends State<TodayHabit> with TickerProviderStateMixin {
+class _TodayHabitViewState extends State<TodayHabitView>
+    with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return GetX<TodayHabitController>(
@@ -42,7 +43,7 @@ class _TodayHabitState extends State<TodayHabit> with TickerProviderStateMixin {
                   children: [
                     Text(
                       '꾸준히 하려면\n작게 해야 합니다'.tr,
-                      style: Get.textTheme.headline4,
+                      style: Get.textTheme.headline5,
                     ),
                     const SizedBox(
                       height: 50.0,
@@ -50,6 +51,7 @@ class _TodayHabitState extends State<TodayHabit> with TickerProviderStateMixin {
                     ProgressBar(
                       percentage: controller.todayPercentage,
                       layoutPadding: Constants.padding * 2,
+                      height: 12.0,
                     ),
                     const SizedBox(
                       height: 50.0,

@@ -10,12 +10,16 @@ class GroupPopupMenu extends StatefulWidget {
     @required this.groups,
     this.initColor,
     this.onSelected,
+    this.colorCirclePadding = const EdgeInsets.all(0.0),
+    this.colorCircleSize = 20.0,
   })  : assert(groups != null),
         super(key: key);
 
   final List<Group> groups;
   final Color initColor;
   final void Function(int) onSelected;
+  final EdgeInsets colorCirclePadding;
+  final double colorCircleSize;
 
   @override
   _GroupPopupMenuState createState() => _GroupPopupMenuState();
@@ -91,10 +95,13 @@ class _GroupPopupMenuState extends State<GroupPopupMenu> {
           Constants.smallBorderRadius,
         ),
       ),
-      child: ColorCircle(
-        color: childColor,
-        width: 20.0,
-        height: 20.0,
+      child: Padding(
+        padding: widget.colorCirclePadding,
+        child: ColorCircle(
+          color: childColor,
+          width: widget.colorCircleSize,
+          height: widget.colorCircleSize,
+        ),
       ),
     );
   }
