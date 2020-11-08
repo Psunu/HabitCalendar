@@ -40,6 +40,7 @@ class Selector extends StatefulWidget {
     return style.copyWith(
       color: Colors.grey,
       fontSize: style.fontSize * 0.8,
+      fontWeight: FontWeight.normal,
     );
   }
 

@@ -1,16 +1,18 @@
 import 'package:habit_calendar/services/database/daos/event_dao.dart';
 import 'package:habit_calendar/services/database/daos/group_dao.dart';
+import 'package:habit_calendar/services/database/daos/habit_notice_time_dao.dart';
 import 'package:habit_calendar/services/database/daos/index_group_dao.dart';
-import 'package:habit_calendar/services/database/daos/notification_type_dao.dart';
+import 'package:habit_calendar/services/database/daos/notice_type_dao.dart';
 import 'package:habit_calendar/services/database/daos/habit_dao.dart';
 import 'package:habit_calendar/services/database/daos/habit_week_dao.dart';
 import 'package:habit_calendar/services/database/daos/week_dao.dart';
 import 'package:habit_calendar/services/database/tables/events.dart';
 import 'package:habit_calendar/services/database/tables/groups.dart';
+import 'package:habit_calendar/services/database/tables/habit_notice_times.dart';
 import 'package:habit_calendar/services/database/tables/habits.dart';
 import 'package:habit_calendar/services/database/tables/habit_weeks.dart';
 import 'package:habit_calendar/services/database/tables/index_groups.dart';
-import 'package:habit_calendar/services/database/tables/notification_types.dart';
+import 'package:habit_calendar/services/database/tables/notice_types.dart';
 import 'package:habit_calendar/services/database/tables/weeks.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
@@ -19,21 +21,23 @@ part 'app_database.g.dart';
 @UseMoor(
   tables: [
     Groups,
-    NotificationTypes,
+    NoticeTypes,
     Weeks,
     Habits,
     HabitWeeks,
     Events,
     IndexGroups,
+    HabitNoticeTimes,
   ],
   daos: [
     GroupDao,
-    NotificationTypeDao,
+    NoticeTypeDao,
     WeekDao,
     HabitDao,
     HabitWeekDao,
     EventDao,
     IndexGroupDao,
+    HabitNoticeTimeDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -62,14 +66,10 @@ class AppDatabase extends _$AppDatabase {
                 .insert(Group(id: 0, name: 'default', color: 0xffffff));
             await into(indexGroups).insert(IndexGroup(groupId: 0, indx: 0));
             // Insert default notification type value
-            await into(notificationTypes)
-                .insert(NotificationType(id: 0, type: 'none'));
-            await into(notificationTypes)
-                .insert(NotificationType(id: 1, type: 'alarm'));
-            await into(notificationTypes)
-                .insert(NotificationType(id: 2, type: 'push'));
-            await into(notificationTypes)
-                .insert(NotificationType(id: 3, type: 'sns'));
+            await into(noticeTypes).insert(NoticeType(id: 0, type: 'none'));
+            await into(noticeTypes).insert(NoticeType(id: 1, type: 'alarm'));
+            await into(noticeTypes).insert(NoticeType(id: 2, type: 'push'));
+            await into(noticeTypes).insert(NoticeType(id: 3, type: 'sns'));
             // Insert default week value
             await into(weeks).insert(Week(id: 0, week: 'mon'));
             await into(weeks).insert(Week(id: 1, week: 'tue'));
@@ -85,8 +85,8 @@ class AppDatabase extends _$AppDatabase {
           (await select(groups).get()).forEach((element) => print(element));
           print('<index_groups>');
           (await select(groups).get()).forEach((element) => print(element));
-          print('<notification_types>');
-          (await select(notificationTypes).get())
+          print('<notice_types>');
+          (await select(noticeTypes).get())
               .forEach((element) => print(element));
           print('<weeks>');
           (await select(weeks).get()).forEach((element) => print(element));
@@ -94,6 +94,9 @@ class AppDatabase extends _$AppDatabase {
           (await select(habits).get()).forEach((element) => print(element));
           print('<habit_weeks>');
           (await select(habitWeeks).get()).forEach((element) => print(element));
+          print('<habit_notice_times>');
+          (await select(habitNoticeTimes).get())
+              .forEach((element) => print(element));
           print('<events>');
           (await select(events).get()).forEach((element) => print(element));
 

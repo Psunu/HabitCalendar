@@ -240,18 +240,16 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   }
 }
 
-class NotificationType extends DataClass
-    implements Insertable<NotificationType> {
+class NoticeType extends DataClass implements Insertable<NoticeType> {
   final int id;
   final String type;
-  NotificationType({@required this.id, @required this.type});
-  factory NotificationType.fromData(
-      Map<String, dynamic> data, GeneratedDatabase db,
+  NoticeType({@required this.id, @required this.type});
+  factory NoticeType.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
     final intType = db.typeSystem.forDartType<int>();
     final stringType = db.typeSystem.forDartType<String>();
-    return NotificationType(
+    return NoticeType(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
       type: stringType.mapFromDatabaseResponse(data['${effectivePrefix}type']),
     );
@@ -268,17 +266,17 @@ class NotificationType extends DataClass
     return map;
   }
 
-  NotificationTypesCompanion toCompanion(bool nullToAbsent) {
-    return NotificationTypesCompanion(
+  NoticeTypesCompanion toCompanion(bool nullToAbsent) {
+    return NoticeTypesCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       type: type == null && nullToAbsent ? const Value.absent() : Value(type),
     );
   }
 
-  factory NotificationType.fromJson(Map<String, dynamic> json,
+  factory NoticeType.fromJson(Map<String, dynamic> json,
       {ValueSerializer serializer}) {
     serializer ??= moorRuntimeOptions.defaultSerializer;
-    return NotificationType(
+    return NoticeType(
       id: serializer.fromJson<int>(json['id']),
       type: serializer.fromJson<String>(json['type']),
     );
@@ -292,13 +290,13 @@ class NotificationType extends DataClass
     };
   }
 
-  NotificationType copyWith({int id, String type}) => NotificationType(
+  NoticeType copyWith({int id, String type}) => NoticeType(
         id: id ?? this.id,
         type: type ?? this.type,
       );
   @override
   String toString() {
-    return (StringBuffer('NotificationType(')
+    return (StringBuffer('NoticeType(')
           ..write('id: $id, ')
           ..write('type: $type')
           ..write(')'))
@@ -310,23 +308,21 @@ class NotificationType extends DataClass
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
-      (other is NotificationType &&
-          other.id == this.id &&
-          other.type == this.type);
+      (other is NoticeType && other.id == this.id && other.type == this.type);
 }
 
-class NotificationTypesCompanion extends UpdateCompanion<NotificationType> {
+class NoticeTypesCompanion extends UpdateCompanion<NoticeType> {
   final Value<int> id;
   final Value<String> type;
-  const NotificationTypesCompanion({
+  const NoticeTypesCompanion({
     this.id = const Value.absent(),
     this.type = const Value.absent(),
   });
-  NotificationTypesCompanion.insert({
+  NoticeTypesCompanion.insert({
     this.id = const Value.absent(),
     @required String type,
   }) : type = Value(type);
-  static Insertable<NotificationType> custom({
+  static Insertable<NoticeType> custom({
     Expression<int> id,
     Expression<String> type,
   }) {
@@ -336,8 +332,8 @@ class NotificationTypesCompanion extends UpdateCompanion<NotificationType> {
     });
   }
 
-  NotificationTypesCompanion copyWith({Value<int> id, Value<String> type}) {
-    return NotificationTypesCompanion(
+  NoticeTypesCompanion copyWith({Value<int> id, Value<String> type}) {
+    return NoticeTypesCompanion(
       id: id ?? this.id,
       type: type ?? this.type,
     );
@@ -357,7 +353,7 @@ class NotificationTypesCompanion extends UpdateCompanion<NotificationType> {
 
   @override
   String toString() {
-    return (StringBuffer('NotificationTypesCompanion(')
+    return (StringBuffer('NoticeTypesCompanion(')
           ..write('id: $id, ')
           ..write('type: $type')
           ..write(')'))
@@ -365,11 +361,11 @@ class NotificationTypesCompanion extends UpdateCompanion<NotificationType> {
   }
 }
 
-class $NotificationTypesTable extends NotificationTypes
-    with TableInfo<$NotificationTypesTable, NotificationType> {
+class $NoticeTypesTable extends NoticeTypes
+    with TableInfo<$NoticeTypesTable, NoticeType> {
   final GeneratedDatabase _db;
   final String _alias;
-  $NotificationTypesTable(this._db, [this._alias]);
+  $NoticeTypesTable(this._db, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   GeneratedIntColumn _id;
   @override
@@ -397,13 +393,13 @@ class $NotificationTypesTable extends NotificationTypes
   @override
   List<GeneratedColumn> get $columns => [id, type];
   @override
-  $NotificationTypesTable get asDslTable => this;
+  $NoticeTypesTable get asDslTable => this;
   @override
-  String get $tableName => _alias ?? 'notification_types';
+  String get $tableName => _alias ?? 'notice_types';
   @override
-  final String actualTableName = 'notification_types';
+  final String actualTableName = 'notice_types';
   @override
-  VerificationContext validateIntegrity(Insertable<NotificationType> instance,
+  VerificationContext validateIntegrity(Insertable<NoticeType> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -422,14 +418,14 @@ class $NotificationTypesTable extends NotificationTypes
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  NotificationType map(Map<String, dynamic> data, {String tablePrefix}) {
+  NoticeType map(Map<String, dynamic> data, {String tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
-    return NotificationType.fromData(data, _db, prefix: effectivePrefix);
+    return NoticeType.fromData(data, _db, prefix: effectivePrefix);
   }
 
   @override
-  $NotificationTypesTable createAlias(String alias) {
-    return $NotificationTypesTable(_db, alias);
+  $NoticeTypesTable createAlias(String alias) {
+    return $NoticeTypesTable(_db, alias);
   }
 }
 
@@ -624,43 +620,37 @@ class $WeeksTable extends Weeks with TableInfo<$WeeksTable, Week> {
 class Habit extends DataClass implements Insertable<Habit> {
   final int id;
   final String name;
-  final String description;
   final DateTime whatTime;
-  final int notificationTime;
-  final bool statusBarFix;
+  final String memo;
+  final String noticeMessage;
   final int groupId;
-  final int notificationTypeId;
+  final int noticeTypeId;
   Habit(
       {@required this.id,
       @required this.name,
-      this.description,
       this.whatTime,
-      this.notificationTime,
-      @required this.statusBarFix,
+      this.memo,
+      this.noticeMessage,
       @required this.groupId,
-      @required this.notificationTypeId});
+      @required this.noticeTypeId});
   factory Habit.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
     final intType = db.typeSystem.forDartType<int>();
     final stringType = db.typeSystem.forDartType<String>();
     final dateTimeType = db.typeSystem.forDartType<DateTime>();
-    final boolType = db.typeSystem.forDartType<bool>();
     return Habit(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
       name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name']),
-      description: stringType
-          .mapFromDatabaseResponse(data['${effectivePrefix}description']),
       whatTime: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}what_time']),
-      notificationTime: intType
-          .mapFromDatabaseResponse(data['${effectivePrefix}notification_time']),
-      statusBarFix: boolType
-          .mapFromDatabaseResponse(data['${effectivePrefix}status_bar_fix']),
+      memo: stringType.mapFromDatabaseResponse(data['${effectivePrefix}memo']),
+      noticeMessage: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}notice_message']),
       groupId:
           intType.mapFromDatabaseResponse(data['${effectivePrefix}group_id']),
-      notificationTypeId: intType.mapFromDatabaseResponse(
-          data['${effectivePrefix}notification_type_id']),
+      noticeTypeId: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}notice_type_id']),
     );
   }
   @override
@@ -672,23 +662,20 @@ class Habit extends DataClass implements Insertable<Habit> {
     if (!nullToAbsent || name != null) {
       map['name'] = Variable<String>(name);
     }
-    if (!nullToAbsent || description != null) {
-      map['description'] = Variable<String>(description);
-    }
     if (!nullToAbsent || whatTime != null) {
       map['what_time'] = Variable<DateTime>(whatTime);
     }
-    if (!nullToAbsent || notificationTime != null) {
-      map['notification_time'] = Variable<int>(notificationTime);
+    if (!nullToAbsent || memo != null) {
+      map['memo'] = Variable<String>(memo);
     }
-    if (!nullToAbsent || statusBarFix != null) {
-      map['status_bar_fix'] = Variable<bool>(statusBarFix);
+    if (!nullToAbsent || noticeMessage != null) {
+      map['notice_message'] = Variable<String>(noticeMessage);
     }
     if (!nullToAbsent || groupId != null) {
       map['group_id'] = Variable<int>(groupId);
     }
-    if (!nullToAbsent || notificationTypeId != null) {
-      map['notification_type_id'] = Variable<int>(notificationTypeId);
+    if (!nullToAbsent || noticeTypeId != null) {
+      map['notice_type_id'] = Variable<int>(noticeTypeId);
     }
     return map;
   }
@@ -697,24 +684,19 @@ class Habit extends DataClass implements Insertable<Habit> {
     return HabitsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       name: name == null && nullToAbsent ? const Value.absent() : Value(name),
-      description: description == null && nullToAbsent
-          ? const Value.absent()
-          : Value(description),
       whatTime: whatTime == null && nullToAbsent
           ? const Value.absent()
           : Value(whatTime),
-      notificationTime: notificationTime == null && nullToAbsent
+      memo: memo == null && nullToAbsent ? const Value.absent() : Value(memo),
+      noticeMessage: noticeMessage == null && nullToAbsent
           ? const Value.absent()
-          : Value(notificationTime),
-      statusBarFix: statusBarFix == null && nullToAbsent
-          ? const Value.absent()
-          : Value(statusBarFix),
+          : Value(noticeMessage),
       groupId: groupId == null && nullToAbsent
           ? const Value.absent()
           : Value(groupId),
-      notificationTypeId: notificationTypeId == null && nullToAbsent
+      noticeTypeId: noticeTypeId == null && nullToAbsent
           ? const Value.absent()
-          : Value(notificationTypeId),
+          : Value(noticeTypeId),
     );
   }
 
@@ -724,12 +706,11 @@ class Habit extends DataClass implements Insertable<Habit> {
     return Habit(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      description: serializer.fromJson<String>(json['description']),
       whatTime: serializer.fromJson<DateTime>(json['whatTime']),
-      notificationTime: serializer.fromJson<int>(json['notificationTime']),
-      statusBarFix: serializer.fromJson<bool>(json['statusBarFix']),
+      memo: serializer.fromJson<String>(json['memo']),
+      noticeMessage: serializer.fromJson<String>(json['noticeMessage']),
       groupId: serializer.fromJson<int>(json['groupId']),
-      notificationTypeId: serializer.fromJson<int>(json['notificationTypeId']),
+      noticeTypeId: serializer.fromJson<int>(json['noticeTypeId']),
     );
   }
   @override
@@ -738,45 +719,41 @@ class Habit extends DataClass implements Insertable<Habit> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
-      'description': serializer.toJson<String>(description),
       'whatTime': serializer.toJson<DateTime>(whatTime),
-      'notificationTime': serializer.toJson<int>(notificationTime),
-      'statusBarFix': serializer.toJson<bool>(statusBarFix),
+      'memo': serializer.toJson<String>(memo),
+      'noticeMessage': serializer.toJson<String>(noticeMessage),
       'groupId': serializer.toJson<int>(groupId),
-      'notificationTypeId': serializer.toJson<int>(notificationTypeId),
+      'noticeTypeId': serializer.toJson<int>(noticeTypeId),
     };
   }
 
   Habit copyWith(
           {int id,
           String name,
-          String description,
           DateTime whatTime,
-          int notificationTime,
-          bool statusBarFix,
+          String memo,
+          String noticeMessage,
           int groupId,
-          int notificationTypeId}) =>
+          int noticeTypeId}) =>
       Habit(
         id: id ?? this.id,
         name: name ?? this.name,
-        description: description ?? this.description,
         whatTime: whatTime ?? this.whatTime,
-        notificationTime: notificationTime ?? this.notificationTime,
-        statusBarFix: statusBarFix ?? this.statusBarFix,
+        memo: memo ?? this.memo,
+        noticeMessage: noticeMessage ?? this.noticeMessage,
         groupId: groupId ?? this.groupId,
-        notificationTypeId: notificationTypeId ?? this.notificationTypeId,
+        noticeTypeId: noticeTypeId ?? this.noticeTypeId,
       );
   @override
   String toString() {
     return (StringBuffer('Habit(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('description: $description, ')
           ..write('whatTime: $whatTime, ')
-          ..write('notificationTime: $notificationTime, ')
-          ..write('statusBarFix: $statusBarFix, ')
+          ..write('memo: $memo, ')
+          ..write('noticeMessage: $noticeMessage, ')
           ..write('groupId: $groupId, ')
-          ..write('notificationTypeId: $notificationTypeId')
+          ..write('noticeTypeId: $noticeTypeId')
           ..write(')'))
         .toString();
   }
@@ -787,99 +764,86 @@ class Habit extends DataClass implements Insertable<Habit> {
       $mrjc(
           name.hashCode,
           $mrjc(
-              description.hashCode,
+              whatTime.hashCode,
               $mrjc(
-                  whatTime.hashCode,
-                  $mrjc(
-                      notificationTime.hashCode,
-                      $mrjc(
-                          statusBarFix.hashCode,
-                          $mrjc(groupId.hashCode,
-                              notificationTypeId.hashCode))))))));
+                  memo.hashCode,
+                  $mrjc(noticeMessage.hashCode,
+                      $mrjc(groupId.hashCode, noticeTypeId.hashCode)))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is Habit &&
           other.id == this.id &&
           other.name == this.name &&
-          other.description == this.description &&
           other.whatTime == this.whatTime &&
-          other.notificationTime == this.notificationTime &&
-          other.statusBarFix == this.statusBarFix &&
+          other.memo == this.memo &&
+          other.noticeMessage == this.noticeMessage &&
           other.groupId == this.groupId &&
-          other.notificationTypeId == this.notificationTypeId);
+          other.noticeTypeId == this.noticeTypeId);
 }
 
 class HabitsCompanion extends UpdateCompanion<Habit> {
   final Value<int> id;
   final Value<String> name;
-  final Value<String> description;
   final Value<DateTime> whatTime;
-  final Value<int> notificationTime;
-  final Value<bool> statusBarFix;
+  final Value<String> memo;
+  final Value<String> noticeMessage;
   final Value<int> groupId;
-  final Value<int> notificationTypeId;
+  final Value<int> noticeTypeId;
   const HabitsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
-    this.description = const Value.absent(),
     this.whatTime = const Value.absent(),
-    this.notificationTime = const Value.absent(),
-    this.statusBarFix = const Value.absent(),
+    this.memo = const Value.absent(),
+    this.noticeMessage = const Value.absent(),
     this.groupId = const Value.absent(),
-    this.notificationTypeId = const Value.absent(),
+    this.noticeTypeId = const Value.absent(),
   });
   HabitsCompanion.insert({
     this.id = const Value.absent(),
     @required String name,
-    this.description = const Value.absent(),
     this.whatTime = const Value.absent(),
-    this.notificationTime = const Value.absent(),
-    this.statusBarFix = const Value.absent(),
+    this.memo = const Value.absent(),
+    this.noticeMessage = const Value.absent(),
     this.groupId = const Value.absent(),
-    this.notificationTypeId = const Value.absent(),
+    this.noticeTypeId = const Value.absent(),
   }) : name = Value(name);
   static Insertable<Habit> custom({
     Expression<int> id,
     Expression<String> name,
-    Expression<String> description,
     Expression<DateTime> whatTime,
-    Expression<int> notificationTime,
-    Expression<bool> statusBarFix,
+    Expression<String> memo,
+    Expression<String> noticeMessage,
     Expression<int> groupId,
-    Expression<int> notificationTypeId,
+    Expression<int> noticeTypeId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
-      if (description != null) 'description': description,
       if (whatTime != null) 'what_time': whatTime,
-      if (notificationTime != null) 'notification_time': notificationTime,
-      if (statusBarFix != null) 'status_bar_fix': statusBarFix,
+      if (memo != null) 'memo': memo,
+      if (noticeMessage != null) 'notice_message': noticeMessage,
       if (groupId != null) 'group_id': groupId,
-      if (notificationTypeId != null)
-        'notification_type_id': notificationTypeId,
+      if (noticeTypeId != null) 'notice_type_id': noticeTypeId,
     });
   }
 
   HabitsCompanion copyWith(
       {Value<int> id,
       Value<String> name,
-      Value<String> description,
       Value<DateTime> whatTime,
-      Value<int> notificationTime,
-      Value<bool> statusBarFix,
+      Value<String> memo,
+      Value<String> noticeMessage,
       Value<int> groupId,
-      Value<int> notificationTypeId}) {
+      Value<int> noticeTypeId}) {
     return HabitsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
-      description: description ?? this.description,
       whatTime: whatTime ?? this.whatTime,
-      notificationTime: notificationTime ?? this.notificationTime,
-      statusBarFix: statusBarFix ?? this.statusBarFix,
+      memo: memo ?? this.memo,
+      noticeMessage: noticeMessage ?? this.noticeMessage,
       groupId: groupId ?? this.groupId,
-      notificationTypeId: notificationTypeId ?? this.notificationTypeId,
+      noticeTypeId: noticeTypeId ?? this.noticeTypeId,
     );
   }
 
@@ -892,23 +856,20 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
-    if (description.present) {
-      map['description'] = Variable<String>(description.value);
-    }
     if (whatTime.present) {
       map['what_time'] = Variable<DateTime>(whatTime.value);
     }
-    if (notificationTime.present) {
-      map['notification_time'] = Variable<int>(notificationTime.value);
+    if (memo.present) {
+      map['memo'] = Variable<String>(memo.value);
     }
-    if (statusBarFix.present) {
-      map['status_bar_fix'] = Variable<bool>(statusBarFix.value);
+    if (noticeMessage.present) {
+      map['notice_message'] = Variable<String>(noticeMessage.value);
     }
     if (groupId.present) {
       map['group_id'] = Variable<int>(groupId.value);
     }
-    if (notificationTypeId.present) {
-      map['notification_type_id'] = Variable<int>(notificationTypeId.value);
+    if (noticeTypeId.present) {
+      map['notice_type_id'] = Variable<int>(noticeTypeId.value);
     }
     return map;
   }
@@ -918,12 +879,11 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
     return (StringBuffer('HabitsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('description: $description, ')
           ..write('whatTime: $whatTime, ')
-          ..write('notificationTime: $notificationTime, ')
-          ..write('statusBarFix: $statusBarFix, ')
+          ..write('memo: $memo, ')
+          ..write('noticeMessage: $noticeMessage, ')
           ..write('groupId: $groupId, ')
-          ..write('notificationTypeId: $notificationTypeId')
+          ..write('noticeTypeId: $noticeTypeId')
           ..write(')'))
         .toString();
   }
@@ -957,20 +917,6 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
     );
   }
 
-  final VerificationMeta _descriptionMeta =
-      const VerificationMeta('description');
-  GeneratedTextColumn _description;
-  @override
-  GeneratedTextColumn get description =>
-      _description ??= _constructDescription();
-  GeneratedTextColumn _constructDescription() {
-    return GeneratedTextColumn(
-      'description',
-      $tableName,
-      true,
-    );
-  }
-
   final VerificationMeta _whatTimeMeta = const VerificationMeta('whatTime');
   GeneratedDateTimeColumn _whatTime;
   @override
@@ -983,29 +929,30 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
     );
   }
 
-  final VerificationMeta _notificationTimeMeta =
-      const VerificationMeta('notificationTime');
-  GeneratedIntColumn _notificationTime;
+  final VerificationMeta _memoMeta = const VerificationMeta('memo');
+  GeneratedTextColumn _memo;
   @override
-  GeneratedIntColumn get notificationTime =>
-      _notificationTime ??= _constructNotificationTime();
-  GeneratedIntColumn _constructNotificationTime() {
-    return GeneratedIntColumn(
-      'notification_time',
+  GeneratedTextColumn get memo => _memo ??= _constructMemo();
+  GeneratedTextColumn _constructMemo() {
+    return GeneratedTextColumn(
+      'memo',
       $tableName,
       true,
     );
   }
 
-  final VerificationMeta _statusBarFixMeta =
-      const VerificationMeta('statusBarFix');
-  GeneratedBoolColumn _statusBarFix;
+  final VerificationMeta _noticeMessageMeta =
+      const VerificationMeta('noticeMessage');
+  GeneratedTextColumn _noticeMessage;
   @override
-  GeneratedBoolColumn get statusBarFix =>
-      _statusBarFix ??= _constructStatusBarFix();
-  GeneratedBoolColumn _constructStatusBarFix() {
-    return GeneratedBoolColumn('status_bar_fix', $tableName, false,
-        defaultValue: const Constant(false));
+  GeneratedTextColumn get noticeMessage =>
+      _noticeMessage ??= _constructNoticeMessage();
+  GeneratedTextColumn _constructNoticeMessage() {
+    return GeneratedTextColumn(
+      'notice_message',
+      $tableName,
+      true,
+    );
   }
 
   final VerificationMeta _groupIdMeta = const VerificationMeta('groupId');
@@ -1019,30 +966,22 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
         defaultValue: const Constant(0));
   }
 
-  final VerificationMeta _notificationTypeIdMeta =
-      const VerificationMeta('notificationTypeId');
-  GeneratedIntColumn _notificationTypeId;
+  final VerificationMeta _noticeTypeIdMeta =
+      const VerificationMeta('noticeTypeId');
+  GeneratedIntColumn _noticeTypeId;
   @override
-  GeneratedIntColumn get notificationTypeId =>
-      _notificationTypeId ??= _constructNotificationTypeId();
-  GeneratedIntColumn _constructNotificationTypeId() {
-    return GeneratedIntColumn('notification_type_id', $tableName, false,
+  GeneratedIntColumn get noticeTypeId =>
+      _noticeTypeId ??= _constructNoticeTypeId();
+  GeneratedIntColumn _constructNoticeTypeId() {
+    return GeneratedIntColumn('notice_type_id', $tableName, false,
         $customConstraints:
-            'DEFAULT 0 REFERENCES notification_types (id) ON UPDATE CASCADE ON DELETE SET DEFAULT',
+            'DEFAULT 0 REFERENCES notice_types (id) ON UPDATE CASCADE ON DELETE SET DEFAULT',
         defaultValue: const Constant(0));
   }
 
   @override
-  List<GeneratedColumn> get $columns => [
-        id,
-        name,
-        description,
-        whatTime,
-        notificationTime,
-        statusBarFix,
-        groupId,
-        notificationTypeId
-      ];
+  List<GeneratedColumn> get $columns =>
+      [id, name, whatTime, memo, noticeMessage, groupId, noticeTypeId];
   @override
   $HabitsTable get asDslTable => this;
   @override
@@ -1063,37 +1002,29 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
-    if (data.containsKey('description')) {
-      context.handle(
-          _descriptionMeta,
-          description.isAcceptableOrUnknown(
-              data['description'], _descriptionMeta));
-    }
     if (data.containsKey('what_time')) {
       context.handle(_whatTimeMeta,
           whatTime.isAcceptableOrUnknown(data['what_time'], _whatTimeMeta));
     }
-    if (data.containsKey('notification_time')) {
+    if (data.containsKey('memo')) {
       context.handle(
-          _notificationTimeMeta,
-          notificationTime.isAcceptableOrUnknown(
-              data['notification_time'], _notificationTimeMeta));
+          _memoMeta, memo.isAcceptableOrUnknown(data['memo'], _memoMeta));
     }
-    if (data.containsKey('status_bar_fix')) {
+    if (data.containsKey('notice_message')) {
       context.handle(
-          _statusBarFixMeta,
-          statusBarFix.isAcceptableOrUnknown(
-              data['status_bar_fix'], _statusBarFixMeta));
+          _noticeMessageMeta,
+          noticeMessage.isAcceptableOrUnknown(
+              data['notice_message'], _noticeMessageMeta));
     }
     if (data.containsKey('group_id')) {
       context.handle(_groupIdMeta,
           groupId.isAcceptableOrUnknown(data['group_id'], _groupIdMeta));
     }
-    if (data.containsKey('notification_type_id')) {
+    if (data.containsKey('notice_type_id')) {
       context.handle(
-          _notificationTypeIdMeta,
-          notificationTypeId.isAcceptableOrUnknown(
-              data['notification_type_id'], _notificationTypeIdMeta));
+          _noticeTypeIdMeta,
+          noticeTypeId.isAcceptableOrUnknown(
+              data['notice_type_id'], _noticeTypeIdMeta));
     }
     return context;
   }
@@ -1783,13 +1714,253 @@ class $IndexGroupsTable extends IndexGroups
   }
 }
 
+class HabitNoticeTime extends DataClass implements Insertable<HabitNoticeTime> {
+  final int id;
+  final int noticeTime;
+  final int habitId;
+  HabitNoticeTime(
+      {@required this.id, @required this.noticeTime, @required this.habitId});
+  factory HabitNoticeTime.fromData(
+      Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
+    final intType = db.typeSystem.forDartType<int>();
+    return HabitNoticeTime(
+      id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
+      noticeTime: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}notice_time']),
+      habitId:
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}habit_id']),
+    );
+  }
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (!nullToAbsent || id != null) {
+      map['id'] = Variable<int>(id);
+    }
+    if (!nullToAbsent || noticeTime != null) {
+      map['notice_time'] = Variable<int>(noticeTime);
+    }
+    if (!nullToAbsent || habitId != null) {
+      map['habit_id'] = Variable<int>(habitId);
+    }
+    return map;
+  }
+
+  HabitNoticeTimesCompanion toCompanion(bool nullToAbsent) {
+    return HabitNoticeTimesCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      noticeTime: noticeTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(noticeTime),
+      habitId: habitId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(habitId),
+    );
+  }
+
+  factory HabitNoticeTime.fromJson(Map<String, dynamic> json,
+      {ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return HabitNoticeTime(
+      id: serializer.fromJson<int>(json['id']),
+      noticeTime: serializer.fromJson<int>(json['noticeTime']),
+      habitId: serializer.fromJson<int>(json['habitId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'noticeTime': serializer.toJson<int>(noticeTime),
+      'habitId': serializer.toJson<int>(habitId),
+    };
+  }
+
+  HabitNoticeTime copyWith({int id, int noticeTime, int habitId}) =>
+      HabitNoticeTime(
+        id: id ?? this.id,
+        noticeTime: noticeTime ?? this.noticeTime,
+        habitId: habitId ?? this.habitId,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('HabitNoticeTime(')
+          ..write('id: $id, ')
+          ..write('noticeTime: $noticeTime, ')
+          ..write('habitId: $habitId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      $mrjf($mrjc(id.hashCode, $mrjc(noticeTime.hashCode, habitId.hashCode)));
+  @override
+  bool operator ==(dynamic other) =>
+      identical(this, other) ||
+      (other is HabitNoticeTime &&
+          other.id == this.id &&
+          other.noticeTime == this.noticeTime &&
+          other.habitId == this.habitId);
+}
+
+class HabitNoticeTimesCompanion extends UpdateCompanion<HabitNoticeTime> {
+  final Value<int> id;
+  final Value<int> noticeTime;
+  final Value<int> habitId;
+  const HabitNoticeTimesCompanion({
+    this.id = const Value.absent(),
+    this.noticeTime = const Value.absent(),
+    this.habitId = const Value.absent(),
+  });
+  HabitNoticeTimesCompanion.insert({
+    this.id = const Value.absent(),
+    @required int noticeTime,
+    @required int habitId,
+  })  : noticeTime = Value(noticeTime),
+        habitId = Value(habitId);
+  static Insertable<HabitNoticeTime> custom({
+    Expression<int> id,
+    Expression<int> noticeTime,
+    Expression<int> habitId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (noticeTime != null) 'notice_time': noticeTime,
+      if (habitId != null) 'habit_id': habitId,
+    });
+  }
+
+  HabitNoticeTimesCompanion copyWith(
+      {Value<int> id, Value<int> noticeTime, Value<int> habitId}) {
+    return HabitNoticeTimesCompanion(
+      id: id ?? this.id,
+      noticeTime: noticeTime ?? this.noticeTime,
+      habitId: habitId ?? this.habitId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (noticeTime.present) {
+      map['notice_time'] = Variable<int>(noticeTime.value);
+    }
+    if (habitId.present) {
+      map['habit_id'] = Variable<int>(habitId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HabitNoticeTimesCompanion(')
+          ..write('id: $id, ')
+          ..write('noticeTime: $noticeTime, ')
+          ..write('habitId: $habitId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $HabitNoticeTimesTable extends HabitNoticeTimes
+    with TableInfo<$HabitNoticeTimesTable, HabitNoticeTime> {
+  final GeneratedDatabase _db;
+  final String _alias;
+  $HabitNoticeTimesTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  GeneratedIntColumn _id;
+  @override
+  GeneratedIntColumn get id => _id ??= _constructId();
+  GeneratedIntColumn _constructId() {
+    return GeneratedIntColumn(
+      'id',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _noticeTimeMeta = const VerificationMeta('noticeTime');
+  GeneratedIntColumn _noticeTime;
+  @override
+  GeneratedIntColumn get noticeTime => _noticeTime ??= _constructNoticeTime();
+  GeneratedIntColumn _constructNoticeTime() {
+    return GeneratedIntColumn(
+      'notice_time',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _habitIdMeta = const VerificationMeta('habitId');
+  GeneratedIntColumn _habitId;
+  @override
+  GeneratedIntColumn get habitId => _habitId ??= _constructHabitId();
+  GeneratedIntColumn _constructHabitId() {
+    return GeneratedIntColumn('habit_id', $tableName, false,
+        $customConstraints:
+            'REFERENCES habits (id) ON UPDATE CASCADE ON DELETE CASCADE');
+  }
+
+  @override
+  List<GeneratedColumn> get $columns => [id, noticeTime, habitId];
+  @override
+  $HabitNoticeTimesTable get asDslTable => this;
+  @override
+  String get $tableName => _alias ?? 'habit_notice_times';
+  @override
+  final String actualTableName = 'habit_notice_times';
+  @override
+  VerificationContext validateIntegrity(Insertable<HabitNoticeTime> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id'], _idMeta));
+    }
+    if (data.containsKey('notice_time')) {
+      context.handle(
+          _noticeTimeMeta,
+          noticeTime.isAcceptableOrUnknown(
+              data['notice_time'], _noticeTimeMeta));
+    } else if (isInserting) {
+      context.missing(_noticeTimeMeta);
+    }
+    if (data.containsKey('habit_id')) {
+      context.handle(_habitIdMeta,
+          habitId.isAcceptableOrUnknown(data['habit_id'], _habitIdMeta));
+    } else if (isInserting) {
+      context.missing(_habitIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  HabitNoticeTime map(Map<String, dynamic> data, {String tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
+    return HabitNoticeTime.fromData(data, _db, prefix: effectivePrefix);
+  }
+
+  @override
+  $HabitNoticeTimesTable createAlias(String alias) {
+    return $HabitNoticeTimesTable(_db, alias);
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   $GroupsTable _groups;
   $GroupsTable get groups => _groups ??= $GroupsTable(this);
-  $NotificationTypesTable _notificationTypes;
-  $NotificationTypesTable get notificationTypes =>
-      _notificationTypes ??= $NotificationTypesTable(this);
+  $NoticeTypesTable _noticeTypes;
+  $NoticeTypesTable get noticeTypes => _noticeTypes ??= $NoticeTypesTable(this);
   $WeeksTable _weeks;
   $WeeksTable get weeks => _weeks ??= $WeeksTable(this);
   $HabitsTable _habits;
@@ -1800,11 +1971,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $EventsTable get events => _events ??= $EventsTable(this);
   $IndexGroupsTable _indexGroups;
   $IndexGroupsTable get indexGroups => _indexGroups ??= $IndexGroupsTable(this);
+  $HabitNoticeTimesTable _habitNoticeTimes;
+  $HabitNoticeTimesTable get habitNoticeTimes =>
+      _habitNoticeTimes ??= $HabitNoticeTimesTable(this);
   GroupDao _groupDao;
   GroupDao get groupDao => _groupDao ??= GroupDao(this as AppDatabase);
-  NotificationTypeDao _notificationTypeDao;
-  NotificationTypeDao get notificationTypeDao =>
-      _notificationTypeDao ??= NotificationTypeDao(this as AppDatabase);
+  NoticeTypeDao _noticeTypeDao;
+  NoticeTypeDao get noticeTypeDao =>
+      _noticeTypeDao ??= NoticeTypeDao(this as AppDatabase);
   WeekDao _weekDao;
   WeekDao get weekDao => _weekDao ??= WeekDao(this as AppDatabase);
   HabitDao _habitDao;
@@ -1817,16 +1991,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   IndexGroupDao _indexGroupDao;
   IndexGroupDao get indexGroupDao =>
       _indexGroupDao ??= IndexGroupDao(this as AppDatabase);
+  HabitNoticeTimeDao _habitNoticeTimeDao;
+  HabitNoticeTimeDao get habitNoticeTimeDao =>
+      _habitNoticeTimeDao ??= HabitNoticeTimeDao(this as AppDatabase);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
         groups,
-        notificationTypes,
+        noticeTypes,
         weeks,
         habits,
         habitWeeks,
         events,
-        indexGroups
+        indexGroups,
+        habitNoticeTimes
       ];
 }

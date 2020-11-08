@@ -11,6 +11,7 @@ class BottomButtons extends StatelessWidget {
     this.backgroundColor,
     this.margin = const EdgeInsets.all(_kPadding),
     this.padding = const EdgeInsets.all(_kButtonPadding),
+    this.spaceBetween = false,
     this.height,
     this.leftButton,
     this.rightButton,
@@ -23,6 +24,7 @@ class BottomButtons extends StatelessWidget {
   final Color backgroundColor;
   final EdgeInsets margin;
   final EdgeInsets padding;
+  final bool spaceBetween;
   final double height;
   final Widget leftButton;
   final Widget rightButton;
@@ -46,37 +48,45 @@ class BottomButtons extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: leftButton ??
-                  FlatButton(
-                    padding: padding,
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(Constants.smallBorderRadius),
-                    ),
-                    onPressed: _leftButtonAction,
-                    child: Text(
-                      _leftButtonString,
-                      style: Get.textTheme.bodyText1,
-                    ),
-                  ),
-            ),
-            Expanded(
-              child: rightButton ??
-                  FlatButton(
-                    padding: padding,
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(Constants.smallBorderRadius),
-                    ),
-                    onPressed: rightButtonAction,
-                    child: Text(
-                      _rightButtonString,
-                      style: Get.textTheme.bodyText1.copyWith(
-                        color: Get.theme.accentColor,
-                        fontWeight: FontWeight.bold,
+              child: Align(
+                alignment:
+                    spaceBetween ? Alignment.centerLeft : Alignment.center,
+                child: leftButton ??
+                    FlatButton(
+                      padding: padding,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(Constants.smallBorderRadius),
+                      ),
+                      onPressed: _leftButtonAction,
+                      child: Text(
+                        _leftButtonString,
+                        style: Get.textTheme.bodyText1,
                       ),
                     ),
-                  ),
+              ),
+            ),
+            Expanded(
+              child: Align(
+                alignment:
+                    spaceBetween ? Alignment.centerRight : Alignment.center,
+                child: rightButton ??
+                    FlatButton(
+                      padding: padding,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(Constants.smallBorderRadius),
+                      ),
+                      onPressed: rightButtonAction,
+                      child: Text(
+                        _rightButtonString,
+                        style: Get.textTheme.bodyText1.copyWith(
+                          color: Get.theme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+              ),
             ),
           ],
         ),

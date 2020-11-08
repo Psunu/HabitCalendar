@@ -88,7 +88,7 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
 
   // Description fields
   bool _isDescriptionActivated;
-  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _memoController = TextEditingController();
 
   // Get Set
   bool get _isNameAlertOn => _isNameEmptyAlertOn || _isNameDuplicatedAlertOn;
@@ -147,7 +147,7 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
     bool weekModified = false;
     bool whatTimeModified = false;
     bool notificationTimeModified = false;
-    bool descriptionModified = false;
+    bool memoModified = false;
 
     nameModified = widget.habit.name.compareTo(_nameController.text) != 0;
 
@@ -169,40 +169,20 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
       whatTimeModified = _isWhatTimeActivated;
     }
 
-    // If notificationTime is set. (notificationTime is activated)
-    if (widget.habit.notificationTime != null) {
-      // If activation changed
-      if (_isNotificationActivated == false) {
-        notificationTimeModified = true;
-        // compare duration
-      } else {
-        notificationTimeModified = widget.habit.notificationTime
-                .compareTo(_notificationTime.inMinutes) !=
-            0;
-      }
-
-      /// If notificationTime is not set. (notificationTime is not activated)
-      /// check only activation
-    } else {
-      notificationTimeModified = _isNotificationActivated;
-    }
-
-    // If description is set. (description is activated)
-    if (widget.habit.description != null) {
+    // If memo is set. (memo is activated)
+    if (widget.habit.memo != null) {
       // If activation changed
       if (_isDescriptionActivated == false) {
-        descriptionModified = true;
+        memoModified = true;
         // compare text
       } else {
-        descriptionModified =
-            widget.habit.description.compareTo(_descriptionController.text) !=
-                0;
+        memoModified = widget.habit.memo.compareTo(_memoController.text) != 0;
       }
 
-      /// If description is not set. (description is not activated)
+      /// If memo is not set. (memo is not activated)
       /// check only activation
     } else {
-      descriptionModified = _isDescriptionActivated;
+      memoModified = _isDescriptionActivated;
     }
 
     final Map<int, bool> testWeeks = Map<int, bool>();
@@ -225,7 +205,7 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
         weekModified ||
         whatTimeModified ||
         notificationTimeModified ||
-        descriptionModified;
+        memoModified;
   }
 
   Color _getGroupColor() => Color(widget.groups
@@ -341,17 +321,13 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
     _isWhatTimeActivated = widget.habit.whatTime != null;
     _whatTime = widget.habit.whatTime;
 
-    // Init notificationTime
-    _isNotificationActivated = widget.habit.notificationTime != null;
-    _notificationTime = Duration(minutes: widget.habit?.notificationTime ?? 0);
-
-    // Init description
-    if (widget.habit.description != null) {
-      _descriptionController.text = widget.habit.description;
-      _descriptionController.selection =
-          TextSelection.collapsed(offset: widget.habit.description.length);
+    // Init memo
+    if (widget.habit.memo != null) {
+      _memoController.text = widget.habit.memo;
+      _memoController.selection =
+          TextSelection.collapsed(offset: widget.habit.memo.length);
     }
-    _isDescriptionActivated = widget.habit.description != null;
+    _isDescriptionActivated = widget.habit.memo != null;
 
     super.initState();
   }
@@ -631,7 +607,7 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
                   size: _kIconSize,
                 ),
                 style: Get.textTheme.bodyText1,
-                descriptionController: _descriptionController,
+                descriptionController: _memoController,
                 initValue: _isDescriptionActivated,
                 onValueChanged: (value) {
                   setState(() {
@@ -664,18 +640,14 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
                     Habit(
                       id: widget.habit.id,
                       name: _nameController.text,
-                      statusBarFix: widget.habit.statusBarFix,
                       groupId: _selectedGroupId,
-                      notificationTypeId: widget.habit.notificationTypeId,
-                      notificationTime: _isNotificationActivated
-                          ? _notificationTime.inMinutes
-                          : null,
                       whatTime: _isWhatTimeActivated
                           ? _whatTime ?? DateTime(0)
                           : null,
-                      description: _isDescriptionActivated
-                          ? _descriptionController.text
-                          : null,
+                      memo:
+                          _isDescriptionActivated ? _memoController.text : null,
+                      noticeMessage: widget.habit.noticeMessage,
+                      noticeTypeId: widget.habit.noticeTypeId,
                     ),
                     _listHabitWeek,
                   );

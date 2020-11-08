@@ -19,7 +19,7 @@ class TimePicker extends StatefulWidget {
     this.timeStyle,
     this.tagStyle,
     this.initTime,
-    this.enabled = true,
+    this.initValue = true,
     this.reverseSwitch = false,
     this.hideSwitch = false,
     this.switchText,
@@ -33,7 +33,7 @@ class TimePicker extends StatefulWidget {
   final TextStyle timeStyle;
   final TextStyle tagStyle;
   final DateTime initTime;
-  final bool enabled;
+  final bool initValue;
   final bool reverseSwitch;
   final bool hideSwitch;
   final Widget switchText;
@@ -73,7 +73,7 @@ class _TimePickerState extends State<TimePicker> {
   @override
   void initState() {
     _time = widget.initTime ?? DateTime(0);
-    _enabled = widget.enabled;
+    _enabled = widget.initValue;
     _enabled = _getEnabled;
 
     super.initState();
@@ -231,6 +231,7 @@ class _TimePickerState extends State<TimePicker> {
                   Switch.adaptive(
                     value: _enabled,
                     onChanged: _onSwitchChanged,
+                    activeColor: Get.theme.accentColor,
                   ),
                   widget.switchText ??
                       Text(

@@ -271,8 +271,8 @@ class _GroupCardState extends State<GroupCard> with TickerProviderStateMixin {
                           Padding(
                             padding: const EdgeInsets.only(
                               left: 40.0,
-                              top: 25.0,
-                              bottom: 25.0,
+                              top: 20.0,
+                              bottom: 20.0,
                             ),
                             child: AutoColoredText(
                               backgroundColor: widget.backgroundColor,

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:animations/animations.dart';
@@ -5,7 +6,7 @@ import 'package:habit_calendar/utils/utils.dart';
 
 import '../widgets/general_purpose/open_container_fab.dart';
 import '../controllers/home_controller.dart';
-import '../views/make_habit_view_edit.dart';
+import '../views/make_habit_view.dart';
 
 class HomeView extends StatelessWidget {
   @override
@@ -29,7 +30,7 @@ class HomeView extends StatelessWidget {
                 Utils.getFormedDate(
                   DateTime.now(),
                 ),
-                style: Get.textTheme.bodyText2,
+                style: Get.textTheme.bodyText1,
               ),
             ),
           ),
@@ -50,14 +51,18 @@ class HomeView extends StatelessWidget {
           bottomNavigationBar: BottomNavigationBar(
             onTap: controller.onBottomNavTapped,
             currentIndex: controller.currentIndex,
+            selectedItemColor: Get.theme.primaryColor,
+            selectedFontSize: Get.textTheme.bodyText2.fontSize,
+            unselectedFontSize: Get.textTheme.bodyText2.fontSize,
             items: [
-              const BottomNavigationBarItem(
-                icon: const Icon(Icons.home),
-                label: 'Home',
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.home_rounded),
+                label: '홈'.tr,
               ),
-              const BottomNavigationBarItem(
-                icon: const Icon(Icons.calendar_today),
-                label: 'Calendar',
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.calendar_today_outlined),
+                activeIcon: const Icon(Icons.calendar_today_rounded),
+                label: '캘린더'.tr,
               ),
             ],
           ),

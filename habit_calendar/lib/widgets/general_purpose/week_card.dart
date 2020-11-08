@@ -60,10 +60,11 @@ class WeekCard extends StatefulWidget {
     Color color,
     Color selectedColor,
     void Function(int, bool) onTap,
-    bool initValue,
+    Map<int, bool> initValue,
     TextStyle textStyle,
   }) {
     EdgeInsets _margin = EdgeInsets.only(right: margin);
+    if (initValue == null) initValue = Map<int, bool>();
 
     return List.generate(_kWeekLength, (index) {
       if (index == _kWeekLength - 1)
@@ -86,7 +87,7 @@ class WeekCard extends StatefulWidget {
           onTap: (isSelected) {
             if (onTap != null) onTap(index, isSelected);
           },
-          initValue: initValue,
+          initValue: initValue[index],
           child: Text(
             Utils.getWeekString(index),
             style: textStyle,

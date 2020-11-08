@@ -18,6 +18,7 @@ class _TodayHabitViewState extends State<TodayHabitView>
       init: TodayHabitController(),
       builder: (controller) => Container(
         height: Get.height,
+        color: Get.theme.scaffoldBackgroundColor,
         child: AnimatedList(
           key: controller.listKey,
           physics: BouncingScrollPhysics(),
@@ -43,15 +44,16 @@ class _TodayHabitViewState extends State<TodayHabitView>
                   children: [
                     Text(
                       '꾸준히 하려면\n작게 해야 합니다'.tr,
-                      style: Get.textTheme.headline5,
+                      style: Get.textTheme.headline4,
                     ),
                     const SizedBox(
                       height: 50.0,
                     ),
                     ProgressBar(
                       percentage: controller.todayPercentage,
+                      backgroundColor: Colors.white,
                       layoutPadding: Constants.padding * 2,
-                      height: 12.0,
+                      height: 15.0,
                     ),
                     const SizedBox(
                       height: 50.0,

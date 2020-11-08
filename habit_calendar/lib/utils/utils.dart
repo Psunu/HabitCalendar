@@ -103,7 +103,7 @@ class Utils {
   static String getFormedWhatTime(DateTime whatTime) {
     if (whatTime == null) return '오늘안에'.tr.capitalizeFirst;
     if (whatTime.hour < 13)
-      return '${Utils.twoDigits(whatTime.hour)}:${Utils.twoDigits(whatTime.minute)}';
+      return '${Utils.twoDigits(whatTime.hour == 0 ? 12 : whatTime.hour)}:${Utils.twoDigits(whatTime.minute)}';
     else
       return '${Utils.twoDigits(whatTime.hour - 12)}:${Utils.twoDigits(whatTime.minute)}';
   }
@@ -118,8 +118,9 @@ class Utils {
     return "0$n";
   }
 
-  static Future<T> customShowModalBottomSheet<T>(
-      {@required void Function(BuildContext) builder}) {
+  static Future<T> customShowModalBottomSheet<T>({
+    @required Widget Function(BuildContext) builder,
+  }) {
     return showModalBottomSheet<T>(
       context: Get.context,
       shape: RoundedRectangleBorder(
@@ -132,8 +133,9 @@ class Utils {
     );
   }
 
-  static Future<T> customShowModal<T>(
-      {Widget Function(BuildContext context) builder}) {
+  static Future<T> customShowModal<T>({
+    @required Widget Function(BuildContext context) builder,
+  }) {
     return showModal<T>(
       context: Get.context,
       configuration: FadeScaleTransitionConfiguration(),

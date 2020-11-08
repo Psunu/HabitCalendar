@@ -4,6 +4,7 @@ import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/widgets/general_purpose/auto_colored_icon.dart';
 import 'package:habit_calendar/widgets/general_purpose/color_circle.dart';
+import 'package:habit_calendar/widgets/project_purpose/custom_chip.dart';
 
 const _kColorCircleSize = 20.0;
 
@@ -16,11 +17,13 @@ class GroupChip extends StatefulWidget {
   GroupChip({
     Key key,
     @required this.group,
-    this.style,
+    this.selectedStyle,
+    this.unSelectedStyle,
     this.color = Colors.white,
     this.groupValue,
     this.onSelected,
-  })  : assert(group != null),
+  })  : assert(color != null),
+        assert(group != null),
         type = _GroupChipType.groupChip,
         onTap = null,
         super(key: key);
@@ -31,7 +34,8 @@ class GroupChip extends StatefulWidget {
     this.onTap,
   })  : type = _GroupChipType.add,
         group = null,
-        style = null,
+        selectedStyle = null,
+        unSelectedStyle = null,
         groupValue = null,
         onSelected = null,
         super(key: key);
@@ -39,7 +43,8 @@ class GroupChip extends StatefulWidget {
   final _GroupChipType type;
 
   final Group group;
-  final TextStyle style;
+  final TextStyle selectedStyle;
+  final TextStyle unSelectedStyle;
   final Color color;
   final int groupValue;
   final void Function(int groupId) onSelected;
@@ -51,32 +56,19 @@ class GroupChip extends StatefulWidget {
 }
 
 class _GroupChipState extends State<GroupChip> {
+  final _borderRadius = BorderRadius.circular(Constants.smallBorderRadius);
   bool _isSelected = false;
 
-  Widget _child;
-  void Function() _callback;
+  TextStyle get _selectedStyle =>
+      widget.selectedStyle ??
+      Get.textTheme.bodyText1.copyWith(color: Get.theme.accentColor);
+  TextStyle get _unSelectedStyle =>
+      widget.unSelectedStyle ?? Get.textTheme.bodyText1;
 
-  @override
-  void initState() {
+  void Function() get _callback {
     switch (widget.type) {
       case _GroupChipType.groupChip:
-        _child = Row(
-          children: [
-            ColorCircle(
-              color: Color(widget.group.color),
-              width: _kColorCircleSize,
-              height: _kColorCircleSize,
-            ),
-            SizedBox(width: 8.0),
-            Text(
-              widget.group.name,
-              style: widget.style ?? Get.textTheme.bodyText1,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        );
-        _callback = () {
+        return () {
           setState(() {
             _isSelected = !_isSelected;
           });
@@ -86,17 +78,45 @@ class _GroupChipState extends State<GroupChip> {
         };
         break;
       case _GroupChipType.add:
-        _child = AutoColoredIcon(
+      default:
+        return () {
+          if (widget.onTap != null) widget.onTap();
+        };
+    }
+  }
+
+  Widget get _child {
+    switch (widget.type) {
+      case _GroupChipType.groupChip:
+        return Row(
+          children: [
+            ColorCircle(
+              color: Color(widget.group.color),
+              width: _kColorCircleSize,
+              height: _kColorCircleSize,
+            ),
+            SizedBox(width: 8.0),
+            Text(
+              widget.group.name,
+              style: _isSelected ? _selectedStyle : _unSelectedStyle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        );
+      case _GroupChipType.add:
+      default:
+        return AutoColoredIcon(
           backgroundColor: widget.color,
           child: Icon(
             Icons.add,
           ),
         );
-        _callback = () {
-          if (widget.onTap != null) widget.onTap();
-        };
     }
+  }
 
+  @override
+  void initState() {
     super.initState();
   }
 
@@ -109,10 +129,15 @@ class _GroupChipState extends State<GroupChip> {
       onTap: _callback,
       child: Material(
         color: widget.color,
-        borderRadius: BorderRadius.circular(Constants.smallBorderRadius),
+        borderRadius: _borderRadius,
         elevation: _isSelected ? 5.0 : 0.0,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
+        child: CustomChip(
+          color: widget.color,
+          padding: const EdgeInsets.symmetric(
+            vertical: 8.0,
+            horizontal: 16.0,
+          ),
+          borderRadius: _borderRadius,
           child: _child,
         ),
       ),

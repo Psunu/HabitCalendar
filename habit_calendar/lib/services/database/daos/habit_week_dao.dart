@@ -16,6 +16,20 @@ class HabitWeekDao extends DatabaseAccessor<AppDatabase>
   Stream<List<HabitWeek>> watchAllHabitWeeks() => select(habitWeeks).watch();
   Future insertHabitWeek(HabitWeek habitWeek) =>
       into(habitWeeks).insert(habitWeek);
+
+  Future<List<int>> insertAllHabitWeeks(List<HabitWeek> weeks) {
+    return transaction(() async {
+      List<int> result = List<int>();
+
+      for (final week in weeks) {
+        final int id = await into(habitWeeks).insert(week);
+        result.add(id);
+      }
+
+      return result;
+    });
+  }
+
   Future updateHabitWeek(HabitWeek habitWeek) =>
       update(habitWeeks).replace(habitWeek);
   Future deleteHabitWeek(HabitWeek habitWeek) =>

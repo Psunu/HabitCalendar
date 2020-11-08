@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
 import 'package:habit_calendar/translations/messages.dart';
 
@@ -28,21 +29,30 @@ class MyApp extends StatelessWidget {
       locale: window.locale,
 
       fallbackLocale: Locale('ko', 'KR'),
+
       theme: ThemeData.light().copyWith(
+        scaffoldBackgroundColor: const Color(Constants.lightScaffoldColor),
+        primaryColor: const Color(Constants.primaryColor),
+        accentColor: const Color(Constants.accentColor),
         textTheme: context.textTheme
             .apply(
-              bodyColor: Colors.black87,
-              displayColor: Colors.black87,
+              bodyColor: const Color(Constants.black),
+              displayColor: const Color(Constants.black),
             )
             .copyWith(
+              headline4: context.textTheme.headline4.copyWith(
+                fontSize: 28.0,
+                color: const Color(Constants.black),
+              ),
               headline5: context.textTheme.headline5.copyWith(
-                color: Colors.black87,
+                color: const Color(Constants.black),
               ),
               headline6: context.textTheme.headline6.copyWith(
-                color: Colors.black87,
+                color: const Color(Constants.black),
                 fontWeight: FontWeight.normal,
               ),
               bodyText1: context.textTheme.bodyText1.copyWith(
+                color: const Color(Constants.black),
                 fontSize: 16.0,
                 fontWeight: FontWeight.normal,
               ),

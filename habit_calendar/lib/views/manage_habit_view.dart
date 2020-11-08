@@ -198,6 +198,7 @@ class _ManageHabitViewState extends State<ManageHabitView>
             duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
             opacity: controller.isEditMode.value ? 0.0 : 1.0,
             child: FloatingActionButton(
+              backgroundColor: Get.theme.accentColor,
               onPressed: _controller.onAddGroupTapped,
               child: Icon(Icons.add),
             ),
@@ -233,7 +234,7 @@ class _ManageHabitViewState extends State<ManageHabitView>
                             Constants.padding,
                             0.0,
                             Constants.padding,
-                            8.0,
+                            12.0,
                           ),
                           child: DragTarget<int>(
                             builder: (context, candidateData, rejectedData) =>

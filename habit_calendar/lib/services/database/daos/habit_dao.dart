@@ -6,12 +6,6 @@ import 'package:moor_flutter/moor_flutter.dart';
 
 part 'habit_dao.g.dart';
 
-class HabitWithHabitWeek {
-  Habit habit;
-  HabitWeek habitWeek;
-  HabitWithHabitWeek(this.habit, this.habitWeek);
-}
-
 @UseDao(tables: [Habits, HabitWeeks])
 class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
   final AppDatabase db;

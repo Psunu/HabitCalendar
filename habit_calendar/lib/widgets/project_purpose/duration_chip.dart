@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
-import 'package:habit_calendar/utils/utils.dart';
 import 'package:habit_calendar/widgets/general_purpose/auto_colored_icon.dart';
-import 'package:habit_calendar/widgets/general_purpose/color_circle.dart';
-
-const _kColorCircleSize = 20.0;
+import 'package:habit_calendar/widgets/project_purpose/custom_chip.dart';
 
 enum _DurationChipType {
   durationChip,
@@ -23,6 +20,7 @@ class DurationChip extends StatefulWidget {
     this.onValueChanged,
   })  : assert(duration != null),
         assert(value != null),
+        assert(color != null),
         type = _DurationChipType.durationChip,
         onTap = null,
         super(key: key);
@@ -56,11 +54,7 @@ class DurationChip extends StatefulWidget {
 }
 
 class _DurationChipState extends State<DurationChip> {
-  // bool _isSelected = false;
-
-  Widget _child;
-  void Function() _callback;
-
+  final _borderRadius = BorderRadius.circular(Constants.smallBorderRadius);
   String get _durationString {
     if (widget.durationString != null) return widget.durationString;
 
@@ -81,11 +75,10 @@ class _DurationChipState extends State<DurationChip> {
     return text;
   }
 
-  @override
-  void initState() {
+  Widget get _child {
     switch (widget.type) {
       case _DurationChipType.durationChip:
-        _child = Row(
+        return Row(
           children: [
             Text(
               _durationString,
@@ -95,7 +88,21 @@ class _DurationChipState extends State<DurationChip> {
             ),
           ],
         );
-        _callback = () {
+      case _DurationChipType.add:
+      default:
+        return AutoColoredIcon(
+          backgroundColor: widget.color,
+          child: Icon(
+            Icons.add,
+          ),
+        );
+    }
+  }
+
+  void Function() get _callback {
+    switch (widget.type) {
+      case _DurationChipType.durationChip:
+        return () {
           if (widget.onValueChanged != null)
             widget.onValueChanged(
               widget.duration,
@@ -104,20 +111,12 @@ class _DurationChipState extends State<DurationChip> {
 
           if (widget.onTap != null) widget.onTap();
         };
-        break;
       case _DurationChipType.add:
-        _child = AutoColoredIcon(
-          backgroundColor: widget.color,
-          child: Icon(
-            Icons.add,
-          ),
-        );
-        _callback = () {
+      default:
+        return () {
           if (widget.onTap != null) widget.onTap();
         };
     }
-
-    super.initState();
   }
 
   @override
@@ -126,10 +125,15 @@ class _DurationChipState extends State<DurationChip> {
       onTap: _callback,
       child: Material(
         color: widget.color,
-        borderRadius: BorderRadius.circular(Constants.smallBorderRadius),
+        borderRadius: _borderRadius,
         elevation: widget.value ? 5.0 : 0.0,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
+        child: CustomChip(
+          color: widget.color,
+          padding: const EdgeInsets.symmetric(
+            vertical: 8.0,
+            horizontal: 16.0,
+          ),
+          borderRadius: _borderRadius,
           child: _child,
         ),
       ),
