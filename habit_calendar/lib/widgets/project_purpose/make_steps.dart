@@ -96,7 +96,7 @@ Widget _buildHeader(String text) {
       Expanded(
         child: Text(
           text,
-          style: _mainTextStyle,
+          style: _askStringStyle.copyWith(color: Colors.grey),
           textAlign: TextAlign.center,
         ),
       ),

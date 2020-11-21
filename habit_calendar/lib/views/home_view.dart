@@ -14,26 +14,6 @@ class HomeView extends StatelessWidget {
     return GetBuilder<HomeController>(
       init: HomeController(),
       builder: (controller) => Scaffold(
-          appBar: AppBar(
-            backgroundColor: Get.theme.scaffoldBackgroundColor,
-            elevation: 0.0,
-            leading: IconButton(
-              icon: Icon(
-                Icons.menu,
-                color: Get.textTheme.bodyText2.color,
-              ),
-              onPressed: () => controller.navigateToManage(),
-            ),
-            title: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                Utils.getFormedDate(
-                  DateTime.now(),
-                ),
-                style: Get.textTheme.bodyText1,
-              ),
-            ),
-          ),
           body: PageTransitionSwitcher(
             transitionBuilder: (
               Widget child,

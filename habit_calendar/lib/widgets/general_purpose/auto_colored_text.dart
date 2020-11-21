@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-const _kRed = 0.2126;
-const _kGreen = 0.7152;
-const _kBlue = 0.0722;
-
-/// Text color will decided by backgroundColor luminance
-/// when luminace is under 148.0 color is dark
-/// otherwise color is light
-const _luminanceBasis = 148.0;
+import 'package:habit_calendar/constants/constants.dart';
 
 class AutoColoredText extends StatefulWidget {
   AutoColoredText({
@@ -31,27 +23,20 @@ class AutoColoredText extends StatefulWidget {
 }
 
 class _AutoColoredTextState extends State<AutoColoredText> {
-  double contrastRatio;
-  TextStyle textStyle;
-
-  double get relativeLuminance {
-    return (widget.backgroundColor.red * _kRed) +
-        (widget.backgroundColor.green * _kGreen) +
-        (widget.backgroundColor.blue * _kBlue);
-  }
+  TextStyle _textStyle;
 
   Color get textColor {
-    return relativeLuminance < _luminanceBasis
+    return widget.backgroundColor.computeLuminance() < 0.5
         ? widget.lightColor ?? Colors.white
-        : widget.darkColor ?? Colors.black87;
+        : widget.darkColor ?? Color(Constants.black);
   }
 
   @override
   void initState() {
     if (widget.child.style != null) {
-      textStyle = widget.child.style.copyWith(color: textColor);
+      _textStyle = widget.child.style.copyWith(color: textColor);
     } else {
-      textStyle = Get.textTheme.bodyText2.copyWith(color: textColor);
+      _textStyle = Get.textTheme.bodyText2.copyWith(color: textColor);
     }
 
     super.initState();
@@ -60,13 +45,13 @@ class _AutoColoredTextState extends State<AutoColoredText> {
   @override
   Widget build(BuildContext context) {
     return DefaultTextStyle(
-      style: textStyle,
+      style: _textStyle,
       child: IconTheme(
         data: IconThemeData(color: textColor),
         child: Text(
           widget.child.data,
           key: widget.child.key,
-          style: textStyle,
+          style: _textStyle,
           strutStyle: widget.child.strutStyle,
           textAlign: widget.child.textAlign,
           textDirection: widget.child.textDirection,

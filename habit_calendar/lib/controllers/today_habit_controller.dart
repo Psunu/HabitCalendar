@@ -12,15 +12,15 @@ import 'package:habit_calendar/widgets/project_purpose/habit_tile.dart';
 import '../enums/day_of_the_week.dart';
 
 class TodayHabitController extends GetxController {
+  final DbService _dbService = Get.find<DbService>();
+
   DateTime today = DateTime.now();
   final todayHabits = List<Habit>().obs;
   final todayEvents = List<Event>().obs;
 
-  final listKey = GlobalKey<AnimatedListState>();
+  final listKey = GlobalKey<SliverAnimatedListState>();
   List<Habit> habitsCache = List<Habit>();
   int latestChangedHabitId;
-
-  final DbService _dbService = Get.find<DbService>();
 
   /// animationControllers is map to keep every each HabitTile animation controllers
   /// key : habit id, value : animation controller
@@ -84,7 +84,7 @@ class TodayHabitController extends GetxController {
       // Remove all removed habits from AnimatedList
       removed.forEach((key, value) {
         listKey.currentState.removeItem(
-          key + 1,
+          key,
           (context, animation) => buildItem(value, animation),
           duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
         );
@@ -93,7 +93,7 @@ class TodayHabitController extends GetxController {
       // Insert all added habits to AnimatedList
       added.forEach((key, value) {
         listKey.currentState.insertItem(
-          key + 1,
+          key,
           duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
         );
       });
@@ -122,12 +122,12 @@ class TodayHabitController extends GetxController {
       /// it shuld be moved
       if (oldIndex != newIndex) {
         listKey.currentState.removeItem(
-          oldIndex + 1,
+          oldIndex,
           (context, animation) => buildItem(todayHabits[oldIndex], animation),
           duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
         );
         listKey.currentState.insertItem(
-          newIndex + 1,
+          newIndex,
           duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
         );
       }
@@ -202,11 +202,12 @@ class TodayHabitController extends GetxController {
         sizeFactor: CurvedAnimation(parent: animation, curve: Curves.ease),
         child: Padding(
           padding: const EdgeInsets.only(
-            bottom: 8.0,
+            bottom: 20.0,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: Constants.padding),
             child: HabitTile(
+              height: 70.0,
               key: ValueKey(habit.id),
               ampm: Text(
                 Utils.getAmPm(habit.whatTime),

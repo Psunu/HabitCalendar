@@ -14,6 +14,8 @@ class Constants {
 
   // Colors
   static const black = 0xff191919;
+  static const disableGrey = 0xff7c7c7c;
+  static const accentGrey = 0xffdbdbdb;
   static const lightScaffoldColor = 0xfff9f9f9;
   static const primaryColor = 0xff6e9fff;
   static const accentColor = 0xff99bcff;

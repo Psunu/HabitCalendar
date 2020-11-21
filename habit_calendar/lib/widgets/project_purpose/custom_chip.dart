@@ -10,6 +10,9 @@ class CustomChip extends StatelessWidget {
       horizontal: 16.0,
     ),
     BorderRadius borderRadius,
+    this.width,
+    this.height,
+    this.elevation = 0.0,
     this.child,
   })  : assert(color != null),
         assert(padding != null),
@@ -23,18 +26,27 @@ class CustomChip extends StatelessWidget {
   final Color color;
   final EdgeInsets padding;
   final BorderRadius borderRadius;
+  final double width;
+  final double height;
+  final double elevation;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: borderRadius,
-      ),
-      child: Padding(
-        padding: padding,
-        child: child,
+    return Material(
+      color: color,
+      borderRadius: borderRadius,
+      elevation: elevation,
+      child: Container(
+        width: width,
+        height: height,
+        child: Padding(
+          padding: padding,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: child,
+          ),
+        ),
       ),
     );
   }

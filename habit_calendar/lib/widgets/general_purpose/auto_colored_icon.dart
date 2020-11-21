@@ -1,13 +1,5 @@
 import 'package:flutter/material.dart';
-
-const _kRed = 0.2126;
-const _kGreen = 0.7152;
-const _kBlue = 0.0722;
-
-/// Icon color will decided by backgroundColor luminance
-/// when luminace is under 148.0 color is dark
-/// otherwise color is light
-const _luminanceBasis = 148.0;
+import 'package:habit_calendar/constants/constants.dart';
 
 class AutoColoredIcon extends StatefulWidget {
   AutoColoredIcon({
@@ -30,29 +22,14 @@ class AutoColoredIcon extends StatefulWidget {
 }
 
 class _AutoColoredIconState extends State<AutoColoredIcon> {
-  double contrastRatio;
-
-  double get relativeLuminance {
-    return (widget.backgroundColor.red * _kRed) +
-        (widget.backgroundColor.green * _kGreen) +
-        (widget.backgroundColor.blue * _kBlue);
-  }
-
-  Color get iconColor {
-    return relativeLuminance < _luminanceBasis
-        ? widget.lightColor ?? Colors.white
-        : widget.darkColor ?? Colors.black87;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  Color get _color => widget.backgroundColor.computeLuminance() < 0.5
+      ? widget.lightColor ?? Colors.white
+      : widget.darkColor ?? Color(Constants.black);
 
   @override
   Widget build(BuildContext context) {
     return IconTheme(
-      data: IconThemeData(color: iconColor),
+      data: IconThemeData(color: _color),
       child: widget.child,
     );
   }
