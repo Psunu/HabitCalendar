@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
+import 'package:habit_calendar/enums/day_of_the_week.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/utils/utils.dart';
 
 import './bottom_buttons.dart';
 import './group_popup_menu.dart';
-import '../general_purpose/duration_picker.dart';
-import '../general_purpose/icon_text.dart';
-import '../general_purpose/time_picker.dart';
-import '../general_purpose/week_card.dart';
+import '../general/duration_picker.dart';
+import '../general/icon_text.dart';
+import '../general/time_picker.dart';
+import '../general/week_card.dart';
 
 const _kIconSize = 25.0;
 const _kWeekLength = 7;
@@ -118,7 +119,9 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
 
     _weeks.forEach((key, value) {
       if (value) {
-        result += ' ' + Utils.getWeekString(key).toLowerCase() + ',';
+        result += ' ' +
+            Utils.getWeekString(DayOfTheWeek.values[key]).toLowerCase() +
+            ',';
         trues++;
       }
     });
@@ -265,7 +268,7 @@ class _HabitInfoWidgetState extends State<HabitInfoWidget>
           height: widget.weekCardHeight * 0.8,
           initValue: _weeks[index],
           child: Text(
-            Utils.getWeekString(index),
+            Utils.getWeekString(DayOfTheWeek.values[index]),
           ),
           onTap: (selected) {
             Get.focusScope.unfocus();

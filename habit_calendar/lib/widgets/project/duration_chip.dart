@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
-import 'package:habit_calendar/widgets/general_purpose/auto_colored_icon.dart';
-import 'package:habit_calendar/widgets/project_purpose/custom_chip.dart';
+import 'package:habit_calendar/widgets/general/auto_colored_icon.dart';
+import 'package:habit_calendar/widgets/project/custom_chip.dart';
 
 enum _DurationChipType {
   durationChip,

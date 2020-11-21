@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 
-import '../widgets/project_purpose/bottom_buttons.dart';
-import '../widgets/project_purpose/group_popup_menu.dart';
-import '../widgets/general_purpose/icon_text.dart';
 import '../controllers/make_habit_controller_old.dart';
+import '../widgets/general/icon_text.dart';
+import '../widgets/project/bottom_buttons.dart';
+import '../widgets/project/group_popup_menu.dart';
 
 const _kIconTextPadding = 20.0;
 

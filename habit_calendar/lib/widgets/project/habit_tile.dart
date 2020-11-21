@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
-import '../general_purpose/slidable.dart';
+
+import '../general/slidable.dart';
 
 typedef OnBackgroundChangedAnimation = Future<void> Function(
   HabitTileBackgroundType from,

@@ -14,7 +14,7 @@ class ProgressBar extends StatelessWidget {
     this.duration = const Duration(
       milliseconds: Constants.mediumAnimationSpeed,
     ),
-  });
+  }) : assert(percentage >= 0.0 || percentage <= 1.0);
 
   final double width;
   final double height;

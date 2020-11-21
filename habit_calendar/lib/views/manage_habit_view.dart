@@ -4,12 +4,12 @@ import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/controllers/manage_habit_controller.dart';
 import 'package:habit_calendar/utils/utils.dart';
-import 'package:habit_calendar/widgets/project_purpose/bottom_bar.dart';
-import 'package:habit_calendar/widgets/project_purpose/delete_confirm_dialog.dart';
+import 'package:habit_calendar/widgets/project/bottom_bar.dart';
+import 'package:habit_calendar/widgets/project/delete_confirm_dialog.dart';
 
-import '../widgets/general_purpose/auto_colored_icon.dart';
-import '../widgets/general_purpose/auto_colored_text.dart';
-import '../widgets/project_purpose/group_card.dart';
+import '../widgets/general/auto_colored_icon.dart';
+import '../widgets/general/auto_colored_text.dart';
+import '../widgets/project/group_card.dart';
 
 class ManageHabitView extends StatefulWidget {
   @override

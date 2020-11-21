@@ -1,12 +1,11 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:animations/animations.dart';
-import 'package:habit_calendar/utils/utils.dart';
 
-import '../widgets/general_purpose/open_container_fab.dart';
 import '../controllers/home_controller.dart';
 import '../views/make_habit_view.dart';
+import '../widgets/general/open_container_fab.dart';
 
 class HomeView extends StatelessWidget {
   @override

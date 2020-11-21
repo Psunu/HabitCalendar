@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:habit_calendar/enums/day_of_the_week.dart';
 import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/utils/utils.dart';
-import 'package:habit_calendar/widgets/general_purpose/duration_picker.dart';
-import 'package:habit_calendar/widgets/general_purpose/time_picker.dart';
-import 'package:habit_calendar/widgets/general_purpose/week_card.dart';
+import 'package:habit_calendar/widgets/general/duration_picker.dart';
+import 'package:habit_calendar/widgets/general/time_picker.dart';
+import 'package:habit_calendar/widgets/general/week_card.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
 import '../services/database/db_service.dart';
@@ -70,7 +71,9 @@ class MakeHabitController extends GetxController {
 
     selectedWeeks.forEach((key, value) {
       if (value) {
-        result += ' ' + Utils.getWeekString(key).toLowerCase() + ',';
+        result += ' ' +
+            Utils.getWeekString(DayOfTheWeek.values[key]).toLowerCase() +
+            ',';
         trues++;
       } else {
         falses++;
@@ -232,7 +235,7 @@ class MakeHabitController extends GetxController {
           margin: margin,
           height: weekCardHeight,
           child: Text(
-            Utils.getWeekString(index),
+            Utils.getWeekString(DayOfTheWeek.values[index]),
           ),
           onTap: (selected) {
             FocusScope.of(context).unfocus();

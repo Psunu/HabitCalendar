@@ -6,7 +6,7 @@ class Constants {
   // Border radius
   static const largeBorderRadius = 20.0;
   static const mediumBorderRadius = 20.0;
-  static const smallBorderRadius = 20.0;
+  static const smallBorderRadius = 10.0;
   // Animation speed (millisconds)
   static const smallAnimationSpeed = 150;
   static const mediumAnimationSpeed = 250;
@@ -19,4 +19,5 @@ class Constants {
   static const lightScaffoldColor = 0xfff9f9f9;
   static const primaryColor = 0xff6e9fff;
   static const accentColor = 0xff99bcff;
+  static const secondaryAccentColor = 0xffff6e6e;
 }

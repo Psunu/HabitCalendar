@@ -2,13 +2,14 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
+import 'package:habit_calendar/enums/day_of_the_week.dart';
 
 class Utils {
   static String getFormedDate(DateTime date) {
     if (Get.locale.languageCode == 'ko') {
-      return '${date.month}월 ${date.day}일 (${Utils.getWeekString(date.weekday - 1)})';
+      return '${date.month}월 ${date.day}일 (${Utils.getWeekString(DayOfTheWeek.values[date.weekday - 1])})';
     } else {
-      return '${date.day} ${getMonthStringEn(date.month)} (${Utils.getWeekString(date.weekday - 1)})';
+      return '${date.day} ${getMonthStringEn(date.month)} (${Utils.getWeekString(DayOfTheWeek.values[date.weekday - 1])})';
     }
   }
 
@@ -42,24 +43,44 @@ class Utils {
     return 'JAN';
   }
 
-  static String getWeekString(int week) {
+  static String getWeekString(DayOfTheWeek week) {
     switch (week) {
-      case 0:
+      case DayOfTheWeek.Mon:
         return '월'.tr.capitalizeFirst;
-      case 1:
+      case DayOfTheWeek.Tue:
         return '화'.tr.capitalizeFirst;
-      case 2:
+      case DayOfTheWeek.Wed:
         return '수'.tr.capitalizeFirst;
-      case 3:
+      case DayOfTheWeek.Thu:
         return '목'.tr.capitalizeFirst;
-      case 4:
+      case DayOfTheWeek.Fri:
         return '금'.tr.capitalizeFirst;
-      case 5:
+      case DayOfTheWeek.Sat:
         return '토'.tr.capitalizeFirst;
-      case 6:
+      case DayOfTheWeek.Sun:
         return '일'.tr.capitalizeFirst;
     }
     return '월'.tr.capitalizeFirst;
+  }
+
+  static String getWeekStringEn(DayOfTheWeek week) {
+    switch (week) {
+      case DayOfTheWeek.Mon:
+        return 'Mon';
+      case DayOfTheWeek.Tue:
+        return 'Tue';
+      case DayOfTheWeek.Wed:
+        return 'Wed';
+      case DayOfTheWeek.Thu:
+        return 'Thu';
+      case DayOfTheWeek.Fri:
+        return 'Fri';
+      case DayOfTheWeek.Sat:
+        return 'Sat';
+      case DayOfTheWeek.Sun:
+        return 'Sun';
+    }
+    return 'Mon';
   }
 
   static String getWhatTimeString(DateTime whatTime) {

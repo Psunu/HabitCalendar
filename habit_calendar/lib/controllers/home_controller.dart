@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
+import 'package:habit_calendar/views/calendar_view.dart';
 import 'package:habit_calendar/views/manage_habit_view.dart';
 import 'package:habit_calendar/views/today_habit_view.dart';
 
@@ -13,9 +14,7 @@ class HomeController extends GetxController {
 
   final List<Widget> pages = <Widget>[
     TodayHabitView(),
-    Container(
-      child: Text('Page2'),
-    ),
+    CalendarView(),
   ];
 
   // Primary methods

@@ -7,9 +7,12 @@ import 'package:habit_calendar/services/database/app_database.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
 import 'package:habit_calendar/utils/utils.dart';
 import 'package:habit_calendar/views/manage_habit_view.dart';
-import 'package:habit_calendar/widgets/project_purpose/habit_tile.dart';
+import 'package:habit_calendar/widgets/project/habit_tile.dart';
 
 import '../enums/day_of_the_week.dart';
+
+const _kHabitTileThreshHold = 0.2;
+const _kHabitTileBackgroundIconSize = 30.0;
 
 class TodayHabitController extends GetxController {
   final DbService _dbService = Get.find<DbService>();
@@ -38,6 +41,11 @@ class TodayHabitController extends GetxController {
     if (todayEvents.length == 0 || todayHabits.length == 0) return 0;
     return completedEvent / todayHabits.length;
   }
+
+  double get _backgroundIconPadding =>
+      (((Get.width - (Constants.padding * 2)) * _kHabitTileThreshHold) -
+          _kHabitTileBackgroundIconSize) /
+      2;
 
   // Controller life cycle
   @override
@@ -202,87 +210,91 @@ class TodayHabitController extends GetxController {
         sizeFactor: CurvedAnimation(parent: animation, curve: Curves.ease),
         child: Padding(
           padding: const EdgeInsets.only(
+            left: Constants.padding,
+            right: Constants.padding,
             bottom: 20.0,
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Constants.padding),
-            child: HabitTile(
-              height: 70.0,
-              key: ValueKey(habit.id),
-              ampm: Text(
-                Utils.getAmPm(habit.whatTime),
-                style: Get.textTheme.bodyText1.copyWith(
-                  fontSize: Get.textTheme.bodyText1.fontSize * 0.8,
-                ),
+          child: HabitTile(
+            height: 70.0,
+            key: ValueKey(habit.id),
+            slideThreshold: _kHabitTileThreshHold,
+            ampm: Text(
+              Utils.getAmPm(habit.whatTime),
+              style: Get.textTheme.bodyText1.copyWith(
+                fontSize: Get.textTheme.bodyText1.fontSize * 0.8,
               ),
-              whatTime: Text(
-                Utils.getFormedWhatTime(habit.whatTime),
-                style: Get.textTheme.bodyText1,
-              ),
-              name: Text(
-                habit.name,
-                style: Get.textTheme.bodyText1,
-              ),
-              checkMark: Icon(
-                Icons.radio_button_unchecked,
-                color: Get.theme.accentColor,
-                size: 60.0,
-              ),
-              background: HabitTileBackground(
-                color: Get.theme.accentColor,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 30.0),
-                  child: RotationTransition(
-                    turns: Tween(begin: 0.0, end: -0.3).animate(
-                      CurvedAnimation(
-                          parent: animationControllers[habit.id],
-                          curve: Curves.ease),
-                    ),
-                    child: Icon(
-                      Icons.check_circle_outline,
-                      color: Get.theme.scaffoldBackgroundColor,
-                      size: 30.0,
-                    ),
-                  ),
-                ),
-              ),
-              secondaryBackground: HabitTileBackground(
-                color: Colors.red,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 30.0),
-                  child: RotationTransition(
-                    turns: Tween(begin: 0.0, end: -0.3).animate(
-                      CurvedAnimation(
-                          parent: animationControllers[habit.id],
-                          curve: Curves.ease),
-                    ),
-                    child: Icon(
-                      Icons.replay,
-                      color: Get.theme.scaffoldBackgroundColor,
-                      size: 30.0,
-                    ),
-                  ),
-                ),
-              ),
-              initBackground: isCompleted(habit.id)
-                  ? HabitTileBackgroundType.secondaryBackground
-                  : HabitTileBackgroundType.background,
-              onBackgroundChangedAnimation: (from, to) async {
-                await animationControllers[habit.id].forward();
-                return animationControllers[habit.id].reverse();
-              },
-              onBackgroundChanged: (from, to) {
-                switch (from) {
-                  case HabitTileBackgroundType.background:
-                    complete(habit.id);
-                    break;
-                  case HabitTileBackgroundType.secondaryBackground:
-                    notComplete(habit.id);
-                    break;
-                }
-                latestChangedHabitId = habit.id;
-              },
             ),
+            whatTime: Text(
+              Utils.getFormedWhatTime(habit.whatTime),
+              style: Get.textTheme.bodyText1,
+            ),
+            name: Text(
+              habit.name,
+              style: Get.textTheme.bodyText1,
+            ),
+            checkMark: Icon(
+              Icons.radio_button_unchecked,
+              color: Get.theme.accentColor,
+              size: 60.0,
+            ),
+            background: HabitTileBackground(
+              color: Get.theme.accentColor,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right: _backgroundIconPadding,
+                ),
+                child: RotationTransition(
+                  turns: Tween(begin: 0.0, end: -0.3).animate(
+                    CurvedAnimation(
+                        parent: animationControllers[habit.id],
+                        curve: Curves.ease),
+                  ),
+                  child: Icon(
+                    Icons.check_circle_outline,
+                    color: Get.theme.scaffoldBackgroundColor,
+                    size: _kHabitTileBackgroundIconSize,
+                  ),
+                ),
+              ),
+            ),
+            secondaryBackground: HabitTileBackground(
+              color: Color(Constants.secondaryAccentColor),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right: _backgroundIconPadding,
+                ),
+                child: RotationTransition(
+                  turns: Tween(begin: 0.0, end: -0.3).animate(
+                    CurvedAnimation(
+                        parent: animationControllers[habit.id],
+                        curve: Curves.ease),
+                  ),
+                  child: Icon(
+                    Icons.replay,
+                    color: Get.theme.scaffoldBackgroundColor,
+                    size: _kHabitTileBackgroundIconSize,
+                  ),
+                ),
+              ),
+            ),
+            initBackground: isCompleted(habit.id)
+                ? HabitTileBackgroundType.secondaryBackground
+                : HabitTileBackgroundType.background,
+            onBackgroundChangedAnimation: (from, to) async {
+              await animationControllers[habit.id].forward();
+              return animationControllers[habit.id].reverse();
+            },
+            onBackgroundChanged: (from, to) {
+              switch (from) {
+                case HabitTileBackgroundType.background:
+                  complete(habit.id);
+                  break;
+                case HabitTileBackgroundType.secondaryBackground:
+                  notComplete(habit.id);
+                  break;
+              }
+              latestChangedHabitId = habit.id;
+            },
           ),
         ),
       ),

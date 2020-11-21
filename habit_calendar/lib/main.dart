@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/services/database/db_service.dart';
 import 'package:habit_calendar/translations/messages.dart';
-
 import 'package:habit_calendar/views/home_view.dart';
 
 Future<void> main() async {
@@ -54,6 +53,11 @@ class MyApp extends StatelessWidget {
               bodyText1: context.textTheme.bodyText1.copyWith(
                 color: const Color(Constants.black),
                 fontSize: 16.0,
+                fontWeight: FontWeight.normal,
+              ),
+              bodyText2: context.textTheme.bodyText1.copyWith(
+                color: const Color(Constants.black),
+                fontSize: 14.0,
                 fontWeight: FontWeight.normal,
               ),
             ),

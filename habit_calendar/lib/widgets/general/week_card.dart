@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
+import 'package:habit_calendar/enums/day_of_the_week.dart';
 import 'package:habit_calendar/utils/utils.dart';
 
 const _kWeekLength = 7;
@@ -89,7 +90,7 @@ class WeekCard extends StatefulWidget {
           },
           initValue: initValue[index],
           child: Text(
-            Utils.getWeekString(index),
+            Utils.getWeekString(DayOfTheWeek.values[index]),
             style: textStyle,
           ),
         ),
@@ -107,7 +108,9 @@ class WeekCard extends StatefulWidget {
 
     weeks.forEach((key, value) {
       if (value) {
-        result += ' ' + Utils.getWeekString(key).toLowerCase() + ',';
+        result += ' ' +
+            Utils.getWeekString(DayOfTheWeek.values[key]).toLowerCase() +
+            ',';
         trues++;
       } else {
         falses++;
