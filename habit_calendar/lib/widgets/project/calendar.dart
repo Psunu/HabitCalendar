@@ -94,6 +94,7 @@ class Calendar extends StatelessWidget {
     Key key,
     DateTime month,
     DayOfTheWeek startWeek = DayOfTheWeek.Sun,
+    DateTime selectedDate,
     Function(DateTime) onSelected,
     double Function(DateTime) onBuildProgressBar,
   }) {
@@ -101,6 +102,7 @@ class Calendar extends StatelessWidget {
       key: key,
       month: month,
       startWeek: startWeek,
+      selectedDate: selectedDate,
       onSelected: onSelected,
       onBuildProgressBar: onBuildProgressBar,
     );
@@ -308,6 +310,7 @@ class _Body extends StatefulWidget {
     Key key,
     this.month,
     this.startWeek = DayOfTheWeek.Sun,
+    this.selectedDate,
     this.onSelected,
     @required this.onBuildProgressBar,
   })  : assert(startWeek != null),
@@ -316,6 +319,7 @@ class _Body extends StatefulWidget {
 
   final DateTime month;
   final DayOfTheWeek startWeek;
+  final DateTime selectedDate;
   final Function(DateTime) onSelected;
   final double Function(DateTime) onBuildProgressBar;
 
@@ -324,8 +328,21 @@ class _Body extends StatefulWidget {
 }
 
 class __BodyState extends State<_Body> {
-  DateTime selectedDate =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  DateTime selectedDate;
+
+  @override
+  void initState() {
+    selectedDate = widget.selectedDate ?? _zeroDate(DateTime.now());
+
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(oldWidget) {
+    selectedDate = widget.selectedDate ?? _zeroDate(DateTime.now());
+
+    super.didUpdateWidget(oldWidget);
+  }
 
   Widget _buildCalendar(DateTime month) {
     month = DateTime(month.year, month.month);

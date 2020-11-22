@@ -15,13 +15,17 @@ const _kHabitTileThreshHold = 0.2;
 const _kHabitTileBackgroundIconSize = 30.0;
 
 class TodayHabitController extends GetxController {
+  TodayHabitController({
+    GlobalKey<SliverAnimatedListState> listKey,
+  }) : listKey = listKey ?? GlobalKey<SliverAnimatedListState>();
+
   final DbService _dbService = Get.find<DbService>();
 
   DateTime today = DateTime.now();
   final todayHabits = List<Habit>().obs;
   final todayEvents = List<Event>().obs;
 
-  final listKey = GlobalKey<SliverAnimatedListState>();
+  GlobalKey<SliverAnimatedListState> listKey;
   List<Habit> habitsCache = List<Habit>();
   int latestChangedHabitId;
 

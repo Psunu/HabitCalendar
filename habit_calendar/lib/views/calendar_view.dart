@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:habit_calendar/constants/constants.dart';
 import 'package:habit_calendar/controllers/calendar_controller.dart';
@@ -31,6 +32,13 @@ const _kMonthSpaceFromAppBar = 97.0 - _kMyHabitMargin;
 const _kNormalMonthTopPadding = _kMyHabitHeight + _kMyHabitMargin + 16.0;
 const _kScrolledMonthTopPadding = 8.0;
 
+const _kCalendarHeight = 368.0;
+const _kSliverAppBarHeight =
+    _kCalendarHeight + _kMonthSpaceFromAppBar + _kProgressBarHeight + 32.0;
+const _kScrolledSliverAppBarHeight = _kCalendarHeight * _kDateTileRatio +
+    20.0 +
+    _kScrolledProgressBarHeight +
+    32.0;
 const _kDateTileRatio = 1 / 6;
 
 class CalendarView extends StatefulWidget {
@@ -40,18 +48,28 @@ class CalendarView extends StatefulWidget {
 
 class _CalendarViewState extends State<CalendarView>
     with TickerProviderStateMixin {
+  CalendarController _calendarController;
+  TodayHabitController _todayHabitController;
+
+  final _listKey = GlobalKey<SliverAnimatedListState>();
+  bool _showFloatingCalendar = false;
+
   ScrollController _scrollController = ScrollController();
+
   AnimationController _monthController;
-  Animation _monthPositionAnimation;
-  Animation _monthLargeCircleSizeAnimation;
-  Animation _monthSmallCircleSizeAnimation;
-  Animation _monthLargeTextSizeAnimation;
-  Animation _monthSmallTextSizeAnimation;
-  Animation _calendarSizeAnimation;
-  Animation _progressBarSizeAnimation;
+  Animation<RelativeRect> _monthPositionAnimation;
+  Animation<double> _monthLargeCircleSizeAnimation;
+  Animation<double> _monthSmallCircleSizeAnimation;
+  Animation<double> _monthLargeTextSizeAnimation;
+  Animation<double> _monthSmallTextSizeAnimation;
+  Animation<double> _calendarSizeAnimation;
+  Animation<double> _progressBarSizeAnimation;
 
   @override
   void initState() {
+    _calendarController = CalendarController();
+    _todayHabitController = TodayHabitController(listKey: _listKey);
+
     _monthController = AnimationController(
       vsync: this,
       duration: Duration(
@@ -70,48 +88,43 @@ class _CalendarViewState extends State<CalendarView>
             _kScrolledMonthTopPadding,
             0.0,
             0.0),
-      ).chain(CurveTween(curve: Curves.ease)),
+      ),
     );
-    _monthLargeCircleSizeAnimation = _monthController.drive(
-      Tween(
-        begin: _kNormalMonthLargeCircleSize,
-        end: _kScrolledMonthLargeCircleSize,
-      ).chain(CurveTween(curve: Curves.ease)),
-    )..addListener(() {
+    _monthLargeCircleSizeAnimation = _monthController.drive(Tween(
+      begin: _kNormalMonthLargeCircleSize,
+      end: _kScrolledMonthLargeCircleSize,
+    ))
+      ..addListener(() {
         setState(() {});
       });
     _monthSmallCircleSizeAnimation = _monthController.drive(
       Tween(
         begin: _kNormalMonthSmallCircleSize,
         end: _kScrolledMonthSmallCircleSize,
-      ).chain(CurveTween(curve: Curves.ease)),
+      ),
     )..addListener(() {
         setState(() {});
       });
-    _monthLargeTextSizeAnimation = _monthController.drive(
-      Tween(
-        begin: _kNormalMonthLargeTextSize,
-        end: _kScrolledMonthLargeTextSize,
-      ).chain(CurveTween(curve: Curves.ease)),
-    )..addListener(() {
+    _monthLargeTextSizeAnimation = _monthController.drive(Tween(
+      begin: _kNormalMonthLargeTextSize,
+      end: _kScrolledMonthLargeTextSize,
+    ))
+      ..addListener(() {
         setState(() {});
       });
-    _monthSmallTextSizeAnimation = _monthController.drive(
-      Tween(
-        begin: _kNormalMonthSmallTextSize,
-        end: _kScrolledMonthSmallTextSize,
-      ).chain(CurveTween(curve: Curves.ease)),
-    )..addListener(() {
+    _monthSmallTextSizeAnimation = _monthController.drive(Tween(
+      begin: _kNormalMonthSmallTextSize,
+      end: _kScrolledMonthSmallTextSize,
+    ))
+      ..addListener(() {
         setState(() {});
       });
     _calendarSizeAnimation = _monthController.drive(
-      Tween(begin: 1.0, end: _kDateTileRatio)
-          .chain(CurveTween(curve: Curves.ease)),
+      Tween(begin: 1.0, end: _kDateTileRatio),
     );
 
     _progressBarSizeAnimation = _monthController.drive(
-      Tween(begin: 1.0, end: _kScrolledProgressBarHeight / _kProgressBarHeight)
-          .chain(CurveTween(curve: Curves.ease)),
+      Tween(begin: 1.0, end: _kScrolledProgressBarHeight / _kProgressBarHeight),
     );
 
     _scrollController.addListener(() {
@@ -119,18 +132,24 @@ class _CalendarViewState extends State<CalendarView>
           _scrollController.offset <= _kMonthSpaceFromAppBar) {
         _monthController.value =
             _scrollController.offset / _kMonthSpaceFromAppBar;
+
+        if (_showFloatingCalendar &&
+            _scrollController.position.userScrollDirection ==
+                ScrollDirection.forward) {
+          setState(() {
+            _showFloatingCalendar = false;
+          });
+        }
+      } else if (!_showFloatingCalendar &&
+          _scrollController.position.userScrollDirection ==
+              ScrollDirection.reverse) {
+        setState(() {
+          _showFloatingCalendar = true;
+        });
       }
     });
 
     super.initState();
-  }
-
-  void _onVerticalDragUpdate(DragUpdateDetails details) {
-    if (details.primaryDelta.sign < 0) {
-      _monthController.forward();
-    } else if (details.primaryDelta.sign > 0) {
-      _monthController.reverse();
-    }
   }
 
   @override
@@ -139,6 +158,46 @@ class _CalendarViewState extends State<CalendarView>
     _scrollController.dispose();
 
     super.dispose();
+  }
+
+  Widget get _calendar {
+    // Use Stack to show shadow of today week
+    return Stack(
+      children: [
+        Padding(
+          // Top padding for WeekHeader
+          padding: const EdgeInsets.only(top: 20.0),
+          child: GetX<CalendarController>(
+            init: _calendarController,
+            builder: (controller) => SizeTransition(
+              sizeFactor: _calendarSizeAnimation,
+              axisAlignment: controller.calendarAxisAlignment,
+              child: Calendar.body(
+                selectedDate: controller.selectedDate.value,
+                onSelected: controller.onSelected,
+                onBuildProgressBar: (DateTime date) => 0.5,
+              ),
+            ),
+          ),
+        ),
+        Calendar.weekHeader(),
+      ],
+    );
+  }
+
+  Widget get _progressBar {
+    return SizeTransition(
+      sizeFactor: _progressBarSizeAnimation,
+      child: GetX<TodayHabitController>(
+        init: _todayHabitController,
+        builder: (controller) => ProgressBar(
+          percentage: controller.todayPercentage,
+          backgroundColor: Colors.white,
+          layoutPadding: Constants.padding * 2,
+          height: _kProgressBarHeight,
+        ),
+      ),
+    );
   }
 
   @override
@@ -156,7 +215,7 @@ class _CalendarViewState extends State<CalendarView>
                 width: _kMyHabitWidth,
                 height: _kMyHabitHeight,
                 child: GetBuilder<TodayHabitController>(
-                  init: TodayHabitController(),
+                  init: _todayHabitController,
                   builder: (controller) => RaisedButton(
                     onPressed: controller.navigateToManage,
                     color: Get.theme.accentColor,
@@ -181,7 +240,7 @@ class _CalendarViewState extends State<CalendarView>
             ),
             actions: [
               GetBuilder<CalendarController>(
-                init: CalendarController(),
+                init: _calendarController,
                 builder: (controller) => Padding(
                   padding: const EdgeInsets.only(right: Constants.padding),
                   child: FlatActionButton(
@@ -207,146 +266,78 @@ class _CalendarViewState extends State<CalendarView>
           body: Container(
             height: Get.height,
             color: Get.theme.scaffoldBackgroundColor,
-            child: Column(
-              children: [
-                // Calendar
-                GestureDetector(
-                  onVerticalDragUpdate: _onVerticalDragUpdate,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      top:
-                          _kMonthSpaceFromAppBar * _calendarSizeAnimation.value,
-                      left: Constants.padding,
-                      right: Constants.padding,
-                      bottom: 32.0,
-                    ),
-                    // Use Stack to show shadow of today week
-                    child: Stack(
-                      children: [
+            child: CustomScrollView(
+              controller: _scrollController,
+              physics: BouncingScrollPhysics(),
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Constants.padding,
+                  ),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate(
+                      [
                         Padding(
-                          padding: const EdgeInsets.only(top: 20.0),
-                          child: GetX<CalendarController>(
-                            init: CalendarController(),
-                            builder: (controller) => SizeTransition(
-                              sizeFactor: _calendarSizeAnimation,
-                              axisAlignment: controller.calendarAxisAlignment,
-                              child: Calendar.body(
-                                month: controller.selectedMonth,
-                                startWeek: controller.startWeek,
-                                onSelected: controller.onSelected,
-                                onBuildProgressBar:
-                                    controller.onBuildProgressBar,
-                              ),
-                            ),
+                          padding: EdgeInsets.only(
+                            top: _kMonthSpaceFromAppBar,
+                            bottom: 32.0,
                           ),
+                          child: _calendar,
                         ),
-                        GetBuilder<CalendarController>(
-                          init: CalendarController(),
-                          builder: (controller) => Calendar.weekHeader(
-                            startWeek: controller.startWeek,
-                          ),
-                        ),
+                        _progressBar,
                       ],
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: Constants.padding,
-                    right: Constants.padding,
-                  ),
-                  child: GetX<TodayHabitController>(
-                    init: TodayHabitController(),
-                    builder: (controller) => SizeTransition(
-                      sizeFactor: _progressBarSizeAnimation,
-                      child: ProgressBar(
-                        percentage: controller.todayPercentage,
-                        backgroundColor: Colors.white,
-                        layoutPadding: Constants.padding * 2,
-                        height: _kProgressBarHeight,
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: CustomScrollView(
-//                    controller: _scrollController,
-                    physics: BouncingScrollPhysics(),
-                    slivers: [
-//                    SliverPadding(
-//                      padding: const EdgeInsets.only(
-//                        top: _kMonthSpaceFromAppBar,
-//                        left: Constants.padding,
-//                        right: Constants.padding,
-//                        bottom: 32.0,
-//                      ),
-//                      sliver: SliverList(
-//                        delegate: SliverChildListDelegate(
-//                          [
-//                            // Use Stack to show shadow of today week
-//                            Stack(
-//                              children: [
-//                                Padding(
-//                                  padding: const EdgeInsets.only(top: 20.0),
-//                                  child: Calendar.body(
-//                                    onBuildProgressBar: (DateTime date) => 0.5,
-//                                  ),
-//                                ),
-//                                Calendar.weekHeader(),
-//                              ],
-//                            )
-//                          ],
-//                        ),
-//                      ),
-//                    ),
-//                      SliverPadding(
-//                        padding: const EdgeInsets.only(
-//                          left: Constants.padding,
-//                          right: Constants.padding,
-//                          bottom: 16.0,
-//                        ),
-//                        sliver: SliverList(
-//                            delegate: SliverChildListDelegate([
-//                          GetX<TodayHabitController>(
-//                            init: TodayHabitController(),
-//                            builder: (controller) => ProgressBar(
-//                              percentage: controller.todayPercentage,
-//                              backgroundColor: Colors.white,
-//                              layoutPadding: Constants.padding * 2,
-//                              height: _kProgressBarHeight,
-//                            ),
-//                          ),
-//                        ])),
-//                      ),
-                      SliverPadding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        sliver: GetX<TodayHabitController>(
-                          init: TodayHabitController(),
-                          builder: (controller) => SliverAnimatedList(
-                            key: controller.listKey,
-                            initialItemCount: controller.todayHabits.length,
-                            itemBuilder: (context, index, animation) {
-                              final habit = controller.todayHabits[index];
-                              controller.animationControllers[habit.id] =
-                                  AnimationController(
-                                      duration: Duration(
-                                        milliseconds:
-                                            Constants.smallAnimationSpeed,
-                                      ),
-                                      vsync: this);
+                SliverPadding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  sliver: GetX<TodayHabitController>(
+                    init: _todayHabitController,
+                    builder: (controller) => SliverAnimatedList(
+                      key: _listKey,
+                      initialItemCount: controller.todayHabits.length,
+                      itemBuilder: (context, index, animation) {
+                        final habit = controller.todayHabits[index];
+                        controller.animationControllers[habit.id] =
+                            AnimationController(
+                                duration: Duration(
+                                  milliseconds: Constants.smallAnimationSpeed,
+                                ),
+                                vsync: this);
 
-                              return controller.buildItem(habit, animation);
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
+                        return controller.buildItem(habit, animation);
+                      },
+                    ),
                   ),
                 ),
               ],
             ),
           ),
         ),
+        if (_showFloatingCalendar)
+          Padding(
+            padding: const EdgeInsets.only(
+              left: Constants.padding,
+              right: Constants.padding,
+              top: _kRegularAppBarHeight,
+            ),
+            child: Container(
+              color: Get.theme.scaffoldBackgroundColor,
+              constraints: BoxConstraints(maxHeight: _kCalendarHeight),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 32.0),
+                    child: _calendar,
+                  ),
+                  _progressBar,
+                ],
+              ),
+            ),
+          )
+        else
+          Container(),
         PositionedTransition(
           rect: _monthPositionAnimation,
           child: Calendar.header(

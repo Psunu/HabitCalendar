@@ -24,6 +24,16 @@ class TodayHabitView extends StatefulWidget {
 
 class _TodayHabitViewState extends State<TodayHabitView>
     with TickerProviderStateMixin {
+  final _listKey = GlobalKey<SliverAnimatedListState>();
+  TodayHabitController _todayHabitController;
+
+  @override
+  void initState() {
+    _todayHabitController = TodayHabitController(listKey: _listKey);
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,7 +55,7 @@ class _TodayHabitViewState extends State<TodayHabitView>
                 width: _kMyHabitWidth,
                 height: _kMyHabitHeight,
                 child: GetBuilder<TodayHabitController>(
-                  init: TodayHabitController(),
+                  init: _todayHabitController,
                   builder: (controller) => RaisedButton(
                     onPressed: controller.navigateToManage,
                     color: Get.theme.accentColor,
@@ -109,7 +119,7 @@ class _TodayHabitViewState extends State<TodayHabitView>
             bottom: PreferredSize(
               preferredSize: Size.fromHeight(_kProgressBarHeight),
               child: GetX<TodayHabitController>(
-                init: TodayHabitController(),
+                init: _todayHabitController,
                 builder: (controller) => ProgressBar(
                   percentage: controller.todayPercentage,
                   backgroundColor: Colors.white,
@@ -122,9 +132,9 @@ class _TodayHabitViewState extends State<TodayHabitView>
           SliverPadding(
             padding: const EdgeInsets.only(top: 46.0),
             sliver: GetX<TodayHabitController>(
-              init: TodayHabitController(),
+              init: _todayHabitController,
               builder: (controller) => SliverAnimatedList(
-                key: controller.listKey,
+                key: _listKey,
                 initialItemCount: controller.todayHabits.length,
                 itemBuilder: (context, index, animation) {
                   final habit = controller.todayHabits[index];
