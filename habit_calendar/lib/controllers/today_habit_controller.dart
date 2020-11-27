@@ -29,6 +29,8 @@ class TodayHabitController extends GetxController {
   List<Habit> habitsCache = List<Habit>();
   int latestChangedHabitId;
 
+  final enableIndicator = false.obs;
+
   /// animationControllers is map to keep every each HabitTile animation controllers
   /// key : habit id, value : animation controller
   Map<int, AnimationController> animationControllers =
@@ -98,7 +100,8 @@ class TodayHabitController extends GetxController {
         listKey.currentState.removeItem(
           key,
           (context, animation) => buildItem(value, animation),
-          duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
+          duration:
+              const Duration(milliseconds: Constants.mediumAnimationSpeed),
         );
       });
 
@@ -106,7 +109,8 @@ class TodayHabitController extends GetxController {
       added.forEach((key, value) {
         listKey.currentState.insertItem(
           key,
-          duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
+          duration:
+              const Duration(milliseconds: Constants.mediumAnimationSpeed),
         );
       });
 
@@ -136,11 +140,13 @@ class TodayHabitController extends GetxController {
         listKey.currentState.removeItem(
           oldIndex,
           (context, animation) => buildItem(todayHabits[oldIndex], animation),
-          duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
+          duration:
+              const Duration(milliseconds: Constants.mediumAnimationSpeed),
         );
         listKey.currentState.insertItem(
           newIndex,
-          duration: Duration(milliseconds: Constants.mediumAnimationSpeed),
+          duration:
+              const Duration(milliseconds: Constants.mediumAnimationSpeed),
         );
       }
     });
@@ -158,12 +164,14 @@ class TodayHabitController extends GetxController {
 
   // Primary methods
   Future<void> complete(int habitId) async {
+    showIndicator();
+
     if (todayEvents
         .where(
           (event) => _eventsWhere(event, habitId),
         )
         .isEmpty) {
-      _dbService.database.eventDao.insertEvent(
+      await _dbService.database.eventDao.insertEvent(
         Event(
           id: null,
           date: today,
@@ -175,6 +183,8 @@ class TodayHabitController extends GetxController {
   }
 
   Future<void> notComplete(int habitId) async {
+    showIndicator();
+
     Event event = todayEvents.singleWhere(
       (event) => _eventsWhere(event, habitId),
       orElse: () => null,
@@ -183,6 +193,14 @@ class TodayHabitController extends GetxController {
     if (event != null) {
       _dbService.database.eventDao.deleteEvent(event);
     }
+  }
+
+  void showIndicator() async {
+    if (enableIndicator.value == true) return;
+
+    enableIndicator.value = true;
+    await Future.delayed(Duration(seconds: 2));
+    enableIndicator.value = false;
   }
 
   void navigateToManage() {

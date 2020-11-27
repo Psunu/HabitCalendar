@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(Constants.lightScaffoldColor),
         primaryColor: const Color(Constants.primaryColor),
         accentColor: const Color(Constants.accentColor),
+        iconTheme: IconThemeData(color: const Color(Constants.black)),
         textTheme: context.textTheme
             .apply(
               bodyColor: const Color(Constants.black),

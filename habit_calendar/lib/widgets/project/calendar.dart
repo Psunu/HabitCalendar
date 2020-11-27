@@ -56,12 +56,31 @@ class Calendar extends StatelessWidget {
   final Function(DateTime) onSelected;
   final double Function(DateTime) onBuildProgressBar;
 
+  // Related with Header
+  static double get headerLargeCircleSize => _kHeaderLargeCircleSize;
+  static double get headerSmallCircleSize => _kHeaderSmallCircleSize;
+  static double get headerCircleVerticalSpaceRatio =>
+      _kHeaderCircleVerticalSpaceRatio;
+  static double get headerCircleHorizontalSpaceRatio =>
+      _kHeaderCircleHorizontalSpaceRatio;
+
+  // Related with WeekHeader
+  static double get weekNormalHeight => _kWeekNormalHeight;
+  static double get weekTodayHeight => _kWeekTodayHeight;
+  static double get weekTodayElevation => _kWeekTodayElevation;
+
+  // Related with Body
+  static double get dateHeight => _kDateTileHeight;
+  static double get dateHeightWithPadding => _kDateTileHeight + 16.0;
+  static double get calendarHeight => dateHeightWithPadding * 6;
+
   static _Header header({
     Key key,
     double largeCircleSize = _kHeaderLargeCircleSize,
     double smallCircleSize = _kHeaderSmallCircleSize,
     Color largeCircleColor,
     Color smallCircleColor,
+    Widget centerChild,
     Widget largeChild,
     Widget smallChild,
   }) {
@@ -71,6 +90,7 @@ class Calendar extends StatelessWidget {
       smallCircleSize: smallCircleSize,
       largeCircleColor: largeCircleColor,
       smallCircleColor: smallCircleColor,
+      centerChild: centerChild,
       largeChild: largeChild,
       smallChild: smallChild,
     );
@@ -101,6 +121,26 @@ class Calendar extends StatelessWidget {
     return _Body(
       key: key,
       month: month,
+      startWeek: startWeek,
+      selectedDate: selectedDate,
+      onSelected: onSelected,
+      onBuildProgressBar: onBuildProgressBar,
+    );
+  }
+
+  static _Body weekBody({
+    Key key,
+    DateTime month,
+    DateTime week,
+    DayOfTheWeek startWeek = DayOfTheWeek.Sun,
+    DateTime selectedDate,
+    Function(DateTime) onSelected,
+    double Function(DateTime) onBuildProgressBar,
+  }) {
+    return _Body.week(
+      key: key,
+      month: month,
+      week: week,
       startWeek: startWeek,
       selectedDate: selectedDate,
       onSelected: onSelected,
@@ -145,6 +185,7 @@ class _Header extends StatelessWidget {
     this.smallCircleSize = _kHeaderSmallCircleSize,
     this.largeCircleColor,
     this.smallCircleColor,
+    this.centerChild,
     this.largeChild,
     this.smallChild,
   })  : assert(largeCircleSize != null && largeCircleSize > 0.0),
@@ -156,6 +197,7 @@ class _Header extends StatelessWidget {
   final double smallCircleSize;
   final Color largeCircleColor;
   final Color smallCircleColor;
+  final Widget centerChild;
   final Widget largeChild;
   final Widget smallChild;
 
@@ -166,56 +208,68 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Stack(
-        overflow: Overflow.visible,
-        children: [
-          // Large circle
-          Container(
-            width: largeCircleSize,
-            height: largeCircleSize,
+    return Stack(
+      children: [
+        Container(
+          height: largeCircleSize +
+              (_verticalSpace + smallCircleSize - largeCircleSize),
+          width: largeCircleSize +
+              (_horizontalSpace + smallCircleSize - largeCircleSize),
+        ),
+        // Large circle
+        Container(
+          width: largeCircleSize,
+          height: largeCircleSize,
+          decoration: BoxDecoration(
+            color: largeCircleColor ?? Get.theme.accentColor,
+            shape: BoxShape.circle,
+          ),
+        ),
+        // Small circle
+        Positioned(
+          top: _verticalSpace,
+          left: _horizontalSpace,
+          child: Container(
+            width: smallCircleSize,
+            height: smallCircleSize,
             decoration: BoxDecoration(
-              color: largeCircleColor ?? Get.theme.accentColor,
+              color: smallCircleColor ?? Get.theme.primaryColor,
               shape: BoxShape.circle,
             ),
           ),
-          // Small circle
-          Positioned(
-            top: _verticalSpace,
-            left: _horizontalSpace,
-            child: Container(
-              width: smallCircleSize,
-              height: smallCircleSize,
-              decoration: BoxDecoration(
-                color: smallCircleColor ?? Get.theme.primaryColor,
-                shape: BoxShape.circle,
-              ),
+        ),
+        Positioned(
+          top: _verticalSpace,
+          left: _horizontalSpace,
+          child: Container(
+            width: smallCircleSize,
+            height: smallCircleSize,
+            decoration: BoxDecoration(
+              color: Get.theme.primaryColor,
+              shape: BoxShape.circle,
             ),
-          ),
-          Positioned(
-            top: _verticalSpace,
-            left: _horizontalSpace,
-            child: Container(
-              width: smallCircleSize,
-              height: smallCircleSize,
-              decoration: BoxDecoration(
-                color: Get.theme.primaryColor,
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: smallChild ?? Container(),
-              ),
-            ),
-          ),
-          Container(
-            width: largeCircleSize,
-            height: largeCircleSize,
             child: Center(
-              child: largeChild ?? Container(),
+              child: smallChild ?? Container(),
             ),
           ),
-        ],
-      ),
+        ),
+        Container(
+          width: largeCircleSize,
+          height: largeCircleSize,
+          child: Center(
+            child: largeChild ?? Container(),
+          ),
+        ),
+        Container(
+          height: largeCircleSize +
+              (_verticalSpace + smallCircleSize - largeCircleSize),
+          width: largeCircleSize +
+              (_horizontalSpace + smallCircleSize - largeCircleSize),
+          child: Center(
+            child: centerChild ?? Container(),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -305,7 +359,12 @@ class _WeekHeader extends StatelessWidget {
   }
 }
 
-class _Body extends StatefulWidget {
+enum _BodyType {
+  full,
+  week,
+}
+
+class _Body extends StatelessWidget {
   _Body({
     Key key,
     this.month,
@@ -313,80 +372,87 @@ class _Body extends StatefulWidget {
     this.selectedDate,
     this.onSelected,
     @required this.onBuildProgressBar,
-  })  : assert(startWeek != null),
+  })  : type = _BodyType.full,
+        week = null,
+        assert(startWeek != null),
         assert(onBuildProgressBar != null),
         super(key: key);
 
+  _Body.week({
+    Key key,
+    this.month,
+    this.week,
+    this.startWeek = DayOfTheWeek.Sun,
+    this.selectedDate,
+    this.onSelected,
+    @required this.onBuildProgressBar,
+  })  : type = _BodyType.week,
+        assert(startWeek != null),
+        assert(onBuildProgressBar != null),
+        super(key: key);
+
+  final _BodyType type;
   final DateTime month;
+  final DateTime week;
   final DayOfTheWeek startWeek;
   final DateTime selectedDate;
   final Function(DateTime) onSelected;
   final double Function(DateTime) onBuildProgressBar;
 
-  @override
-  __BodyState createState() => __BodyState();
-}
-
-class __BodyState extends State<_Body> {
-  DateTime selectedDate;
-
-  @override
-  void initState() {
-    selectedDate = widget.selectedDate ?? _zeroDate(DateTime.now());
-
-    super.initState();
+  Widget _buildDateRow(List<DateTime> dates) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: dates
+          .map(
+            (e) => Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 4.0,
+                ),
+                child: _DateTile<DateTime>(
+                  date: e,
+                  currentMonth: month,
+                  value: e,
+                  groupValue: selectedDate,
+                  onTap: () {
+                    if (onSelected != null) onSelected(e);
+                  },
+                  onBuildProgressBar: onBuildProgressBar,
+                ),
+              ),
+            ),
+          )
+          .toList(),
+    );
   }
 
-  @override
-  void didUpdateWidget(oldWidget) {
-    selectedDate = widget.selectedDate ?? _zeroDate(DateTime.now());
+  Widget _buildWeek(DateTime week) {
+    final DateTime startDate = week.firstDayOfWeek(
+      startWeek: startWeek,
+    );
 
-    super.didUpdateWidget(oldWidget);
+    List<DateTime> dates = List<DateTime>();
+
+    for (int i = 0; i < 7; i++) {
+      dates.add(startDate.add(Duration(days: i)));
+    }
+
+    return _buildDateRow(dates);
   }
 
   Widget _buildCalendar(DateTime month) {
-    month = DateTime(month.year, month.month);
-
     List<Widget> weeks = List<Widget>();
-    final DateTime startDate = month
-        .subtract(Duration(days: month.weekday - 1 - widget.startWeek.index));
 
-    List<DateTime> temp = List<DateTime>();
+    final DateTime startDate = month.firstDayOfWeek(startWeek: startWeek);
+
+    List<DateTime> dates = List<DateTime>();
 
     for (int i = 0; i < 42; i++) {
-      temp.add(startDate.add(Duration(days: i)));
+      dates.add(startDate.add(Duration(days: i)));
       if ((i + 1) % 7 == 0) {
-        weeks.add(
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: temp
-                .map(
-                  (e) => Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8.0,
-                        horizontal: 4.0,
-                      ),
-                      child: _DateTile<DateTime>(
-                        date: e,
-                        currentMonth: month,
-                        value: e,
-                        groupValue: selectedDate,
-                        onTap: () {
-                          setState(() {
-                            selectedDate = e;
-                          });
-                          if (widget.onSelected != null) widget.onSelected(e);
-                        },
-                        onBuildProgressBar: widget.onBuildProgressBar,
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-        );
-        temp = List<DateTime>();
+        weeks.add(_buildDateRow(dates));
+        dates = List<DateTime>();
       }
     }
 
@@ -397,9 +463,19 @@ class __BodyState extends State<_Body> {
 
   @override
   Widget build(BuildContext context) {
+    Widget child;
+    switch (type) {
+      case _BodyType.week:
+        child = _buildWeek(week?.zeroDay() ?? DateTime.now().zeroDay());
+        break;
+      case _BodyType.full:
+      default:
+        child = _buildCalendar(month?.zeroDay() ?? DateTime.now().zeroDay());
+    }
+
     return Container(
       color: Colors.white,
-      child: _buildCalendar(_zeroDate(widget.month ?? DateTime.now())),
+      child: child,
     );
   }
 }
@@ -433,7 +509,8 @@ class _DateTile<T> extends StatelessWidget {
   final Function() onTap;
   final double Function(T) onBuildProgressBar;
 
-  bool get _isSelected => value == groupValue;
+  bool get _isSelected =>
+      value == groupValue && currentMonth.month == date.month;
   bool get _isToday =>
       _zeroDate(date).isAtSameMomentAs(_zeroDate(DateTime.now()));
   bool get _isBeforeOrEqualToday =>
@@ -469,7 +546,7 @@ class _DateTile<T> extends StatelessWidget {
           maxLines: 1,
         ),
       );
-    else if (_isBeforeOrEqualToday) {
+    else if (_isBeforeOrEqualToday && currentMonth.month == date.month) {
       final result = onBuildProgressBar(value);
       if (result != null && result >= 0.0) {
         return ProgressBar(

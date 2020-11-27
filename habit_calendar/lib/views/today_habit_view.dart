@@ -120,11 +120,15 @@ class _TodayHabitViewState extends State<TodayHabitView>
               preferredSize: Size.fromHeight(_kProgressBarHeight),
               child: GetX<TodayHabitController>(
                 init: _todayHabitController,
-                builder: (controller) => ProgressBar(
-                  percentage: controller.todayPercentage,
-                  backgroundColor: Colors.white,
-                  layoutPadding: Constants.padding * 2,
-                  height: _kProgressBarHeight,
+                builder: (controller) => GestureDetector(
+                  onTap: controller.showIndicator,
+                  child: ProgressBar(
+                    percentage: controller.todayPercentage,
+                    backgroundColor: Colors.white,
+                    layoutPadding: Constants.padding * 2,
+                    height: _kProgressBarHeight,
+                    enableIndicator: controller.enableIndicator.value,
+                  ),
                 ),
               ),
             ),

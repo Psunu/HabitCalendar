@@ -192,3 +192,19 @@ class Utils {
     );
   }
 }
+
+extension zeroing on DateTime {
+  DateTime zeroDay() => DateTime(this.year, this.month, this.day);
+  DateTime zeroMonth() => DateTime(this.year, this.month);
+  DateTime zeroYear() => DateTime(this.year);
+
+  DateTime firstDayOfWeek({DayOfTheWeek startWeek = DayOfTheWeek.Sun}) {
+    int subtractDays = 0;
+    if (startWeek.index != this.weekday - 1 && startWeek != DayOfTheWeek.Mon) {
+      subtractDays = DayOfTheWeek.Sun.index - (startWeek.index - 1);
+      subtractDays += this.weekday - 1;
+    }
+
+    return this.subtract(Duration(days: subtractDays)).zeroDay();
+  }
+}

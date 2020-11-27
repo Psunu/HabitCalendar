@@ -9,7 +9,7 @@ class Selector extends StatefulWidget {
     @required this.items,
     this.itemExtent = 40.0,
     this.initialItem = 0,
-    @required this.tagStyle,
+    this.tagStyle,
     @required this.selectedStyle,
     @required this.unselectedStyle,
     this.tag = '',
